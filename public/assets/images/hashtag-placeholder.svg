@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="850" height="898" viewBox="0 0 850 898">
+  <rect width="100%" height="100%" fill="#8a8a8a"/>
+  <rect x="24" y="24" width="802" height="850" rx="16" fill="#d9d9d9" stroke="#b8b8b8" stroke-width="3"/>
+  <text x="50%" y="48%" dominant-baseline="middle" text-anchor="middle" font-family="Arial,sans-serif" font-size="47" fill="#666666">Hashtag</text>
+  <text x="50%" y="56%" dominant-baseline="middle" text-anchor="middle" font-family="Arial,sans-serif" font-size="30" fill="#888888">Placeholder Foto</text>
+</svg>

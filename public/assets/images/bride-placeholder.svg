@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1080" viewBox="0 0 720 1080">
+  <rect width="720" height="1080" fill="#6b3a4a"/>
+  <rect x="40" y="40" width="640" height="1000" rx="24" fill="#ffffff" fill-opacity="0.12" stroke="#d9b168" stroke-width="4"/>
+  <text x="360" y="520" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="42" font-weight="600">Putri</text>
+  <text x="360" y="580" text-anchor="middle" fill="#f0e6d2" font-family="Arial, sans-serif" font-size="24">Placeholder Foto</text>
+</svg>

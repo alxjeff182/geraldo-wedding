@@ -1,0 +1,16 @@
+{
+  "name": "Geraldo & Christin",
+  "short_name": "G&C Wedding",
+  "description": "Undangan pernikahan Geraldo & Christin",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#5c1a1a",
+  "theme_color": "#5c1a1a",
+  "icons": [
+    {
+      "src": "/assets/images/batak-sampul.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
