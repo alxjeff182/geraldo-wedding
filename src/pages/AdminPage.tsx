@@ -6,7 +6,6 @@ import { useWeddingContent } from "../context/WeddingContentContext";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { checkAdminAccess } from "../lib/admin-access";
 import {
-  canAttemptAdminLogin,
   clearAdminLoginAttempts,
   formatLockoutMinutes,
   getLoginLockoutRemainingMs,
