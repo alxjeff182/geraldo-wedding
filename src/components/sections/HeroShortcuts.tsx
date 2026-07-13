@@ -1,16 +1,10 @@
 import { motion } from "framer-motion";
 import { OPEN_EASE } from "../../constants/open-animation";
+import { useWeddingContent } from "../../context/WeddingContentContext";
 import type { HeroShortcutId } from "../../types/hero-shortcut";
-import { HERO_SHORTCUT_LABELS } from "../../types/hero-shortcut";
 import { ClockIcon } from "../ui/ClockIcon";
 import { LocationIcon } from "../ui/LocationIcon";
 import { RsvpIcon } from "../ui/RsvpIcon";
-
-const shortcuts = [
-  { id: "countdown" as const, label: HERO_SHORTCUT_LABELS.countdown, icon: ClockIcon },
-  { id: "events" as const, label: HERO_SHORTCUT_LABELS.events, icon: LocationIcon },
-  { id: "rsvp" as const, label: HERO_SHORTCUT_LABELS.rsvp, icon: RsvpIcon },
-];
 
 const trackVariants = {
   hidden: { opacity: 0, y: 16 },
@@ -41,8 +35,15 @@ type Props = {
 };
 
 export function HeroShortcuts({ onOpen }: Props) {
+  const { content } = useWeddingContent();
+  const shortcuts = [
+    { id: "countdown" as const, label: content.shortcuts.countdown, icon: ClockIcon },
+    { id: "events" as const, label: content.shortcuts.events, icon: LocationIcon },
+    { id: "rsvp" as const, label: content.shortcuts.rsvp, icon: RsvpIcon },
+  ];
+
   return (
-    <nav className="hero-shortcuts" aria-label="Navigasi cepat undangan">
+    <nav className="hero-shortcuts" aria-label={content.shortcuts.navAriaLabel}>
       <motion.div
         className="hero-shortcuts__track"
         variants={trackVariants}
@@ -57,7 +58,7 @@ export function HeroShortcuts({ onOpen }: Props) {
               key={item.id}
               type="button"
               className="hero-shortcut"
-              aria-label={`Buka ${item.label}`}
+              aria-label={`${content.shortcuts.openAriaLabel} ${item.label}`}
               variants={buttonVariants}
               whileTap={{ scale: 0.97 }}
               onClick={() => onOpen(item.id)}

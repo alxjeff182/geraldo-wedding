@@ -26,20 +26,20 @@ export function SiteFooter() {
   const instagramUrl = creator.instagramUrl ?? creator.url;
 
   return (
-    <footer className="site-footer" aria-label="Kredit pembuat undangan">
+    <footer className="site-footer" aria-label={content.footer.ariaLabel}>
       <p className="site-footer__line">
-        Dibuat oleh{" "}
+        {content.footer.creditPrefix}{" "}
         <a href={creator.url} target="_blank" rel="noopener noreferrer">
           {creator.name}
         </a>
       </p>
-      <p className="site-footer__line">Kunjungi portfolio di bawah ini:</p>
+      <p className="site-footer__line">{content.footer.portfolioPrompt}</p>
       <div className="site-footer__links">
         <a
           href={websiteUrl}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Kunjungi website"
+          aria-label={content.footer.websiteAriaLabel}
         >
           <GlobeIcon />
         </a>
@@ -47,7 +47,7 @@ export function SiteFooter() {
           href={instagramUrl}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Kunjungi Instagram"
+          aria-label={content.footer.instagramAriaLabel}
         >
           <InstagramIcon />
         </a>

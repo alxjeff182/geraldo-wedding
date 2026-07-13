@@ -34,4 +34,16 @@ describe("mergeWeddingContent", () => {
     expect(merged.events).toHaveLength(1);
     expect(merged.events[0].name).toBe("Solo Event");
   });
+
+  it("provides 10 invite templates by default", () => {
+    const merged = mergeWeddingContent({});
+    expect(merged.invite.whatsappTemplates).toHaveLength(10);
+  });
+
+  it("migrates legacy single whatsappTemplate override", () => {
+    const merged = mergeWeddingContent({
+      invite: { whatsappTemplate: "Halo {nama}" },
+    });
+    expect(merged.invite.whatsappTemplates[0].message).toBe("Halo {nama}");
+  });
 });

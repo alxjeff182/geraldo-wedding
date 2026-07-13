@@ -3,29 +3,34 @@ import { mergeWeddingContent } from "../lib/merge-content";
 import { getSupabase, isSupabaseConfigured } from "../lib/supabase";
 import type { SiteContentOverrides } from "../types/site-content";
 import { useWeddingContent } from "../context/WeddingContentContext";
-import { ImageUploader } from "../components/admin/ImageUploader";
-
-type Tab = "umum" | "mempelai" | "acara" | "galeri" | "gift" | "media";
-
-const TABS: { id: Tab; label: string }[] = [
-  { id: "umum", label: "Umum" },
-  { id: "mempelai", label: "Mempelai" },
-  { id: "acara", label: "Acara" },
-  { id: "galeri", label: "Galeri" },
-  { id: "gift", label: "Gift" },
-  { id: "media", label: "Media" },
-];
+import { usePageMeta } from "../hooks/usePageMeta";
+import { checkAdminAccess } from "../lib/admin-access";
+import {
+  canAttemptAdminLogin,
+  clearAdminLoginAttempts,
+  formatLockoutMinutes,
+  getLoginLockoutRemainingMs,
+  recordFailedAdminLogin,
+} from "../lib/admin-login-guard";
+import { AdminLoginScreen } from "../components/admin/AdminLoginScreen";
+import { AdminTabContent } from "../components/admin/AdminTabContent";
+import { TABS } from "../components/admin/admin-tabs";
+import type { AdminTab } from "../components/admin/types";
 
 export function AdminPage() {
-  const { refresh } = useWeddingContent();
+  const { refresh, content } = useWeddingContent();
   const [sessionEmail, setSessionEmail] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState<string | null>(null);
-  const [tab, setTab] = useState<Tab>("umum");
+  const [loggingIn, setLoggingIn] = useState(false);
+  const [tab, setTab] = useState<AdminTab>("umum");
   const [draft, setDraft] = useState<SiteContentOverrides>({});
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+
+  usePageMeta(content, { noIndex: true });
 
   useEffect(() => {
     if (!isSupabaseConfigured) return;
@@ -43,17 +48,44 @@ export function AdminPage() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (!sessionEmail) {
+      setIsAdmin(null);
+      return;
+    }
+
+    void checkAdminAccess().then(setIsAdmin);
+  }, [sessionEmail]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
+
+    const lockoutRemaining = getLoginLockoutRemainingMs();
+    if (lockoutRemaining > 0) {
+      setAuthError(
+        `Terlalu banyak percobaan login. Coba lagi dalam ${formatLockoutMinutes(lockoutRemaining)} menit.`,
+      );
+      return;
+    }
+
+    setLoggingIn(true);
     const supabase = getSupabase();
     if (!supabase) {
       setAuthError("Supabase belum dikonfigurasi");
+      setLoggingIn(false);
       return;
     }
 
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) setAuthError("Login gagal. Periksa email dan password.");
+    setLoggingIn(false);
+    if (error) {
+      recordFailedAdminLogin();
+      setAuthError("Login gagal. Periksa email dan password.");
+      return;
+    }
+
+    clearAdminLoginAttempts();
   };
 
   const handleLogout = async () => {
@@ -77,7 +109,7 @@ export function AdminPage() {
   };
 
   useEffect(() => {
-    if (!sessionEmail || !isSupabaseConfigured) return;
+    if (!sessionEmail || !isAdmin || !isSupabaseConfigured) return;
     const supabase = getSupabase();
     if (!supabase) return;
 
@@ -91,7 +123,7 @@ export function AdminPage() {
           setDraft(data.content as SiteContentOverrides);
         }
       });
-  }, [sessionEmail]);
+  }, [sessionEmail, isAdmin]);
 
   const merged = mergeWeddingContent(draft);
 
@@ -131,411 +163,104 @@ export function AdminPage() {
 
   if (!sessionEmail) {
     return (
+      <AdminLoginScreen
+        siteTitle={content.site.title}
+        email={email}
+        password={password}
+        authError={authError}
+        loggingIn={loggingIn}
+        onEmailChange={setEmail}
+        onPasswordChange={setPassword}
+        onSubmit={handleLogin}
+      />
+    );
+  }
+
+  if (isAdmin === null) {
+    return (
       <div className="admin-page admin-page--login">
-        <form className="admin-login" onSubmit={(e) => void handleLogin(e)}>
-          <h1>CMS Undangan</h1>
-          <p>Masuk dengan akun admin Supabase Auth</p>
-          <label className="admin-field">
-            <span>Email</span>
-            <input
-              type="email"
-              className="admin-input"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </label>
-          <label className="admin-field">
-            <span>Password</span>
-            <input
-              type="password"
-              className="admin-input"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </label>
-          {authError && <p className="admin-error">{authError}</p>}
-          <button type="submit" className="admin-btn">
-            Masuk
-          </button>
-        </form>
+        <p className="admin-login__subtitle">Memverifikasi akses admin...</p>
       </div>
     );
   }
 
-  return (
-    <div className="admin-page">
-      <header className="admin-header">
-        <div>
-          <h1>CMS Undangan</h1>
-          <p>{sessionEmail}</p>
-        </div>
-        <div className="admin-header__actions">
-          <a href="/" className="admin-btn admin-btn--secondary" target="_blank" rel="noreferrer">
-            Lihat Situs
-          </a>
-          <button type="button" className="admin-btn admin-btn--secondary" onClick={() => void handleLogout()}>
+  if (!isAdmin) {
+    return (
+      <div className="admin-page admin-page--login">
+        <div className="admin-login-shell">
+          <h1 className="admin-login__title">Akses ditolak</h1>
+          <p className="admin-login__subtitle">
+            Akun ini tidak terdaftar sebagai admin. Hubungi pengelola undangan.
+          </p>
+          <button type="button" className="admin-btn admin-login__submit" onClick={() => void handleLogout()}>
             Keluar
           </button>
-          <button type="button" className="admin-btn" disabled={saving} onClick={() => void handleSave()}>
-            {saving ? "Menyimpan..." : "Simpan"}
-          </button>
         </div>
-      </header>
+      </div>
+    );
+  }
 
-      {message && <p className="admin-message">{message}</p>}
+  const activeTab = TABS.find((t) => t.id === tab);
+  const isSuccessMessage = message?.includes("berhasil");
 
-      <nav className="admin-tabs" aria-label="Bagian editor">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            className={`admin-tab${tab === t.id ? " admin-tab--active" : ""}`}
-            onClick={() => setTab(t.id)}
-          >
-            {t.label}
-          </button>
-        ))}
-      </nav>
+  return (
+    <div className="admin-page admin-page--dashboard">
+      <div className="admin-dashboard-bg" aria-hidden />
 
-      <div className="admin-panel">
-        {tab === "umum" && (
-          <>
-            <label className="admin-field">
-              <span>Judul Situs</span>
-              <input
-                className="admin-input"
-                value={merged.site.title}
-                onChange={(e) => updateDraft(["site", "title"], e.target.value)}
-              />
-            </label>
-            <label className="admin-field">
-              <span>Deskripsi SEO</span>
-              <textarea
-                className="admin-input"
-                rows={3}
-                value={merged.site.description}
-                onChange={(e) => updateDraft(["site", "description"], e.target.value)}
-              />
-            </label>
-            <label className="admin-field">
-              <span>Tanggal (ISO)</span>
-              <input
-                className="admin-input"
-                value={merged.date}
-                onChange={(e) => updateDraft(["date"], e.target.value)}
-              />
-            </label>
-            <label className="admin-field">
-              <span>Label Tanggal</span>
-              <input
-                className="admin-input"
-                value={merged.dateLabel}
-                onChange={(e) => updateDraft(["dateLabel"], e.target.value)}
-              />
-            </label>
-            <label className="admin-field">
-              <span>Intro Mempelai</span>
-              <textarea
-                className="admin-input"
-                rows={4}
-                value={merged.intro}
-                onChange={(e) => updateDraft(["intro"], e.target.value)}
-              />
-            </label>
-          </>
-        )}
-
-        {tab === "mempelai" && (
-          <>
-            {(["groom", "bride"] as const).map((role) => (
-              <fieldset key={role} className="admin-fieldset">
-                <legend>{role === "groom" ? "Mempelai Pria" : "Mempelai Wanita"}</legend>
-                <label className="admin-field">
-                  <span>Nama Pendek</span>
-                  <input
-                    className="admin-input"
-                    value={merged.couple[role].shortName}
-                    onChange={(e) => updateDraft(["couple", role, "shortName"], e.target.value)}
-                  />
-                </label>
-                <label className="admin-field">
-                  <span>Nama Lengkap</span>
-                  <input
-                    className="admin-input"
-                    value={merged.couple[role].fullName}
-                    onChange={(e) => updateDraft(["couple", role, "fullName"], e.target.value)}
-                  />
-                </label>
-                <ImageUploader
-                  label="Foto"
-                  folder={`couple/${role}`}
-                  value={merged.couple[role].photo}
-                  onChange={(url) => updateDraft(["couple", role, "photo"], url)}
-                />
-              </fieldset>
-            ))}
-            <fieldset className="admin-fieldset">
-              <legend>Hero Caption</legend>
-              <label className="admin-field">
-                <span>Nama Pria (hero)</span>
-                <input
-                  className="admin-input"
-                  value={merged.hero.groomName}
-                  onChange={(e) => updateDraft(["hero", "groomName"], e.target.value)}
-                />
-              </label>
-              <label className="admin-field">
-                <span>Nama Wanita (hero)</span>
-                <input
-                  className="admin-input"
-                  value={merged.hero.brideName}
-                  onChange={(e) => updateDraft(["hero", "brideName"], e.target.value)}
-                />
-              </label>
-            </fieldset>
-          </>
-        )}
-
-        {tab === "acara" && (
-          <div className="admin-stack">
-            {merged.events.map((event, index) => (
-              <fieldset key={index} className="admin-fieldset">
-                <legend>Acara {index + 1}</legend>
-                <label className="admin-field">
-                  <span>Nama</span>
-                  <input
-                    className="admin-input"
-                    value={event.name}
-                    onChange={(e) => {
-                      const events = [...merged.events];
-                      events[index] = { ...events[index], name: e.target.value };
-                      updateDraft(["events"], events);
-                    }}
-                  />
-                </label>
-                <label className="admin-field">
-                  <span>Tanggal (baris baru = enter)</span>
-                  <textarea
-                    className="admin-input"
-                    rows={2}
-                    value={event.dateLabel}
-                    onChange={(e) => {
-                      const events = [...merged.events];
-                      events[index] = { ...events[index], dateLabel: e.target.value };
-                      updateDraft(["events"], events);
-                    }}
-                  />
-                </label>
-                <label className="admin-field">
-                  <span>Waktu</span>
-                  <input
-                    className="admin-input"
-                    value={event.time}
-                    onChange={(e) => {
-                      const events = [...merged.events];
-                      events[index] = { ...events[index], time: e.target.value };
-                      updateDraft(["events"], events);
-                    }}
-                  />
-                </label>
-                <label className="admin-field">
-                  <span>Venue</span>
-                  <input
-                    className="admin-input"
-                    value={event.venue}
-                    onChange={(e) => {
-                      const events = [...merged.events];
-                      events[index] = { ...events[index], venue: e.target.value };
-                      updateDraft(["events"], events);
-                    }}
-                  />
-                </label>
-                <label className="admin-field">
-                  <span>Alamat</span>
-                  <textarea
-                    className="admin-input"
-                    rows={2}
-                    value={event.address}
-                    onChange={(e) => {
-                      const events = [...merged.events];
-                      events[index] = { ...events[index], address: e.target.value };
-                      updateDraft(["events"], events);
-                    }}
-                  />
-                </label>
-                <label className="admin-field">
-                  <span>Maps URL</span>
-                  <input
-                    className="admin-input"
-                    value={event.mapsUrl}
-                    onChange={(e) => {
-                      const events = [...merged.events];
-                      events[index] = { ...events[index], mapsUrl: e.target.value };
-                      updateDraft(["events"], events);
-                    }}
-                  />
-                </label>
-              </fieldset>
-            ))}
+      <div className="admin-shell">
+        <header className="admin-topbar">
+          <div className="admin-topbar__brand">
+            <p className="admin-topbar__eyebrow">Panel Admin</p>
+            <h1 className="admin-topbar__title">{content.site.title}</h1>
+            <p className="admin-topbar__user">{sessionEmail}</p>
           </div>
+          <div className="admin-topbar__actions">
+            <a href="/" className="admin-btn admin-btn--ghost" target="_blank" rel="noreferrer">
+              Lihat Situs
+            </a>
+            <button type="button" className="admin-btn admin-btn--ghost" onClick={() => void handleLogout()}>
+              Keluar
+            </button>
+            <button type="button" className="admin-btn admin-btn--primary" disabled={saving} onClick={() => void handleSave()}>
+              {saving ? "Menyimpan..." : "Simpan Perubahan"}
+            </button>
+          </div>
+        </header>
+
+        {message && (
+          <p
+            className={`admin-toast${isSuccessMessage ? " admin-toast--success" : " admin-toast--error"}`}
+            role="status"
+          >
+            {message}
+          </p>
         )}
 
-        {tab === "galeri" && (
-          <>
-            <label className="admin-field">
-              <span>Judul</span>
-              <input
-                className="admin-input"
-                value={merged.gallery.title}
-                onChange={(e) => updateDraft(["gallery", "title"], e.target.value)}
-              />
-            </label>
-            {merged.gallery.images.map((img, index) => (
-              <div key={index} className="admin-gallery-row">
-                <ImageUploader
-                  label={`Foto ${index + 1}`}
-                  folder="gallery"
-                  value={img.src}
-                  onChange={(url) => {
-                    const images = merged.gallery.images.map((item, i) =>
-                      i === index ? { ...item, src: url } : item,
-                    ) as { src: string; alt: string }[];
-                    updateDraft(["gallery", "images"], images);
-                  }}
-                />
-                <label className="admin-field">
-                  <span>Alt text</span>
-                  <input
-                    className="admin-input"
-                    value={img.alt}
-                    onChange={(e) => {
-                      const images = merged.gallery.images.map((item, i) =>
-                        i === index ? { ...item, alt: e.target.value } : item,
-                      ) as { src: string; alt: string }[];
-                      updateDraft(["gallery", "images"], images);
-                    }}
-                  />
-                </label>
-              </div>
-            ))}
-          </>
-        )}
+        <nav className="admin-tabs" aria-label="Bagian editor">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              className={`admin-tab${tab === t.id ? " admin-tab--active" : ""}`}
+              onClick={() => setTab(t.id)}
+            >
+              {t.label}
+            </button>
+          ))}
+        </nav>
 
-        {tab === "gift" && (
-          <>
-            <label className="admin-field">
-              <span>Deskripsi</span>
-              <textarea
-                className="admin-input"
-                rows={3}
-                value={merged.gift.description}
-                onChange={(e) => updateDraft(["gift", "description"], e.target.value)}
-              />
-            </label>
-            <label className="admin-field">
-              <span>Alamat Kado Fisik</span>
-              <textarea
-                className="admin-input"
-                rows={2}
-                value={merged.gift.physicalAddress}
-                onChange={(e) => updateDraft(["gift", "physicalAddress"], e.target.value)}
-              />
-            </label>
-            {merged.gift.accounts[0] && (
-              <fieldset className="admin-fieldset">
-                <legend>Rekening Bank</legend>
-                <label className="admin-field">
-                  <span>Bank</span>
-                  <input
-                    className="admin-input"
-                    value={merged.gift.accounts[0].bank}
-                    onChange={(e) => {
-                      const accounts = [...merged.gift.accounts];
-                      accounts[0] = { ...accounts[0], bank: e.target.value };
-                      updateDraft(["gift", "accounts"], accounts);
-                    }}
-                  />
-                </label>
-                <label className="admin-field">
-                  <span>Nomor</span>
-                  <input
-                    className="admin-input"
-                    value={merged.gift.accounts[0].number}
-                    onChange={(e) => {
-                      const accounts = [...merged.gift.accounts];
-                      accounts[0] = { ...accounts[0], number: e.target.value };
-                      updateDraft(["gift", "accounts"], accounts);
-                    }}
-                  />
-                </label>
-                <ImageUploader
-                  label="Logo Bank"
-                  folder="gift"
-                  value={merged.gift.accounts[0].logo}
-                  onChange={(url) => {
-                    const accounts = [...merged.gift.accounts];
-                    accounts[0] = { ...accounts[0], logo: url };
-                    updateDraft(["gift", "accounts"], accounts);
-                  }}
-                />
-              </fieldset>
-            )}
-          </>
-        )}
+        <section className="admin-panel" aria-labelledby="admin-panel-title">
+          <header className="admin-panel__head">
+            <h2 id="admin-panel-title" className="admin-panel__title">
+              {activeTab?.label}
+            </h2>
+            <p className="admin-panel__desc">{activeTab?.description}</p>
+          </header>
 
-        {tab === "media" && (
-          <>
-            <ImageUploader
-              label="Cover / Sampul"
-              folder="media"
-              value={merged.media.coverBg}
-              onChange={(url) => updateDraft(["media", "coverBg"], url)}
-            />
-            <ImageUploader
-              label="Hero Photo"
-              folder="media"
-              value={merged.media.heroPhoto}
-              onChange={(url) => {
-                updateDraft(["media", "heroPhoto"], url);
-                updateDraft(["media", "portrait"], url);
-              }}
-            />
-            <ImageUploader
-              label="Video Hero"
-              folder="media"
-              accept="video/mp4,video/webm"
-              value={merged.media.video}
-              onChange={(url) => updateDraft(["media", "video"], url)}
-            />
-            <ImageUploader
-              label="Audio"
-              folder="media"
-              accept="audio/mpeg,audio/mp3"
-              value={merged.media.audio}
-              onChange={(url) => updateDraft(["media", "audio"], url)}
-            />
-            <ImageUploader
-              label="Background Desktop"
-              folder="media"
-              value={merged.media.desktopBg}
-              onChange={(url) => updateDraft(["media", "desktopBg"], url)}
-            />
-            <ImageUploader
-              label="Divider"
-              folder="media"
-              value={merged.media.divider}
-              onChange={(url) => updateDraft(["media", "divider"], url)}
-            />
-            <ImageUploader
-              label="OG Image"
-              folder="media"
-              value={merged.media.ogImage}
-              onChange={(url) => updateDraft(["media", "ogImage"], url)}
-            />
-          </>
-        )}
+          <div className="admin-panel__body">
+            <AdminTabContent tab={tab} merged={merged} updateDraft={updateDraft} setMessage={setMessage} />
+          </div>
+        </section>
       </div>
     </div>
   );

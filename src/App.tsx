@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { OPEN_EASE, COVER_OPEN_DURATION } from "./constants/open-animation";
+import { OPEN_EASE, COVER_OPEN_DURATION, COVER_OPEN_MS } from "./constants/open-animation";
 import { useWeddingContent } from "./context/WeddingContentContext";
 import { useGuestName } from "./hooks/useGuestName";
 import { useAudio } from "./hooks/useAudio";
@@ -13,7 +13,12 @@ import { Hero } from "./components/sections/Hero";
 import { Quote } from "./components/sections/Quote";
 import { SectionModal } from "./components/ui/SectionModal";
 import type { HeroShortcutId } from "./types/hero-shortcut";
-import { HERO_SHORTCUT_LABELS } from "./types/hero-shortcut";
+
+const SHORTCUT_TITLE_KEYS: Record<HeroShortcutId, "countdown" | "events" | "rsvp"> = {
+  countdown: "countdown",
+  events: "events",
+  rsvp: "rsvp",
+};
 
 const AdminPage = lazy(() =>
   import("./pages/AdminPage").then((m) => ({ default: m.AdminPage })),
@@ -61,7 +66,7 @@ function DesktopSidebar({ opened }: { opened: boolean }) {
       transition={{ duration: COVER_OPEN_DURATION, ease: OPEN_EASE }}
     >
       <div className="relative z-10">
-        <p className="font-display text-xs tracking-[0.2em] text-cream uppercase">The Wedding Of</p>
+        <p className="font-display text-xs tracking-[0.2em] text-cream uppercase">{content.hero.eyebrow}</p>
         <h1 className="font-serif mt-2 text-5xl leading-[0.95] text-cream capitalize">
           {content.site.title}
         </h1>
@@ -81,6 +86,7 @@ export default function App({ adminMode = false }: AppProps) {
   const { content, loading: contentLoading } = useWeddingContent();
   const { guestName, guestId, loading: guestLoading } = useGuestName();
   const [opened, setOpened] = useState(false);
+  const [heroRevealReady, setHeroRevealReady] = useState(false);
   const [shortcutModal, setShortcutModal] = useState<HeroShortcutId | null>(null);
   const { audioRef, playing, play, toggle } = useAudio();
   const { message, show, hide } = useToast();
@@ -98,6 +104,16 @@ export default function App({ adminMode = false }: AppProps) {
       document.body.style.height = "";
     };
   }, [adminMode]);
+
+  useEffect(() => {
+    if (!opened) {
+      setHeroRevealReady(false);
+      return;
+    }
+
+    const timer = window.setTimeout(() => setHeroRevealReady(true), COVER_OPEN_MS);
+    return () => window.clearTimeout(timer);
+  }, [opened]);
 
   const handleOpen = () => {
     if (opened) return;
@@ -154,7 +170,7 @@ export default function App({ adminMode = false }: AppProps) {
           }
           transition={{ duration: COVER_OPEN_DURATION, ease: OPEN_EASE }}
         >
-          <Hero videoEnabled={opened} onShortcutOpen={setShortcutModal} />
+          <Hero coverOpenComplete={heroRevealReady} onShortcutOpen={setShortcutModal} />
           <Quote />
           <Suspense fallback={<SectionFallback />}>
             <Couple />
@@ -190,7 +206,7 @@ export default function App({ adminMode = false }: AppProps) {
 
       <SectionModal
         open={shortcutModal !== null}
-        title={shortcutModal ? HERO_SHORTCUT_LABELS[shortcutModal] : ""}
+        title={shortcutModal ? content.shortcuts[SHORTCUT_TITLE_KEYS[shortcutModal]] : ""}
         modalId={shortcutModal}
         onClose={() => setShortcutModal(null)}
       >

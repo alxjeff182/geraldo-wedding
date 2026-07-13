@@ -1,15 +1,22 @@
 import { motion } from "framer-motion";
-import { useState, type FormEvent } from "react";
+import { useState, useRef, useEffect, type FormEvent } from "react";
 import { OPEN_EASE } from "../../constants/open-animation";
 import { isSupabaseConfigured } from "../../lib/supabase";
 import { useWeddingContent } from "../../context/WeddingContentContext";
 import { submitForm } from "../../lib/submit-form";
+import {
+  checkRsvpClientGuard,
+  hasRsvpSubmitted,
+  markRsvpSubmitted,
+} from "../../lib/rsvp-spam-guard";
 
 type Props = {
   guestId: string | null;
   onSuccess: (message: string) => void;
   embedded?: boolean;
 };
+
+type Attendance = "hadir" | "tidak_hadir" | "ragu";
 
 const EMBED_SPRING = { type: "spring" as const, stiffness: 380, damping: 26 };
 
@@ -30,26 +37,28 @@ function SendIcon() {
   );
 }
 
-function GuestCountPills({
+function OptionPills<T extends string>({
   value,
   onChange,
+  options,
+  ariaLabel,
 }: {
-  value: string;
-  onChange: (value: string) => void;
+  value: T;
+  onChange: (value: T) => void;
+  options: { value: T; label: string }[];
+  ariaLabel: string;
 }) {
-  const options = ["1", "2", "3"] as const;
-
   return (
-    <div className="rsvp-count-pills" role="group" aria-label="Jumlah kehadiran">
-      {options.map((count, index) => {
-        const active = value === count;
+    <div className="rsvp-count-pills" role="group" aria-label={ariaLabel}>
+      {options.map((option, index) => {
+        const active = value === option.value;
 
         return (
           <motion.button
-            key={count}
+            key={option.value}
             type="button"
             className={`rsvp-count-pill${active ? " rsvp-count-pill--active" : ""}`}
-            onClick={() => onChange(count)}
+            onClick={() => onChange(option.value)}
             aria-pressed={active}
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -57,7 +66,7 @@ function GuestCountPills({
             whileHover={{ scale: 1.06, y: -1 }}
             whileTap={{ scale: 0.94 }}
           >
-            {count}
+            {option.label}
           </motion.button>
         );
       })}
@@ -67,44 +76,171 @@ function GuestCountPills({
 
 export function RsvpForm({ guestId, onSuccess, embedded = false }: Props) {
   const { content } = useWeddingContent();
+  const formOpenedAt = useRef(Date.now());
   const [name, setName] = useState("");
+  const [attendance, setAttendance] = useState<Attendance>("hadir");
   const [guestCount, setGuestCount] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [alreadySubmitted, setAlreadySubmitted] = useState(() => hasRsvpSubmitted(guestId));
+
+  useEffect(() => {
+    const syncSubmitted = () => setAlreadySubmitted(hasRsvpSubmitted(guestId));
+    syncSubmitted();
+    window.addEventListener("storage", syncSubmitted);
+    return () => window.removeEventListener("storage", syncSubmitted);
+  }, [guestId]);
+
+  const guardMessage = (reason: "already_submitted" | "too_fast" | "spam_name") => {
+    if (reason === "already_submitted") return content.rsvp.alreadySubmittedMessage;
+    if (reason === "too_fast") return content.rsvp.tooFastMessage;
+    return content.rsvp.spamNameMessage;
+  };
+
+  const attendanceOptions: { value: Attendance; label: string }[] = [
+    { value: "hadir", label: content.rsvp.attendanceHadir },
+    { value: "tidak_hadir", label: content.rsvp.attendanceTidak },
+    { value: "ragu", label: content.rsvp.attendanceRagu },
+  ];
+
+  const showGuestCount = attendance !== "tidak_hadir";
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!name || !guestCount) return;
+    if (alreadySubmitted || submitting) return;
+    if (!name || (showGuestCount && !guestCount)) return;
+
+    const guard = checkRsvpClientGuard(guestId, formOpenedAt.current, name);
+    if (!guard.allowed) {
+      onSuccess(guardMessage(guard.reason) ?? content.rsvp.errorMessage);
+      if (guard.reason === "already_submitted") setAlreadySubmitted(true);
+      return;
+    }
 
     const honeypot = (e.currentTarget.elements.namedItem("website") as HTMLInputElement)?.value ?? "";
+    const companyHoneypot =
+      (e.currentTarget.elements.namedItem("company") as HTMLInputElement)?.value ?? "";
 
     setSubmitting(true);
 
     const result = await submitForm({
       type: "rsvp",
       honeypot,
+      companyHoneypot,
+      formOpenedAt: formOpenedAt.current,
       payload: {
         guest_id: guestId,
         name: name.trim(),
-        guest_count: Number(guestCount),
-        attendance: "hadir",
+        guest_count: showGuestCount ? Number(guestCount) : 1,
+        attendance,
       },
+      messages: content.rsvp,
     });
 
     setSubmitting(false);
 
     if (!result.ok) {
-      onSuccess(result.error ?? "Gagal mengirim RSVP. Silakan coba lagi.");
+      if (result.error?.includes("sudah pernah dikirim")) {
+        markRsvpSubmitted(guestId);
+        setAlreadySubmitted(true);
+      }
+      onSuccess(result.error ?? content.rsvp.errorMessage);
       return;
     }
 
-    onSuccess(result.message ?? "Terima kasih! Konfirmasi kehadiran Anda telah kami terima.");
+    markRsvpSubmitted(guestId);
+    setAlreadySubmitted(true);
+    onSuccess(result.message ?? content.rsvp.successMessage);
     setName("");
+    setAttendance("hadir");
     setGuestCount("");
   };
 
   const Wrapper = embedded ? "div" : "section";
   const FieldWrap = embedded ? motion.label : "label";
+  const MotionDiv = embedded ? motion.div : "div";
+
+  const attendanceField = embedded ? (
+    <MotionDiv
+      className="wedding-field wedding-field--pills"
+      custom={1}
+      variants={fieldVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <span className="wedding-field__label">{content.rsvp.attendanceLabel}</span>
+      <OptionPills
+        value={attendance}
+        onChange={setAttendance}
+        options={attendanceOptions}
+        ariaLabel={content.rsvp.attendanceAriaLabel}
+      />
+    </MotionDiv>
+  ) : (
+    <label className="wedding-field">
+      <span className="wedding-field__label">{content.rsvp.attendanceLabel}</span>
+      <select
+        required
+        value={attendance}
+        onChange={(e) => setAttendance(e.target.value as Attendance)}
+        className="wedding-field__select"
+      >
+        {attendanceOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+
+  const guestCountField = showGuestCount ? (
+    embedded ? (
+      <MotionDiv
+        className="wedding-field wedding-field--pills"
+        custom={2}
+        variants={fieldVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <span className="wedding-field__label">{content.rsvp.guestCountLabel}</span>
+        <OptionPills
+          value={guestCount}
+          onChange={setGuestCount}
+          options={content.rsvp.guestCountOptions.map((count) => ({ value: count, label: count }))}
+          ariaLabel={content.rsvp.guestCountAriaLabel}
+        />
+        <input
+          type="text"
+          required
+          value={guestCount}
+          onChange={() => undefined}
+          className="sr-only"
+          tabIndex={-1}
+          aria-hidden
+        />
+      </MotionDiv>
+    ) : (
+      <label className="wedding-field">
+        <span className="wedding-field__label">{content.rsvp.guestCountLabel}</span>
+        <select
+          required
+          value={guestCount}
+          onChange={(e) => setGuestCount(e.target.value)}
+          className="wedding-field__select"
+        >
+          <option value="">{content.rsvp.guestCountPlaceholder}</option>
+          {content.rsvp.guestCountOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </label>
+    )
+  ) : null;
+
+  const submitButtonIndex = showGuestCount ? 3 : 2;
 
   return (
     <Wrapper
@@ -133,11 +269,9 @@ export function RsvpForm({ guestId, onSuccess, embedded = false }: Props) {
             : {})}
         >
           <h2 id="rsvp-heading" className="section-card__title">
-            Rsvp
+            {content.rsvp.title}
           </h2>
-          <p className="section-card__subtitle">
-            Konfirmasi kehadiran Anda dengan mengisi form berikut
-          </p>
+          <p className="section-card__subtitle">{content.rsvp.subtitle}</p>
         </motion.div>
 
         {!isSupabaseConfigured && (
@@ -146,6 +280,11 @@ export function RsvpForm({ guestId, onSuccess, embedded = false }: Props) {
           </p>
         )}
 
+        {alreadySubmitted ? (
+          <p className="section-card__note section-card__note--success" role="status">
+            {content.rsvp.alreadySubmittedMessage}
+          </p>
+        ) : (
         <form
           className={`wedding-form${embedded ? " wedding-form--embedded" : ""}`}
           onSubmit={(e) => void handleSubmit(e)}
@@ -153,6 +292,14 @@ export function RsvpForm({ guestId, onSuccess, embedded = false }: Props) {
           <input
             type="text"
             name="website"
+            tabIndex={-1}
+            autoComplete="off"
+            className="sr-only"
+            aria-hidden
+          />
+          <input
+            type="text"
+            name="company"
             tabIndex={-1}
             autoComplete="off"
             className="sr-only"
@@ -170,7 +317,7 @@ export function RsvpForm({ guestId, onSuccess, embedded = false }: Props) {
                 }
               : {})}
           >
-            <span className="wedding-field__label">Nama*</span>
+            <span className="wedding-field__label">{content.rsvp.nameLabel}</span>
             <input
               type="text"
               required
@@ -178,54 +325,20 @@ export function RsvpForm({ guestId, onSuccess, embedded = false }: Props) {
               onChange={(e) => setName(e.target.value)}
               onFocus={() => setFocusedField("name")}
               onBlur={() => setFocusedField(null)}
-              placeholder="Nama Anda"
+              placeholder={content.rsvp.namePlaceholder}
               className="wedding-field__input"
             />
           </FieldWrap>
 
-          {embedded ? (
-            <motion.div
-              className="wedding-field wedding-field--pills"
-              custom={1}
-              variants={fieldVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              <span className="wedding-field__label">Jumlah Kehadiran*</span>
-              <GuestCountPills value={guestCount} onChange={setGuestCount} />
-              <input
-                type="text"
-                required
-                value={guestCount}
-                onChange={() => undefined}
-                className="sr-only"
-                tabIndex={-1}
-                aria-hidden
-              />
-            </motion.div>
-          ) : (
-            <label className="wedding-field">
-              <span className="wedding-field__label">Jumlah Kehadiran*</span>
-              <select
-                required
-                value={guestCount}
-                onChange={(e) => setGuestCount(e.target.value)}
-                className="wedding-field__select"
-              >
-                <option value="">Pilih</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-              </select>
-            </label>
-          )}
+          {attendanceField}
+          {guestCountField}
 
           {embedded ? (
             <motion.button
               type="submit"
               className="btn-submit btn-submit--interactive"
               disabled={submitting}
-              custom={2}
+              custom={submitButtonIndex}
               variants={fieldVariants}
               initial="hidden"
               animate="visible"
@@ -241,15 +354,16 @@ export function RsvpForm({ guestId, onSuccess, embedded = false }: Props) {
               >
                 <SendIcon />
               </motion.span>
-              {submitting ? "Mengirim..." : "Submit"}
+              {submitting ? content.rsvp.submitting : content.rsvp.submit}
             </motion.button>
           ) : (
             <button type="submit" className="btn-submit" disabled={submitting}>
               <SendIcon />
-              {submitting ? "Mengirim..." : "Submit"}
+              {submitting ? content.rsvp.submitting : content.rsvp.submit}
             </button>
           )}
         </form>
+        )}
 
         <motion.p
           className="section-card__note"

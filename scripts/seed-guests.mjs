@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Seed guests from CSV: slug,display_name
+ * Seed guests from CSV: slug,display_name,phone
  * Usage: node scripts/seed-guests.mjs guests.csv
  *
  * Requires env: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
@@ -28,8 +28,12 @@ const rows = csv
   .split("\n")
   .slice(1)
   .map((line) => {
-    const [slug, display_name] = line.split(",").map((s) => s.trim());
-    return { slug, display_name };
+    const [slug, display_name, phone = ""] = line.split(",").map((s) => s.trim());
+    return {
+      slug,
+      display_name,
+      phone: phone || null,
+    };
   })
   .filter((r) => r.slug && r.display_name);
 

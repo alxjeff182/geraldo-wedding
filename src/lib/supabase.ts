@@ -6,6 +6,8 @@ export type Guest = {
   id: string;
   slug: string;
   display_name: string;
+  phone: string | null;
+  created_at?: string;
 };
 
 export type RsvpSubmission = {
@@ -55,7 +57,7 @@ export type WeddingDatabase = {
     Tables: {
       guests: {
         Row: Guest;
-        Insert: { slug: string; display_name: string };
+        Insert: { slug: string; display_name: string; phone?: string | null };
         Update: Partial<Guest>;
         Relationships: [];
       };
@@ -77,9 +79,19 @@ export type WeddingDatabase = {
         Update: Partial<Wish>;
         Relationships: [];
       };
+      admin_allowlist: {
+        Row: { email: string };
+        Insert: { email: string };
+        Update: { email: string };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
+      is_admin: {
+        Args: Record<string, never>;
+        Returns: boolean;
+      };
       get_guest_by_slug: {
         Args: { guest_slug: string };
         Returns: { id: string; display_name: string }[];

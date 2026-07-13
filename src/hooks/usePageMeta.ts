@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { absoluteUrl } from "../lib/absolute-url";
 import type { WeddingConfig } from "../config/wedding.config";
 
 function setMeta(name: string, content: string, property = false) {
@@ -22,24 +23,30 @@ function setLink(rel: string, href: string) {
   el.href = href;
 }
 
-export function usePageMeta(content: WeddingConfig) {
+export function usePageMeta(content: WeddingConfig, options?: { noIndex?: boolean }) {
   useEffect(() => {
+    const siteUrl = content.site.url;
+    const ogImage = absoluteUrl(siteUrl, content.media.ogImage);
+    const icon = absoluteUrl(siteUrl, content.media.coverBg || content.media.ogImage);
+
     document.title = content.site.title;
 
     setMeta("description", content.site.description);
     setMeta("og:title", content.site.title, true);
     setMeta("og:description", content.site.description, true);
-    setMeta("og:image", content.media.ogImage, true);
+    setMeta("og:url", siteUrl.replace(/\/$/, ""), true);
+    setMeta("og:image", ogImage, true);
     setMeta("twitter:title", content.site.title);
     setMeta("twitter:description", content.site.description);
-    setMeta("twitter:image", content.media.ogImage);
+    setMeta("twitter:image", ogImage);
 
-    const icon = content.media.coverBg || content.media.ogImage;
     setLink("icon", icon);
     setLink("apple-touch-icon", icon);
 
-    if (content.site.noIndex) {
+    if (content.site.noIndex || options?.noIndex) {
       setMeta("robots", "noindex, nofollow");
+    } else {
+      setMeta("robots", "index, follow");
     }
-  }, [content]);
+  }, [content, options?.noIndex]);
 }

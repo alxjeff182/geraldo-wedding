@@ -69,16 +69,17 @@ export function Guestbook({ guestId, onSuccess }: Props) {
         name: name.trim(),
         message: message.trim(),
       },
+      messages: content.guestbook,
     });
 
     setSubmitting(false);
 
     if (!result.ok) {
-      onSuccess(result.error ?? "Gagal mengirim ucapan. Silakan coba lagi.");
+      onSuccess(result.error ?? content.guestbook.errorMessage);
       return;
     }
 
-    onSuccess(result.message ?? "Terima kasih atas ucapan Anda!");
+    onSuccess(result.message ?? content.guestbook.successMessage);
     setName("");
     setMessage("");
     void loadWishes();
@@ -110,9 +111,9 @@ export function Guestbook({ guestId, onSuccess }: Props) {
         />
 
         <h2 id="guestbook-heading" className="guestbook-title">
-          Best Wishes
+          {content.guestbook.title}
         </h2>
-        <p className="guestbook-subtitle">Sampaikan doa dan ucapan terbaik Anda</p>
+        <p className="guestbook-subtitle">{content.guestbook.subtitle}</p>
 
         <div className="cui-panel">
           <form className="cui-form" onSubmit={(e) => void handleSubmit(e)}>
@@ -131,7 +132,7 @@ export function Guestbook({ guestId, onSuccess }: Props) {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Nama"
+                placeholder={content.guestbook.namePlaceholder}
                 maxLength={200}
                 className="cui-field__input"
               />
@@ -145,7 +146,7 @@ export function Guestbook({ guestId, onSuccess }: Props) {
                 required
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Ucapan"
+                placeholder={content.guestbook.messagePlaceholder}
                 rows={2}
                 maxLength={2000}
                 className="cui-field__textarea"
@@ -156,7 +157,7 @@ export function Guestbook({ guestId, onSuccess }: Props) {
             </label>
 
             <button type="submit" className="cui-submit" disabled={submitting}>
-              {submitting ? "Mengirim..." : "Kirim"}
+              {submitting ? content.guestbook.submitting : content.guestbook.submit}
             </button>
           </form>
 
@@ -170,8 +171,8 @@ export function Guestbook({ guestId, onSuccess }: Props) {
             ) : wishes.length === 0 ? (
               <p className="cui-comments__empty">
                 {isSupabaseConfigured
-                  ? "Belum ada ucapan. Jadilah yang pertama!"
-                  : "Hubungkan Supabase untuk menampilkan buku tamu."}
+                  ? content.guestbook.emptyMessage
+                  : content.guestbook.emptyNoSupabase}
               </p>
             ) : (
               <>
@@ -190,7 +191,7 @@ export function Guestbook({ guestId, onSuccess }: Props) {
                       disabled={page === 0}
                       onClick={() => setPage((p) => p - 1)}
                     >
-                      Sebelumnya
+                      {content.guestbook.pagerPrev}
                     </button>
                     <span>
                       {page + 1} / {totalPages}
@@ -200,7 +201,7 @@ export function Guestbook({ guestId, onSuccess }: Props) {
                       disabled={page >= totalPages - 1}
                       onClick={() => setPage((p) => p + 1)}
                     >
-                      Selanjutnya
+                      {content.guestbook.pagerNext}
                     </button>
                   </div>
                 )}

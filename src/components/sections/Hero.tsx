@@ -13,7 +13,8 @@ import type { HeroShortcutId } from "../../types/hero-shortcut";
 const REVEAL_EASE = OPEN_EASE;
 
 type Props = {
-  videoEnabled: boolean;
+  /** Cover parallax selesai — baru mulai video & reveal pill */
+  coverOpenComplete: boolean;
   onShortcutOpen: (id: HeroShortcutId) => void;
 };
 
@@ -49,7 +50,7 @@ function HeroSparkle() {
   );
 }
 
-export function Hero({ videoEnabled, onShortcutOpen }: Props) {
+export function Hero({ coverOpenComplete, onShortcutOpen }: Props) {
   const { content } = useWeddingContent();
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -65,7 +66,7 @@ export function Hero({ videoEnabled, onShortcutOpen }: Props) {
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !videoEnabled) {
+    if (!coverOpenComplete) {
       setContentRevealed(false);
       if (video) {
         video.pause();
@@ -74,8 +75,15 @@ export function Hero({ videoEnabled, onShortcutOpen }: Props) {
       return;
     }
 
+    if (reducedMotion) {
+      const timer = window.setTimeout(() => setContentRevealed(true), HERO_REVEAL_DURATION * 1000);
+      return () => window.clearTimeout(timer);
+    }
+
+    if (!video) return;
+
     video.src = content.media.video;
-    video.preload = "metadata";
+    video.preload = "auto";
     video.load();
 
     void video.play().catch(() => undefined);
@@ -100,7 +108,7 @@ export function Hero({ videoEnabled, onShortcutOpen }: Props) {
       video.removeEventListener("timeupdate", onTimeUpdate);
       window.clearTimeout(fallback);
     };
-  }, [videoEnabled, content.media.video]);
+  }, [coverOpenComplete, content.media.video, reducedMotion]);
 
   return (
     <section ref={sectionRef} className="section-hero-wrap" aria-label="Sampul mempelai">
@@ -108,7 +116,7 @@ export function Hero({ videoEnabled, onShortcutOpen }: Props) {
         <motion.div
           className="absolute inset-0 overflow-hidden"
           initial={false}
-          animate={videoEnabled ? { opacity: 1 } : { opacity: 0 }}
+          animate={coverOpenComplete ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 0.85, ease: REVEAL_EASE }}
           aria-hidden
         >
@@ -116,9 +124,8 @@ export function Hero({ videoEnabled, onShortcutOpen }: Props) {
             ref={videoRef}
             className="h-full w-full object-cover"
             style={{ scale: bgScale }}
-            poster={content.media.heroPhoto}
             initial={false}
-            animate={videoEnabled ? { y: 0, scale: 1 } : { y: "4%", scale: 1.1 }}
+            animate={coverOpenComplete ? { y: 0, scale: 1 } : { y: "4%", scale: 1.1 }}
             transition={{ duration: 0.85, ease: REVEAL_EASE }}
             muted
             playsInline
@@ -129,48 +136,39 @@ export function Hero({ videoEnabled, onShortcutOpen }: Props) {
       ) : null}
       <Particles visible={contentRevealed} />
 
-      <motion.div
-        className="hero-card-reveal"
-        initial={false}
-        animate={
-          contentRevealed
-            ? { opacity: 1, y: 0, scale: 1 }
-            : { opacity: 0, y: -40, scale: 0.95 }
-        }
-        transition={{ duration: HERO_REVEAL_DURATION, ease: REVEAL_EASE }}
-        style={{ visibility: contentRevealed ? "visible" : "hidden" }}
-      >
-        <div className="hero-pill">
-          {contentRevealed && !reducedMotion && (
-            <div className="absolute top-3 right-3 z-20">
-              <HeroSparkle />
+      {contentRevealed && (
+        <motion.div
+          className="hero-card-reveal"
+          initial={{ opacity: 0, y: -40, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: HERO_REVEAL_DURATION, ease: REVEAL_EASE }}
+        >
+          <div className="hero-pill">
+            {!reducedMotion && (
+              <div className="absolute top-3 right-3 z-20">
+                <HeroSparkle />
+              </div>
+            )}
+
+            <div className="hero-pill__photo-wrap">
+              <motion.img
+                src={content.media.heroPhoto}
+                alt="Geraldo dan Christin"
+                className="hero-pill__image"
+                width={576}
+                height={1024}
+                initial={{ opacity: 0, scale: 1.02 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  duration: HERO_REVEAL_DURATION,
+                  ease: REVEAL_EASE,
+                  delay: 0.12,
+                }}
+                loading="eager"
+                fetchPriority="high"
+              />
             </div>
-          )}
 
-          <div className="hero-pill__photo-wrap">
-            <motion.img
-              src={content.media.heroPhoto}
-              alt="Geraldo dan Christin"
-              className="hero-pill__image"
-              width={576}
-              height={1024}
-              initial={false}
-              animate={
-                contentRevealed
-                  ? { opacity: 1, scale: 1 }
-                  : { opacity: 0, scale: 1.02 }
-              }
-              transition={{
-                duration: HERO_REVEAL_DURATION,
-                ease: REVEAL_EASE,
-                delay: contentRevealed ? 0.12 : 0,
-              }}
-              loading="eager"
-              fetchPriority="high"
-            />
-          </div>
-
-          {contentRevealed && (
             <div className="hero-pill__footer">
               <div className="hero-pill__caption">
                 <p className="hero-pill__eyebrow">{content.hero.eyebrow}</p>
@@ -184,9 +182,9 @@ export function Hero({ videoEnabled, onShortcutOpen }: Props) {
               </div>
               <HeroShortcuts onOpen={onShortcutOpen} />
             </div>
-          )}
-        </div>
-      </motion.div>
+          </div>
+        </motion.div>
+      )}
     </section>
   );
 }

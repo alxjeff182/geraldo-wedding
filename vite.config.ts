@@ -4,6 +4,19 @@ import tailwindcss from "@tailwindcss/vite";
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
+function htmlMetaPlugin(siteUrl: string): Plugin {
+  const base = siteUrl.replace(/\/$/, "");
+
+  return {
+    name: "html-meta",
+    transformIndexHtml(html) {
+      return html
+        .replace(/content="\/assets/g, `content="${base}/assets`)
+        .replace(/"image": "\/assets/g, `"image": "${base}/assets`);
+    },
+  };
+}
+
 function sitemapPlugin(siteUrl: string): Plugin {
   const base = siteUrl.replace(/\/$/, "");
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -29,7 +42,7 @@ export default defineConfig(({ mode }) => {
   const siteUrl = env.VITE_SITE_URL || "https://your-domain.com";
 
   return {
-    plugins: [react(), tailwindcss(), sitemapPlugin(siteUrl)],
+    plugins: [react(), tailwindcss(), htmlMetaPlugin(siteUrl), sitemapPlugin(siteUrl)],
     build: {
       rollupOptions: {
         output: {

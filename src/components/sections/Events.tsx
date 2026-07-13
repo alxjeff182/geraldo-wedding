@@ -63,7 +63,7 @@ function EmbeddedEventItem({
         </div>
 
         <div className="events-item__venue events-item__venue--embedded">
-          <p className="events-venue-label">Bertempat di</p>
+          <p className="events-venue-label">{content.eventsSection.venueLabel}</p>
           <p>
             <strong>{event.venue}</strong>
           </p>
@@ -81,7 +81,7 @@ function EmbeddedEventItem({
         >
           <span className="btn-gold__shine" aria-hidden />
           <LocationIcon />
-          Open Maps
+          {content.eventsSection.mapsButton}
         </motion.a>
       </motion.article>
 
@@ -134,17 +134,20 @@ export function Events({ embedded = false }: Props) {
         >
           <p className="events-title">
             {embedded ? (
-              "Wedding Event"
+              content.eventsSection.titleEmbedded
             ) : (
               <>
-                Wedding
-                <br />
-                Event
+                {content.eventsSection.title.split("\n").map((line, index, lines) => (
+                  <span key={line}>
+                    {line}
+                    {index < lines.length - 1 && <br />}
+                  </span>
+                ))}
               </>
             )}
           </p>
           <p id="events-heading" className="events-subtitle">
-            Acara akan dilaksanakan pada:
+            {content.eventsSection.subtitle}
           </p>
         </motion.div>
 
@@ -175,7 +178,7 @@ export function Events({ embedded = false }: Props) {
                 </div>
 
                 <div className="events-item__venue">
-                  <p>Bertempat di:</p>
+                  <p>{content.eventsSection.venueLabelColon}</p>
                   <p>
                     <strong>{event.venue}</strong>
                   </p>
@@ -189,7 +192,7 @@ export function Events({ embedded = false }: Props) {
                   className="btn-gold mt-5"
                 >
                   <LocationIcon />
-                  Open Maps
+                  {content.eventsSection.mapsButton}
                 </a>
 
                 {index < content.events.length - 1 && (

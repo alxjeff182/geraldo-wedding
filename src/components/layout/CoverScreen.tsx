@@ -48,7 +48,7 @@ export function CoverScreen({ guestName, onOpen }: Props) {
       >
         <motion.img
           src={content.media.rumahBolon}
-          alt="Rumah Bolon — simbol adat Batak"
+          alt={content.cover.rumahBolonAlt}
           className="mb-5 w-[38%] max-w-[180px]"
           width={180}
           height={223}
@@ -63,7 +63,7 @@ export function CoverScreen({ guestName, onOpen }: Props) {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.25 }}
         >
-          Wedding Invitation
+          {content.cover.eyebrow}
         </motion.p>
         <motion.h1
           className="font-serif mt-3 text-[34px] leading-[0.9] font-medium text-gold uppercase"
@@ -79,7 +79,7 @@ export function CoverScreen({ guestName, onOpen }: Props) {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.45 }}
         >
-          Kepada Yth.
+          {content.cover.salutation}
         </motion.p>
         <motion.p
           className="font-label mt-1 text-[13px] tracking-[0.05em] text-gold"
@@ -98,10 +98,10 @@ export function CoverScreen({ guestName, onOpen }: Props) {
           transition={{ delay: 0.6 }}
           whileTap={{ scale: 0.97 }}
           style={{ visibility: opening ? "hidden" : "visible" }}
-          aria-label="Buka undangan pernikahan"
+          aria-label={content.cover.openButtonAriaLabel}
         >
           <LeafIcon />
-          Buka Undangan
+          {content.cover.openButton}
         </motion.button>
       </motion.div>
     </motion.div>

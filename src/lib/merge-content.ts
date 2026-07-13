@@ -1,5 +1,6 @@
 import { wedding, type WeddingConfig } from "../config/wedding.config";
 import type { SiteContentOverrides } from "../types/site-content";
+import { resolveInviteTemplates } from "../config/invite-templates";
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -27,7 +28,36 @@ function deepMerge<T>(base: T, overrides: unknown): T {
 }
 
 export function mergeWeddingContent(overrides: SiteContentOverrides = {}): WeddingConfig {
-  return deepMerge(structuredClone(wedding) as WeddingConfig, overrides);
+  const normalized = structuredClone(overrides) as SiteContentOverrides;
+
+  if (normalized.invite) {
+    const invite = normalized.invite;
+    if (!invite.whatsappTemplates?.length && invite.whatsappTemplate) {
+      invite.whatsappTemplates = resolveInviteTemplates(undefined, invite.whatsappTemplate);
+      delete invite.whatsappTemplate;
+    }
+  }
+
+  const merged = deepMerge(structuredClone(wedding) as WeddingConfig, normalized) as WeddingConfig;
+  const whatsappTemplates = resolveInviteTemplates(
+    [...merged.invite.whatsappTemplates],
+    undefined,
+  );
+
+  const defaultTemplateId = whatsappTemplates.some(
+    (item) => item.id === merged.invite.defaultTemplateId,
+  )
+    ? merged.invite.defaultTemplateId
+    : (whatsappTemplates[0]?.id ?? "");
+
+  return {
+    ...merged,
+    invite: {
+      ...merged.invite,
+      whatsappTemplates,
+      defaultTemplateId,
+    },
+  };
 }
 
 export function getDefaultWeddingContent(): WeddingConfig {

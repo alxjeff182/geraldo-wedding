@@ -1,8 +1,6 @@
 import { useCountdown } from "../../hooks/useCountdown";
 import { useWeddingContent } from "../../context/WeddingContentContext";
 
-const labels = ["Days", "Hours", "Minutes", "Seconds"] as const;
-
 type Props = {
   embedded?: boolean;
 };
@@ -10,7 +8,12 @@ type Props = {
 export function Countdown({ embedded = false }: Props) {
   const { content } = useWeddingContent();
   const { days, hours, minutes, seconds } = useCountdown(content.date);
-
+  const labelList = [
+    content.countdown.labels.days,
+    content.countdown.labels.hours,
+    content.countdown.labels.minutes,
+    content.countdown.labels.seconds,
+  ];
   const values = [days, hours, minutes, seconds];
   const Wrapper = embedded ? "div" : "section";
 
@@ -48,9 +51,9 @@ export function Countdown({ embedded = false }: Props) {
           />
         </div>
 
-        <p className="countdown-title">Counting The Days</p>
+        <p className="countdown-title">{content.countdown.title}</p>
         <h2 id="countdown-heading" className="sr-only">
-          Hitung mundur menuju hari pernikahan
+          {content.countdown.heading}
         </h2>
 
         <div
@@ -60,9 +63,9 @@ export function Countdown({ embedded = false }: Props) {
           aria-label={`${days} hari ${hours} jam ${minutes} menit ${seconds} detik`}
         >
           {values.map((value, i) => (
-            <div key={labels[i]} className="countdown-box">
+            <div key={labelList[i]} className="countdown-box">
               <span className="countdown-box__digit">{String(value).padStart(2, "0")}</span>
-              <span className="countdown-box__label">{labels[i]}</span>
+              <span className="countdown-box__label">{labelList[i]}</span>
             </div>
           ))}
         </div>

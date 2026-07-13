@@ -39,7 +39,7 @@ export function Gift({ onCopy }: Props) {
       await navigator.clipboard.writeText(text);
       onCopy(message);
     } catch {
-      onCopy("Gagal menyalin");
+      onCopy(content.giftUi.copyError);
     }
   };
 
@@ -59,7 +59,7 @@ export function Gift({ onCopy }: Props) {
           aria-controls="gift-amplop"
         >
           <GiftIcon />
-          Klik di sini
+          {content.giftUi.openButton}
         </button>
 
         {open && (
@@ -75,20 +75,25 @@ export function Gift({ onCopy }: Props) {
               />
 
               <div className="gift-amplop__text">
-                <p>Bank {account.bank}</p>
-                <p>No. Rekening — {account.number}</p>
                 <p>
-                  a.n <strong>{account.holder}</strong>
+                  {content.giftUi.bankLabel} {account.bank}
+                </p>
+                <p>
+                  {content.giftUi.accountNumberLabel} {account.number}
+                </p>
+                <p>
+                  {content.giftUi.accountHolderPrefix}{" "}
+                  <strong>{account.holder}</strong>
                 </p>
               </div>
 
               <button
                 type="button"
                 className="btn-copy"
-                onClick={() => void copyText(account.number, "Nomor rekening berhasil disalin")}
+                onClick={() => void copyText(account.number, content.giftUi.copyAccountSuccess)}
               >
                 <CopyIcon />
-                Salin Nomor Rekening
+                {content.giftUi.copyAccountButton}
               </button>
 
               <div className="gift-amplop__divider" aria-hidden>
@@ -98,10 +103,11 @@ export function Gift({ onCopy }: Props) {
               </div>
 
               <div className="gift-amplop__text">
-                <p>Kirim Kado</p>
+                <p>{content.giftUi.physicalGiftTitle}</p>
                 <p>{content.gift.physicalAddress}</p>
                 <p>
-                  a.n <strong>{account.holder}</strong>
+                  {content.giftUi.accountHolderPrefix}{" "}
+                  <strong>{account.holder}</strong>
                 </p>
               </div>
 
@@ -109,11 +115,11 @@ export function Gift({ onCopy }: Props) {
                 type="button"
                 className="btn-copy"
                 onClick={() =>
-                  void copyText(content.gift.physicalAddress, "Alamat berhasil disalin")
+                  void copyText(content.gift.physicalAddress, content.giftUi.copyAddressSuccess)
                 }
               >
                 <CopyIcon />
-                Salin Alamat
+                {content.giftUi.copyAddressButton}
               </button>
             </div>
           </div>

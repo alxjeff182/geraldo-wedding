@@ -24,9 +24,9 @@ export function Couple() {
       aria-labelledby="couple-heading"
     >
       <div className="couple-card">
-        <p className="font-script text-[54px] leading-[0.8] text-gold">Sang</p>
+        <p className="font-script text-[54px] leading-[0.8] text-gold">{content.coupleSection.prefix}</p>
         <h2 id="couple-heading" className="font-serif text-[33px] leading-[0.8] text-gold uppercase">
-          Mempelai
+          {content.coupleSection.title}
         </h2>
         <p className="font-body mx-auto mb-6 mt-4 max-w-sm px-4 text-xs font-light leading-relaxed text-cream">
           {content.intro}
@@ -51,7 +51,7 @@ export function Couple() {
           {groom.instagramHandle}
         </a>
 
-        <p className="font-script my-6 text-[54px] leading-[0.8] text-gold">dengan</p>
+        <p className="font-script my-6 text-[54px] leading-[0.8] text-gold">{content.coupleSection.connector}</p>
 
         <motion.div
           className="couple-photo"
