@@ -2545,6 +2545,8 @@ body {
   position: relative;
   z-index: 1;
   width: min(100%, 80rem);
+  max-width: 100%;
+  min-width: 0;
   margin: 0 auto;
   padding: 1rem 1rem 2.5rem;
 }
@@ -2716,7 +2718,9 @@ body {
 .admin-panel__body--dense {
   gap: 0.75rem;
   padding: 0.85rem 1rem 1rem;
+  min-width: 0;
   min-height: 0;
+  max-width: 100%;
 }
 
 .admin-form-grid {
@@ -2992,8 +2996,13 @@ textarea.admin-input {
 
 /* Shared admin data table */
 .admin-table-wrap {
-  overflow: auto;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
   border-radius: 0.75rem;
   border: 1px solid rgba(212, 175, 55, 0.22);
   background: rgba(0, 0, 0, 0.14);
@@ -3078,18 +3087,35 @@ textarea.admin-input {
 
 /* Data list grid (secureRx-style) */
 .admin-datalist-wrap {
-  flex: 1;
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   min-height: 0;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x pan-y;
   border-radius: 0.65rem;
   border: 1px solid rgba(212, 175, 55, 0.22);
   background: rgba(0, 0, 0, 0.12);
+  scrollbar-gutter: stable;
+}
+
+.admin-datalist-wrap::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.admin-datalist-wrap::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(212, 175, 55, 0.35);
 }
 
 .admin-datalist {
-  width: 100%;
-  min-width: 52rem;
+  width: max-content;
+  min-width: max(100%, 52rem);
   border-collapse: collapse;
   font-size: 0.8rem;
 }
@@ -3378,6 +3404,8 @@ textarea.admin-input {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  min-width: 0;
+  max-width: 100%;
   min-height: 0;
 }
 
@@ -3385,6 +3413,17 @@ textarea.admin-input {
   display: grid;
   gap: 0.85rem;
   align-items: stretch;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 0;
+}
+
+.admin-invite__main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  min-width: 0;
+  max-width: 100%;
   min-height: 0;
 }
 
@@ -3395,9 +3434,6 @@ textarea.admin-input {
   }
 
   .admin-invite__main {
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
     overflow: hidden;
   }
 
