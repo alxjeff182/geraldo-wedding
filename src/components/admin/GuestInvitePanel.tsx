@@ -29,10 +29,9 @@ type Props = {
 type GuestDraft = {
   display_name: string;
   phone: string;
-  slug: string;
 };
 
-type SortKey = "name" | "phone" | "slug" | "template" | "created";
+type SortKey = "name" | "phone" | "template" | "created";
 type SortDir = "asc" | "desc";
 
 const PAGE_SIZES = [10, 15, 25, 50] as const;
@@ -40,7 +39,6 @@ const PAGE_SIZES = [10, 15, 25, 50] as const;
 const emptyDraft = (): GuestDraft => ({
   display_name: "",
   phone: "",
-  slug: "",
 });
 
 function truncate(text: string, max = 72): string {
@@ -77,7 +75,6 @@ export function GuestInvitePanel({
   const [adding, setAdding] = useState(false);
   const [newGuest, setNewGuest] = useState<GuestDraft>(emptyDraft);
   const [search, setSearch] = useState("");
-  const [slugTouched, setSlugTouched] = useState(false);
   const [templateByGuest, setTemplateByGuest] = useState<Record<string, string>>({});
   const [editingTemplateId, setEditingTemplateId] = useState(invite.defaultTemplateId);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -156,8 +153,6 @@ export function GuestInvitePanel({
         cmp = a.display_name.localeCompare(b.display_name, "id");
       } else if (sortKey === "phone") {
         cmp = (a.phone ?? "").localeCompare(b.phone ?? "", "id");
-      } else if (sortKey === "slug") {
-        cmp = a.slug.localeCompare(b.slug, "id");
       } else if (sortKey === "template") {
         const ta = getInviteTemplateById(templates, getGuestTemplateId(a.id)).name;
         const tb = getInviteTemplateById(templates, getGuestTemplateId(b.id)).name;
@@ -210,7 +205,7 @@ export function GuestInvitePanel({
   const handleAddGuest = async () => {
     const display_name = newGuest.display_name.trim();
     const phone = newGuest.phone.trim();
-    const slug = (newGuest.slug.trim() || slugifyGuestName(display_name)).toLowerCase();
+    const slug = slugifyGuestName(display_name);
 
     if (!display_name || !slug) return;
 
@@ -236,7 +231,6 @@ export function GuestInvitePanel({
     }
 
     setNewGuest(emptyDraft());
-    setSlugTouched(false);
     onNotify(invite.guestAdded);
     await loadGuests();
   };
@@ -250,11 +244,14 @@ export function GuestInvitePanel({
       return;
     }
 
+    const display_name = guest.display_name.trim();
+    const slug = slugifyGuestName(display_name);
+
     const { error } = await supabase
       .from("guests")
       .update({
-        display_name: guest.display_name.trim(),
-        slug: guest.slug.trim().toLowerCase(),
+        display_name,
+        slug,
         phone: guest.phone?.trim() || null,
       })
       .eq("id", guest.id);
@@ -503,23 +500,7 @@ export function GuestInvitePanel({
               className="admin-input"
               value={newGuest.display_name}
               placeholder={invite.nameLabel}
-              onChange={(e) => {
-                const display_name = e.target.value;
-                setNewGuest((prev) => ({
-                  ...prev,
-                  display_name,
-                  slug: slugTouched ? prev.slug : slugifyGuestName(display_name),
-                }));
-              }}
-            />
-            <input
-              className="admin-input admin-table__mono"
-              value={newGuest.slug}
-              placeholder={invite.slugLabel}
-              onChange={(e) => {
-                setSlugTouched(true);
-                setNewGuest((prev) => ({ ...prev, slug: e.target.value }));
-              }}
+              onChange={(e) => setNewGuest((prev) => ({ ...prev, display_name: e.target.value }))}
             />
             <input
               className="admin-input"
@@ -564,11 +545,7 @@ export function GuestInvitePanel({
                         Template <span>{sortIcon("template")}</span>
                       </button>
                     </th>
-                    <th className="admin-datalist__col-msg">
-                      <button type="button" className="admin-datalist__sort" onClick={() => toggleSort("slug")}>
-                        Isi Pesan <span>{sortIcon("slug")}</span>
-                      </button>
-                    </th>
+                    <th className="admin-datalist__col-msg">Isi Pesan</th>
                     <th>
                       <button type="button" className="admin-datalist__sort" onClick={() => toggleSort("created")}>
                         Ditambah <span>{sortIcon("created")}</span>
@@ -623,28 +600,40 @@ export function GuestInvitePanel({
                               {hasPhone ? "Siap WA" : "No WA kosong"}
                             </span>
                           </td>
-                          <td>
-                            {waUrl ? (
-                              <a
-                                href={waUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="admin-datalist__action"
-                                title={invite.openWhatsApp}
-                                aria-label={invite.openWhatsApp}
-                              >
-                                ✈
-                              </a>
-                            ) : (
+                          <td className="admin-datalist__actions-cell">
+                            <div className="admin-datalist__row-actions">
+                              {waUrl ? (
+                                <a
+                                  href={waUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="admin-datalist__action"
+                                  title={invite.openWhatsApp}
+                                  aria-label={invite.openWhatsApp}
+                                >
+                                  ✈
+                                </a>
+                              ) : (
+                                <button
+                                  type="button"
+                                  className="admin-datalist__action admin-datalist__action--disabled"
+                                  disabled
+                                  title={invite.noPhone}
+                                >
+                                  ✈
+                                </button>
+                              )}
                               <button
                                 type="button"
-                                className="admin-datalist__action admin-datalist__action--disabled"
-                                disabled
-                                title={invite.noPhone}
+                                className="admin-datalist__action admin-datalist__action--danger"
+                                disabled={savingId === guest.id}
+                                title="Hapus"
+                                aria-label={`Hapus ${guest.display_name}`}
+                                onClick={() => void handleDeleteGuest(guest)}
                               >
-                                ✈
+                                ✕
                               </button>
-                            )}
+                            </div>
                           </td>
                         </tr>
 
@@ -666,14 +655,6 @@ export function GuestInvitePanel({
                                       onChange={(e) =>
                                         updateGuestField(guest.id, "display_name", e.target.value)
                                       }
-                                    />
-                                  </label>
-                                  <label className="admin-field">
-                                    <span className="admin-label">{invite.slugLabel}</span>
-                                    <input
-                                      className="admin-input admin-table__mono"
-                                      value={guest.slug}
-                                      onChange={(e) => updateGuestField(guest.id, "slug", e.target.value)}
                                     />
                                   </label>
                                   <label className="admin-field">
