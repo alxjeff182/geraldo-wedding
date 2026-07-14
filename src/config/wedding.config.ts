@@ -301,7 +301,7 @@ export const wedding = {
     noPhone: "Isi nomor telepon dulu",
     saveTemplateHint: "Setelah mengubah template pesan, klik «Simpan Perubahan» di atas.",
     templateLabel: "Template Pesan WhatsApp",
-    templatesSubtitle: "Pilih dan edit salah satu dari 10 template undangan. Setiap tamu bisa dikirim dengan template berbeda.",
+    templatesSubtitle: "Pilih dan edit salah satu dari 3 template undangan. Setiap tamu bisa dikirim dengan template berbeda.",
     templateSelectLabel: "Template kirim",
     defaultTemplateLabel: "Template bawaan daftar tamu",
     templateNameLabel: "Nama template",

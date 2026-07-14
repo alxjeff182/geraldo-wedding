@@ -197,27 +197,6 @@ export function RsvpSubmissionsPanel({ rsvp, onNotify }: Props) {
 
   return (
     <section className="admin-rsvp-list">
-      <header className="admin-rsvp-list__head">
-        <div>
-          <h3 className="admin-rsvp-list__title">{rsvp.listTitle}</h3>
-          <p className="admin-rsvp-list__subtitle">{rsvp.listSubtitle}</p>
-        </div>
-        <div className="admin-rsvp-list__stats" aria-label="Ringkasan RSVP">
-          <span className="admin-rsvp-list__stat">
-            <strong>{stats.total}</strong> {rsvp.statTotal}
-          </span>
-          <span className="admin-rsvp-list__stat admin-rsvp-list__stat--hadir">
-            <strong>{stats.people}</strong> {rsvp.statPeople}
-          </span>
-          <span className="admin-rsvp-list__stat admin-rsvp-list__stat--hadir">
-            <strong>{stats.hadir}</strong> {rsvp.statHadir}
-          </span>
-          <span className="admin-rsvp-list__stat admin-rsvp-list__stat--tidak">
-            <strong>{stats.tidak}</strong> {rsvp.statTidak}
-          </span>
-        </div>
-      </header>
-
       <div className="admin-rsvp-list__toolbar">
         <input
           className="admin-input admin-rsvp-list__search"
@@ -239,6 +218,20 @@ export function RsvpSubmissionsPanel({ rsvp, onNotify }: Props) {
           ))}
         </div>
         <div className="admin-rsvp-list__actions">
+          <div className="admin-rsvp-list__stats" aria-label="Ringkasan RSVP">
+            <span className="admin-rsvp-list__stat">
+              <strong>{stats.total}</strong> {rsvp.statTotal}
+            </span>
+            <span className="admin-rsvp-list__stat admin-rsvp-list__stat--hadir">
+              <strong>{stats.people}</strong> {rsvp.statPeople}
+            </span>
+            <span className="admin-rsvp-list__stat admin-rsvp-list__stat--hadir">
+              <strong>{stats.hadir}</strong> {rsvp.statHadir}
+            </span>
+            <span className="admin-rsvp-list__stat admin-rsvp-list__stat--tidak">
+              <strong>{stats.tidak}</strong> {rsvp.statTidak}
+            </span>
+          </div>
           <button type="button" className="admin-btn admin-btn--ghost" onClick={() => void loadData()}>
             {rsvp.refreshButton}
           </button>
@@ -258,8 +251,8 @@ export function RsvpSubmissionsPanel({ rsvp, onNotify }: Props) {
       ) : filtered.length === 0 ? (
         <p className="admin-rsvp-list__empty">{rsvp.emptyList}</p>
       ) : (
-        <div className="admin-rsvp-list__table-wrap">
-          <table className="admin-rsvp-list__table">
+        <div className="admin-table-wrap admin-rsvp-list__table-wrap">
+          <table className="admin-table admin-table--striped admin-rsvp-list__table">
             <thead>
               <tr>
                 <th>{rsvp.colDate}</th>

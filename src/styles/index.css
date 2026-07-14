@@ -2544,7 +2544,7 @@ body {
 .admin-shell {
   position: relative;
   z-index: 1;
-  width: min(100%, 56rem);
+  width: min(100%, 80rem);
   margin: 0 auto;
   padding: 1rem 1rem 2.5rem;
 }
@@ -2688,10 +2688,35 @@ body {
   color: rgba(245, 230, 200, 0.6);
 }
 
+.admin-panel__head--compact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 1rem;
+  padding: 0.7rem 1rem;
+}
+
+.admin-panel__head--compact .admin-panel__title {
+  font-size: 1.05rem;
+}
+
+.admin-panel__head--compact .admin-panel__desc {
+  margin: 0;
+  flex: 1;
+  min-width: 12rem;
+  font-size: 0.76rem;
+}
+
 .admin-panel__body {
   display: grid;
   gap: 1.25rem;
   padding: 1.35rem;
+}
+
+.admin-panel__body--dense {
+  gap: 0.75rem;
+  padding: 0.85rem 1rem 1rem;
+  min-height: 0;
 }
 
 .admin-form-grid {
@@ -2730,6 +2755,15 @@ body {
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--color-gold-light);
+}
+
+.admin-fieldset--compact {
+  padding: 0.75rem;
+  gap: 0.55rem;
+}
+
+.admin-fieldset--compact legend {
+  font-size: 0.85rem;
 }
 
 .admin-label {
@@ -2808,6 +2842,12 @@ textarea.admin-input {
 .admin-btn--secondary:hover {
   border-color: var(--color-gold);
   background: rgba(0, 0, 0, 0.35);
+}
+
+.admin-btn--sm {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.72rem;
+  min-height: 1.85rem;
 }
 
 .admin-error {
@@ -2950,47 +2990,495 @@ textarea.admin-input {
   }
 }
 
-/* Guest invite panel */
-.admin-invite {
-  display: grid;
-  gap: 1.25rem;
+/* Shared admin data table */
+.admin-table-wrap {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  background: rgba(0, 0, 0, 0.14);
 }
 
-.admin-invite__head {
+.admin-table {
+  width: 100%;
+  min-width: 44rem;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.admin-table--striped tbody tr:nth-child(even) {
+  background: rgba(0, 0, 0, 0.14);
+}
+
+.admin-table--striped tbody tr:hover {
+  background: rgba(212, 175, 55, 0.06);
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 0.5rem 0.65rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+  vertical-align: middle;
+}
+
+.admin-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(245, 240, 232, 0.55);
+  background: rgba(26, 15, 14, 0.98);
+  box-shadow: 0 1px 0 rgba(212, 175, 55, 0.12);
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-table .admin-input {
+  padding: 0.4rem 0.55rem;
+  font-size: 0.8rem;
+  border-radius: 0.5rem;
+}
+
+.admin-table__mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.75rem;
+}
+
+.admin-table__actions {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
+  gap: 0.35rem;
+  align-items: center;
 }
 
-.admin-invite__title {
-  margin: 0;
-  font-size: 1.15rem;
-  font-weight: 600;
-  color: var(--admin-text, #f5f0e8);
+.admin-table .admin-btn--whatsapp.admin-btn--sm {
+  width: auto;
+  min-height: 1.85rem;
+  padding: 0.35rem 0.65rem;
 }
 
-.admin-invite__subtitle {
-  margin: 0.35rem 0 0;
-  font-size: 0.9rem;
+.admin-invite__send-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 12rem;
+}
+
+.admin-invite__send-cell .admin-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 11rem;
+}
+
+/* Data list grid (secureRx-style) */
+.admin-datalist-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.admin-datalist {
+  width: 100%;
+  min-width: 52rem;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.admin-datalist thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 0.55rem 0.65rem;
+  text-align: left;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   color: rgba(245, 240, 232, 0.72);
-  max-width: 36rem;
+  background: rgba(45, 28, 24, 0.98);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  white-space: nowrap;
+}
+
+.admin-datalist tbody td {
+  padding: 0.55rem 0.65rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.08);
+  vertical-align: middle;
+  color: rgba(245, 240, 232, 0.9);
+}
+
+.admin-datalist tbody tr.admin-datalist__row--stripe {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.admin-datalist tbody tr:not(.admin-datalist__detail-row):hover {
+  background: rgba(212, 175, 55, 0.07);
+}
+
+.admin-datalist__row--open {
+  background: rgba(212, 175, 55, 0.1) !important;
+}
+
+.admin-datalist__sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-datalist__sort span {
+  opacity: 0.55;
+  font-size: 0.72rem;
+}
+
+.admin-datalist__col-expand,
+.admin-datalist__col-action {
+  width: 2.5rem;
+}
+
+.admin-datalist__col-no {
+  width: 2.75rem;
+}
+
+.admin-datalist__col-msg {
+  min-width: 14rem;
+}
+
+.admin-datalist__expand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0.3rem;
+  background: transparent;
+  color: rgba(245, 240, 232, 0.7);
+  cursor: pointer;
+}
+
+.admin-datalist__expand:hover {
+  background: rgba(212, 175, 55, 0.12);
+  color: var(--color-gold);
+}
+
+.admin-datalist__no {
+  color: rgba(245, 240, 232, 0.55);
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-datalist__name {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.admin-datalist__mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.76rem;
+  white-space: nowrap;
+}
+
+.admin-datalist__msg {
+  max-width: 18rem;
+  color: rgba(245, 240, 232, 0.72);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-datalist__date {
+  white-space: nowrap;
+  font-size: 0.74rem;
+  color: rgba(245, 240, 232, 0.62);
+}
+
+.admin-datalist__status {
+  display: inline-flex;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.admin-datalist__status--ok {
+  background: rgba(74, 222, 128, 0.14);
+  color: #86efac;
+}
+
+.admin-datalist__status--warn {
+  background: rgba(248, 113, 113, 0.12);
+  color: #fca5a5;
+}
+
+.admin-datalist__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(37, 211, 102, 0.35);
+  background: rgba(37, 211, 102, 0.18);
+  color: #86efac;
+  text-decoration: none;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.admin-datalist__action:hover {
+  background: rgba(37, 211, 102, 0.32);
+  transform: translateY(-1px);
+}
+
+.admin-datalist__action--disabled,
+.admin-datalist__action:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.admin-datalist__detail-row td {
+  padding: 0;
+  background: rgba(0, 0, 0, 0.22);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.16);
+}
+
+.admin-datalist__detail {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem 1rem;
+}
+
+.admin-datalist__detail-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(245, 240, 232, 0.55);
+}
+
+.admin-datalist__detail-msg pre {
+  margin: 0;
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  background: rgba(0, 0, 0, 0.28);
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: rgba(245, 240, 232, 0.9);
+  max-height: 10rem;
+  overflow: auto;
+}
+
+.admin-datalist__detail-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.55rem;
+}
+
+@media (min-width: 720px) {
+  .admin-datalist__detail-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.admin-datalist__detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.admin-datalist__link {
+  flex: 1 1 12rem;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.72rem;
+  color: rgba(245, 240, 232, 0.6);
+}
+
+.admin-datalist__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.admin-datalist__pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: auto;
+}
+
+.admin-datalist__page-btn {
+  min-width: 1.85rem;
+  height: 1.85rem;
+  padding: 0 0.4rem;
+  border-radius: 0.35rem;
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  background: rgba(0, 0, 0, 0.18);
+  color: rgba(245, 240, 232, 0.85);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.admin-datalist__page-btn:hover:not(:disabled) {
+  border-color: rgba(212, 175, 55, 0.45);
+  background: rgba(212, 175, 55, 0.1);
+}
+
+.admin-datalist__page-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.admin-datalist__page-btn--active {
+  border-color: rgba(212, 175, 55, 0.55);
+  background: rgba(212, 175, 55, 0.18);
+  color: var(--color-gold);
+  font-weight: 700;
+}
+
+.admin-datalist__page-size {
+  width: auto;
+  min-width: 3.5rem;
+  padding: 0.3rem 0.45rem;
+  font-size: 0.75rem;
+}
+
+/* Guest invite panel */
+.admin-invite {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 0;
+}
+
+.admin-invite-layout {
+  display: grid;
+  gap: 0.85rem;
+  align-items: stretch;
+  min-height: 0;
+}
+
+@media (min-width: 1024px) {
+  .admin-invite-layout {
+    grid-template-columns: minmax(15rem, 20rem) minmax(0, 1fr);
+    max-height: calc(100dvh - 14rem);
+  }
+
+  .admin-invite__main {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .admin-invite__table-wrap,
+  .admin-datalist-wrap {
+    flex: 1;
+    min-height: 0;
+  }
+}
+
+.admin-invite__side {
+  min-width: 0;
+}
+
+.admin-invite__template-meta {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.admin-invite__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.admin-invite__tab {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.35rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  background: rgba(0, 0, 0, 0.14);
+  color: rgba(245, 240, 232, 0.8);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.admin-invite__tab:hover {
+  border-color: rgba(212, 175, 55, 0.45);
+}
+
+.admin-invite__tab--active {
+  background: rgba(212, 175, 55, 0.16);
+  border-color: rgba(212, 175, 55, 0.55);
+  color: var(--admin-gold, #d4af37);
+}
+
+.admin-invite__message {
+  min-height: 7rem;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.admin-invite__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.admin-invite__search {
+  flex: 1 1 12rem;
+  min-width: 0;
 }
 
 .admin-invite__stats {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.65rem;
+  gap: 0.45rem;
 }
 
 .admin-invite__stat {
-  padding: 0.45rem 0.75rem;
+  padding: 0.3rem 0.6rem;
   border-radius: 999px;
   border: 1px solid rgba(212, 175, 55, 0.28);
   background: rgba(0, 0, 0, 0.18);
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   color: rgba(245, 240, 232, 0.85);
+  white-space: nowrap;
 }
 
 .admin-invite__stat strong {
@@ -2998,72 +3486,96 @@ textarea.admin-input {
   font-weight: 700;
 }
 
-.admin-invite__template textarea.admin-input {
-  min-height: 12rem;
-  font-family: inherit;
-  line-height: 1.55;
-  resize: vertical;
-}
-
-.admin-invite__templates {
+.admin-invite__add-row {
   display: grid;
-  gap: 0.65rem;
+  grid-template-columns: 1fr;
+  gap: 0.45rem;
 }
 
-.admin-invite__template-card {
-  border: 1px solid rgba(212, 175, 55, 0.22);
+@media (min-width: 640px) {
+  .admin-invite__add-row {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 0.9fr) auto;
+    align-items: center;
+  }
+}
+
+.admin-invite__empty {
+  margin: 0;
+  padding: 1rem;
+  text-align: center;
   border-radius: 0.75rem;
-  background: rgba(0, 0, 0, 0.12);
-  overflow: hidden;
+  border: 1px dashed rgba(212, 175, 55, 0.25);
+  color: rgba(245, 240, 232, 0.7);
+  font-size: 0.88rem;
 }
 
-.admin-invite__template-summary {
-  padding: 0.75rem 0.9rem;
+.admin-invite__link-cell {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 8rem;
+}
+
+.admin-invite__link-text {
+  display: block;
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgba(245, 240, 232, 0.72);
+}
+
+.admin-invite__preview {
+  position: relative;
+  font-size: 0.72rem;
+}
+
+.admin-invite__preview summary {
   cursor: pointer;
-  font-weight: 600;
-  color: rgba(245, 240, 232, 0.9);
+  color: rgba(245, 240, 232, 0.65);
+  user-select: none;
   list-style: none;
 }
 
-.admin-invite__template-summary::-webkit-details-marker {
+.admin-invite__preview summary::-webkit-details-marker {
   display: none;
 }
 
-.admin-invite__template-body {
-  display: grid;
-  gap: 0.75rem;
-  padding: 0 0.9rem 0.9rem;
-  border-top: 1px solid rgba(212, 175, 55, 0.12);
+.admin-invite__preview pre {
+  position: absolute;
+  z-index: 5;
+  margin: 0.25rem 0 0;
+  padding: 0.65rem;
+  max-width: 18rem;
+  max-height: 10rem;
+  overflow: auto;
+  border-radius: 0.55rem;
+  background: rgba(26, 15, 14, 0.98);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: rgba(245, 240, 232, 0.88);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
-.admin-invite__template-select {
-  font-size: 0.82rem;
-}
-
-.admin-invite__wa-col .admin-field {
-  margin-bottom: 0.35rem;
-}
-
-.admin-invite__hint {
-  margin: 0 0 0.75rem;
-  font-size: 0.82rem;
-  color: rgba(245, 240, 232, 0.65);
+.admin-invite__template textarea.admin-input {
+  font-family: inherit;
 }
 
 .admin-invite__vars {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.45rem;
-  margin-bottom: 0.85rem;
+  gap: 0.35rem;
 }
 
 .admin-invite__var {
-  padding: 0.3rem 0.6rem;
-  border-radius: 0.45rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.4rem;
   border: 1px solid rgba(212, 175, 55, 0.35);
   background: rgba(212, 175, 55, 0.08);
   color: var(--admin-gold, #d4af37);
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease;
@@ -3072,111 +3584,6 @@ textarea.admin-input {
 .admin-invite__var:hover {
   background: rgba(212, 175, 55, 0.16);
   border-color: rgba(212, 175, 55, 0.55);
-}
-
-.admin-invite__toolbar {
-  display: flex;
-  gap: 0.75rem;
-}
-
-.admin-invite__search {
-  flex: 1;
-  min-width: 0;
-}
-
-.admin-invite__loading,
-.admin-invite__empty {
-  margin: 0;
-  padding: 1.25rem;
-  text-align: center;
-  border-radius: 0.75rem;
-  border: 1px dashed rgba(212, 175, 55, 0.25);
-  color: rgba(245, 240, 232, 0.7);
-  font-size: 0.92rem;
-}
-
-.admin-invite__list {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.admin-invite__row {
-  display: grid;
-  gap: 0.75rem;
-  padding: 1rem;
-  border-radius: 0.85rem;
-  border: 1px solid rgba(212, 175, 55, 0.22);
-  background: rgba(0, 0, 0, 0.16);
-}
-
-.admin-invite__row--head {
-  display: none;
-  padding: 0.55rem 1rem;
-  border-style: dashed;
-  background: transparent;
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: rgba(245, 240, 232, 0.55);
-}
-
-.admin-invite__guest {
-  display: grid;
-  gap: 0.55rem;
-}
-
-.admin-invite__slug {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.85rem;
-}
-
-.admin-invite__preview {
-  font-size: 0.82rem;
-}
-
-.admin-invite__preview summary {
-  cursor: pointer;
-  color: rgba(245, 240, 232, 0.75);
-  user-select: none;
-}
-
-.admin-invite__preview pre {
-  margin: 0.5rem 0 0;
-  padding: 0.75rem;
-  border-radius: 0.55rem;
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(212, 175, 55, 0.15);
-  white-space: pre-wrap;
-  word-break: break-word;
-  font-size: 0.78rem;
-  line-height: 1.5;
-  color: rgba(245, 240, 232, 0.88);
-  max-height: 12rem;
-  overflow: auto;
-}
-
-.admin-invite__row-actions--inline {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-}
-
-.admin-invite__link-col {
-  display: grid;
-  gap: 0.45rem;
-  align-content: start;
-}
-
-.admin-invite__link {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.78rem;
-  word-break: break-all;
-}
-
-.admin-invite__wa-col {
-  display: flex;
-  align-items: flex-start;
 }
 
 .admin-btn--danger {
@@ -3192,14 +3599,17 @@ textarea.admin-input {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  min-height: 2.65rem;
-  padding: 0.55rem 1rem;
-  border-radius: 0.6rem;
+  flex: 0 0 auto;
+  width: auto;
+  min-width: max-content;
+  min-height: 2.25rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 0.55rem;
   border: 1px solid rgba(37, 211, 102, 0.45);
   background: linear-gradient(180deg, #25d366 0%, #1da851 100%);
   color: #fff !important;
   font-weight: 600;
+  white-space: nowrap;
   text-decoration: none;
   box-shadow: 0 2px 8px rgba(37, 211, 102, 0.25);
   transition: filter 0.15s ease, transform 0.1s ease;
@@ -3220,65 +3630,40 @@ textarea.admin-input {
   transform: none;
 }
 
-@media (min-width: 900px) {
-  .admin-invite__row--head {
-    display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.2fr) 11rem;
-    gap: 0.75rem;
-    align-items: center;
-  }
-
-  .admin-invite__row {
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.2fr) 11rem;
-    align-items: start;
-  }
-
-  .admin-invite__row-actions--inline {
-    margin-top: 0.15rem;
-  }
-}
-
 /* RSVP submissions list */
 .admin-rsvp-list {
-  display: grid;
-  gap: 1rem;
-  padding-top: 0.25rem;
-}
-
-.admin-rsvp-list__head {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 0.65rem;
+  min-height: 0;
 }
 
-.admin-rsvp-list__title {
-  margin: 0;
-  font-size: 1.15rem;
-  font-weight: 600;
-  color: var(--admin-text, #f5f0e8);
+@media (min-width: 1024px) {
+  .admin-rsvp-list {
+    max-height: calc(100dvh - 14rem);
+  }
+
+  .admin-rsvp-list__table-wrap {
+    flex: 1;
+    min-height: 0;
+  }
 }
 
-.admin-rsvp-list__subtitle {
-  margin: 0.35rem 0 0;
-  font-size: 0.9rem;
-  color: rgba(245, 240, 232, 0.72);
+.admin-rsvp-list__stat {
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  background: rgba(0, 0, 0, 0.18);
+  font-size: 0.76rem;
+  color: rgba(245, 240, 232, 0.85);
+  white-space: nowrap;
 }
 
 .admin-rsvp-list__stats {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.55rem;
-}
-
-.admin-rsvp-list__stat {
-  padding: 0.45rem 0.75rem;
-  border-radius: 999px;
-  border: 1px solid rgba(212, 175, 55, 0.28);
-  background: rgba(0, 0, 0, 0.18);
-  font-size: 0.82rem;
-  color: rgba(245, 240, 232, 0.85);
+  gap: 0.45rem;
+  align-items: center;
 }
 
 .admin-rsvp-list__stat strong {
@@ -3295,12 +3680,15 @@ textarea.admin-input {
 }
 
 .admin-rsvp-list__toolbar {
-  display: grid;
-  gap: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
 }
 
 .admin-rsvp-list__search {
-  width: 100%;
+  flex: 1 1 12rem;
+  min-width: 0;
 }
 
 .admin-rsvp-list__filters {
@@ -3333,50 +3721,23 @@ textarea.admin-input {
 .admin-rsvp-list__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.45rem;
+  align-items: center;
+  margin-left: auto;
 }
 
 .admin-rsvp-list__empty {
   margin: 0;
-  padding: 1.25rem;
+  padding: 1rem;
   text-align: center;
   border-radius: 0.75rem;
   border: 1px dashed rgba(212, 175, 55, 0.25);
   color: rgba(245, 240, 232, 0.7);
-}
-
-.admin-rsvp-list__table-wrap {
-  overflow-x: auto;
-  border-radius: 0.85rem;
-  border: 1px solid rgba(212, 175, 55, 0.22);
-  background: rgba(0, 0, 0, 0.16);
+  font-size: 0.88rem;
 }
 
 .admin-rsvp-list__table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.86rem;
-}
-
-.admin-rsvp-list__table th,
-.admin-rsvp-list__table td {
-  padding: 0.75rem 0.85rem;
-  text-align: left;
-  border-bottom: 1px solid rgba(212, 175, 55, 0.12);
-  vertical-align: top;
-}
-
-.admin-rsvp-list__table th {
-  font-size: 0.74rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: rgba(245, 240, 232, 0.55);
-  background: rgba(0, 0, 0, 0.12);
-}
-
-.admin-rsvp-list__table tbody tr:last-child td {
-  border-bottom: none;
+  min-width: 36rem;
 }
 
 .admin-rsvp-list__date {

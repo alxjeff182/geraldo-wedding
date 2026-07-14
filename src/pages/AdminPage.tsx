@@ -200,6 +200,7 @@ export function AdminPage() {
   }
 
   const activeTab = TABS.find((t) => t.id === tab);
+  const isDenseTab = tab === "undangan" || tab === "rsvp";
   const isSuccessMessage = message?.includes("berhasil");
 
   return (
@@ -249,14 +250,16 @@ export function AdminPage() {
         </nav>
 
         <section className="admin-panel" aria-labelledby="admin-panel-title">
-          <header className="admin-panel__head">
+          <header
+            className={`admin-panel__head${isDenseTab ? " admin-panel__head--compact" : ""}`}
+          >
             <h2 id="admin-panel-title" className="admin-panel__title">
               {activeTab?.label}
             </h2>
             <p className="admin-panel__desc">{activeTab?.description}</p>
           </header>
 
-          <div className="admin-panel__body">
+          <div className={`admin-panel__body${isDenseTab ? " admin-panel__body--dense" : ""}`}>
             <AdminTabContent tab={tab} merged={merged} updateDraft={updateDraft} setMessage={setMessage} />
           </div>
         </section>
