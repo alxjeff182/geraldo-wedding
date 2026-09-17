@@ -3561,7 +3561,8 @@ textarea.admin-input {
 }
 
 .admin-invite__message {
-  min-height: 7rem;
+  min-height: 5.5rem;
+  max-height: 12rem;
   resize: vertical;
   line-height: 1.5;
 }
