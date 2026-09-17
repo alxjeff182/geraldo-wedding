@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildAndroidInsertIntent,
   buildGoogleCalendarUrl,
   buildIcsCalendar,
   buildIcsContent,
+  isAndroid,
   prefersAppleCalendar,
 } from "./calendar-links";
 
@@ -47,9 +49,30 @@ describe("calendar-links", () => {
     expect(ics?.match(/BEGIN:VEVENT/g)?.length).toBe(2);
   });
 
+  it("builds Android insert intent with prefilled fields", () => {
+    const intent = buildAndroidInsertIntent(event);
+    expect(intent).toContain("intent://");
+    expect(intent).toContain("android.intent.action.INSERT");
+    expect(intent).toContain("vnd.android.cursor.item/event");
+    expect(intent).toContain("S.title=");
+    expect(intent).toContain(encodeURIComponent("Pemberkatan - Geraldo & Christin"));
+    expect(intent).toContain("l.beginTime=");
+    expect(intent).toContain("l.endTime=");
+  });
+
+  it("detects Android", () => {
+    expect(
+      isAndroid(
+        "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/120.0.0.0 Mobile Safari/537.36",
+      ),
+    ).toBe(true);
+    expect(isAndroid("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)")).toBe(false);
+  });
+
   it("returns null for invalid dates", () => {
     expect(buildGoogleCalendarUrl({ ...event, startsAt: "bad" })).toBeNull();
     expect(buildIcsContent({ ...event, endsAt: "" })).toBeNull();
+    expect(buildAndroidInsertIntent({ ...event, startsAt: "bad" })).toBeNull();
   });
 
   it("detects Apple calendar clients including Mac Chrome", () => {

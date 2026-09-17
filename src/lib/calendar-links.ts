@@ -154,6 +154,53 @@ export function openGoogleCalendar(event: CalendarEventInput): boolean {
   return true;
 }
 
+export function isAndroid(
+  userAgent = typeof navigator !== "undefined" ? navigator.userAgent : "",
+): boolean {
+  return /Android/i.test(userAgent);
+}
+
+/** Chrome Intent URL → opens Google Calendar / stock Calendar with fields prefilled. */
+export function buildAndroidInsertIntent(event: CalendarEventInput): string | null {
+  const begin = new Date(event.startsAt).getTime();
+  const end = new Date(event.endsAt).getTime();
+  if (Number.isNaN(begin) || Number.isNaN(end)) return null;
+
+  const extras = [
+    `S.title=${encodeURIComponent(event.title)}`,
+    event.details?.trim()
+      ? `S.description=${encodeURIComponent(event.details.trim())}`
+      : null,
+    event.location?.trim()
+      ? `S.eventLocation=${encodeURIComponent(event.location.trim())}`
+      : null,
+    `l.beginTime=${begin}`,
+    `l.endTime=${end}`,
+  ].filter(Boolean);
+
+  return `intent://#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.item/event;${extras.join(";")};end`;
+}
+
+/** Prefer native Calendar app; fall back to Google Calendar app deep link. */
+export function openAndroidCalendar(event: CalendarEventInput): boolean {
+  const insertIntent = buildAndroidInsertIntent(event);
+  if (insertIntent) {
+    window.location.assign(insertIntent);
+    return true;
+  }
+
+  const googleUrl = buildGoogleCalendarUrl(event);
+  if (!googleUrl) return false;
+
+  const fallback = encodeURIComponent(googleUrl);
+  const path = googleUrl.replace(/^https:\/\//i, "");
+  const gcalIntent =
+    `intent://${path}#Intent;scheme=https;package=com.google.android.calendar;` +
+    `S.browser_fallback_url=${fallback};end`;
+  window.location.assign(gcalIntent);
+  return true;
+}
+
 export function openCalendarForEvent(
   event: CalendarEventInput,
   filename = "wedding.ics",
@@ -173,6 +220,21 @@ export function openCalendarForEvents(
     if (!ics) return false;
     openAppleCalendarIcs(ics, filename);
     return true;
+  }
+
+  if (isAndroid()) {
+    const primary = { ...events[0] };
+    if (events.length > 1) {
+      const others = events
+        .slice(1)
+        .map((e) => `• ${e.title} (${e.details?.split("\n")[0] ?? ""})`)
+        .join("\n");
+      primary.details = [primary.details?.trim(), "", "Acara lainnya:", others]
+        .filter((line) => line !== undefined)
+        .join("\n")
+        .trim();
+    }
+    return openAndroidCalendar(primary);
   }
 
   if (openGoogleCalendar(events[0])) return true;
