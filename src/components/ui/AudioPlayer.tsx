@@ -1,3 +1,5 @@
+import { createPortal } from "react-dom";
+
 type Props = {
   playing: boolean;
   onToggle: () => void;
@@ -5,7 +7,7 @@ type Props = {
 
 function VinylIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <circle cx="12" cy="12" r="10" />
       <circle cx="12" cy="12" r="3.5" fill="#fffcfb" />
       <circle cx="12" cy="12" r="1.2" fill="currentColor" />
@@ -15,7 +17,7 @@ function VinylIcon() {
 
 function StopCircleIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
       <circle cx="12" cy="12" r="9.25" stroke="currentColor" strokeWidth="1.5" />
       <rect x="8.5" y="8.5" width="7" height="7" rx="1" fill="currentColor" />
     </svg>
@@ -23,7 +25,7 @@ function StopCircleIcon() {
 }
 
 export function AudioPlayer({ playing, onToggle }: Props) {
-  return (
+  const button = (
     <button
       type="button"
       onClick={onToggle}
@@ -34,4 +36,7 @@ export function AudioPlayer({ playing, onToggle }: Props) {
       {playing ? <VinylIcon /> : <StopCircleIcon />}
     </button>
   );
+
+  if (typeof document === "undefined") return button;
+  return createPortal(button, document.body);
 }

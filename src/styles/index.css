@@ -1629,22 +1629,34 @@ body {
 
 .audio-toggle {
   position: fixed;
-  left: max(10px, env(safe-area-inset-left));
+  left: calc(12px + env(safe-area-inset-left, 0px));
   right: auto;
   top: auto;
-  bottom: max(10px, env(safe-area-inset-bottom));
-  z-index: 50;
+  /* Sit above home indicator / browser chrome, beside shortcut row */
+  bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+  z-index: 9998;
   display: flex;
-  height: 2.5rem;
-  width: 2.5rem;
+  height: 2.75rem;
+  width: 2.75rem;
   align-items: center;
   justify-content: center;
-  border: none;
+  border: 1.5px solid rgba(212, 175, 55, 0.85);
   border-radius: 9999px;
   background: #fffcfb;
   color: #661c18;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.35),
+    0 0 0 3px rgba(102, 28, 24, 0.25);
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (min-width: 768px) {
+  .audio-toggle {
+    /* Bottom-left of the 500px invitation column */
+    left: calc(100% - 500px + 12px);
+    bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  }
 }
 
 .audio-toggle--playing {
