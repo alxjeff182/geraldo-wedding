@@ -1629,8 +1629,10 @@ body {
 
 .audio-toggle {
   position: fixed;
-  top: 10px;
-  right: 10px;
+  left: max(10px, env(safe-area-inset-left));
+  right: auto;
+  top: auto;
+  bottom: max(10px, env(safe-area-inset-bottom));
   z-index: 50;
   display: flex;
   height: 2.5rem;
