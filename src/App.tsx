@@ -7,6 +7,7 @@ import { useAudio } from "./hooks/useAudio";
 import { usePageMeta } from "./hooks/usePageMeta";
 import { CoverScreen } from "./components/layout/CoverScreen";
 import { AudioPlayer } from "./components/ui/AudioPlayer";
+import { CalendarFab } from "./components/ui/CalendarFab";
 import { Toast } from "./components/ui/Toast";
 import { useToast } from "./hooks/useToast";
 import { Hero } from "./components/sections/Hero";
@@ -213,6 +214,7 @@ export default function App({ adminMode = false }: AppProps) {
       </div>
 
       {opened && <AudioPlayer playing={playing} onToggle={toggle} />}
+      {opened && <CalendarFab />}
 
       <SectionModal
         open={shortcutModal !== null}

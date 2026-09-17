@@ -50,6 +50,11 @@ export function AdminAcaraTab({ merged, updateDraft }: AdminTabProps) {
             value={merged.eventsSection.calendarIcsButton}
             onChange={(value) => updateDraft(["eventsSection", "calendarIcsButton"], value)}
           />
+          <AdminTextField
+            label="Label FAB Kalender (pojok kanan)"
+            value={merged.eventsSection.calendarFabLabel}
+            onChange={(value) => updateDraft(["eventsSection", "calendarFabLabel"], value)}
+          />
         </div>
       </fieldset>
 

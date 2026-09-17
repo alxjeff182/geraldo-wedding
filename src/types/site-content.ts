@@ -133,6 +133,7 @@ export type SiteContentOverrides = {
     mapsButton?: string;
     calendarGoogleButton?: string;
     calendarIcsButton?: string;
+    calendarFabLabel?: string;
   };
   story?: {
     enabled?: boolean;

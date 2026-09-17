@@ -291,6 +291,7 @@ export const wedding = {
     mapsButton: "Open Maps",
     calendarGoogleButton: "Google Calendar",
     calendarIcsButton: "Unduh .ics",
+    calendarFabLabel: "Tambah ke Google Calendar",
   },
 
   giftUi: {

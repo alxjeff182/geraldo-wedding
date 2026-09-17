@@ -1659,6 +1659,41 @@ body {
   }
 }
 
+.calendar-fab {
+  position: fixed;
+  right: calc(12px + env(safe-area-inset-right, 0px));
+  left: auto;
+  top: auto;
+  bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+  z-index: 9998;
+  display: flex;
+  height: 2.75rem;
+  width: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid rgba(212, 175, 55, 0.85);
+  border-radius: 9999px;
+  background: #fffcfb;
+  color: #661c18;
+  text-decoration: none;
+  box-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.35),
+    0 0 0 3px rgba(102, 28, 24, 0.25);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.calendar-fab:hover {
+  background: #fff8f0;
+}
+
+@media (min-width: 768px) {
+  .calendar-fab {
+    /* Bottom-right of the 500px invitation column */
+    right: 12px;
+    bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+
 .audio-toggle--playing {
   animation: audio-spin 4s linear infinite;
 }
