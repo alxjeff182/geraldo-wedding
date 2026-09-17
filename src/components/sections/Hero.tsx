@@ -41,15 +41,6 @@ function Particles({ visible }: { visible: boolean }) {
   );
 }
 
-function HeroSparkle() {
-  return (
-    <span className="hero-sparkle" aria-hidden>
-      <span className="hero-sparkle__core" />
-      <span className="hero-sparkle__ring" />
-    </span>
-  );
-}
-
 export function Hero({ coverOpenComplete, onShortcutOpen }: Props) {
   const { content } = useWeddingContent();
   const sectionRef = useRef<HTMLElement>(null);
@@ -144,12 +135,6 @@ export function Hero({ coverOpenComplete, onShortcutOpen }: Props) {
           transition={{ duration: HERO_REVEAL_DURATION, ease: REVEAL_EASE }}
         >
           <div className="hero-pill">
-            {!reducedMotion && (
-              <div className="absolute top-3 right-3 z-20">
-                <HeroSparkle />
-              </div>
-            )}
-
             <div className="hero-pill__photo-wrap">
               <motion.img
                 src={content.media.heroPhoto}

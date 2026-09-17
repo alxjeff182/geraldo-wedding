@@ -92,10 +92,14 @@ export function prefersAppleCalendar(userAgent = typeof navigator !== "undefined
   return iOS || iPadOs || mac;
 }
 
-function isIosLike(
-  userAgent = typeof navigator !== "undefined" ? navigator.userAgent : "",
-): boolean {
-  if (/iPad|iPhone|iPod/i.test(userAgent)) return true;
+function toBase64Url(text: string): string {
+  const bytes = new TextEncoder().encode(text);
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function isTouchMac(): boolean {
   return (
     typeof navigator !== "undefined" &&
     navigator.platform === "MacIntel" &&
@@ -103,15 +107,21 @@ function isIosLike(
   );
 }
 
-/** Open ICS so iOS/macOS offers Add to Calendar / Calendar.app. */
-export function openAppleCalendarIcs(content: string, filename = "wedding.ics") {
-  if (isIosLike()) {
-    const href = `data:text/calendar;charset=utf-8,${encodeURIComponent(content)}`;
-    window.location.href = href;
+/** Open ICS in Apple Calendar (Calendar.app / iOS Calendar — no file download). */
+export function openAppleCalendarIcs(content: string, _filename = "wedding.ics") {
+  const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
+  const iOS = /iPad|iPhone|iPod/i.test(ua) || isTouchMac();
+
+  if (iOS) {
+    window.location.assign(`data:text/calendar;charset=utf-8,${encodeURIComponent(content)}`);
     return;
   }
-  // Mac Chrome/Safari/Firefox: downloading .ics opens Calendar.app reliably.
-  downloadIcsFile(filename, content);
+
+  // Desktop Mac (any browser): webcal:// hands off to Calendar.app
+  const encoded = toBase64Url(content);
+  const httpsUrl = `${window.location.origin}/api/calendar?ics=${encoded}`;
+  const webcalUrl = httpsUrl.replace(/^https:/i, "webcal:").replace(/^http:/i, "webcal:");
+  window.location.assign(webcalUrl);
 }
 
 export function openGoogleCalendar(event: CalendarEventInput): boolean {
