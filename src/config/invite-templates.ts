@@ -6,50 +6,50 @@ export type InviteMessageTemplate = {
 
 export const INVITE_MESSAGE_TEMPLATES: InviteMessageTemplate[] = [
   {
-    id: "formal-islami",
-    name: "1. Formal Islami",
-    message: `Assalamu'alaikum Warahmatullahi Wabarakatuh
+    id: "formal-kristen",
+    name: "1. Formal Kristen",
+    message: `Shalom,
 
 {salam} {nama},
 
-Dengan memohon rahmat dan berkat Allah SWT, kami bermaksud menyelenggarakan pernikahan putra-putri kami:
+Dengan penuh sukacita dan mengucap syukur kepada Tuhan Yesus Kristus, kami mengundang Bapak/Ibu/Saudara/i untuk hadir dalam pemberkatan pernikahan kami:
 
 💍 {pasangan}
 📅 {tanggal}
 📍 {lokasi}
 
-Mohon doa restu dan kehadiran Bapak/Ibu/Saudara/i di acara pernikahan kami.
+Kami berharap kehadiran dan doa Bapak/Ibu/Saudara/i menjadi berkat bagi kami.
 
 Undangan digital:
 {link}
 
-Terima kasih 🙏
-Wassalamu'alaikum`,
+Tuhan memberkati 🙏`,
   },
   {
     id: "formal-nasional",
-    name: "2. Formal Nasional",
+    name: "2. Formal Sopan",
     message: `{salam} {nama},
 
-Dengan memohon rahmat dan berkat Tuhan Yang Maha Esa, kami mengundang Bapak/Ibu/Saudara/i untuk hadir di acara pernikahan kami:
+Dengan memohon berkat Tuhan, kami mengundang Bapak/Ibu/Saudara/i untuk hadir di acara pernikahan kami:
 
 💍 {pasangan}
 📅 {tanggal}
 📍 {lokasi}
 
-Merupakan suatu kehormatan apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.
+Merupakan suatu kehormatan apabila Bapak/Ibu/Saudara/i berkenan hadir dan mendoakan kami.
 
 Silakan buka undangan melalui link berikut:
 {link}
 
-Atas perhatian dan doa restunya, kami ucapkan terima kasih.`,
+Atas perhatian dan doanya, kami ucapkan terima kasih.
+Tuhan memberkati.`,
   },
   {
     id: "singkat-sopan",
     name: "3. Singkat & Sopan",
     message: `Halo {nama} 👋
 
-Kami mengundang Anda untuk hadir di pernikahan {pasangan}.
+Dengan sukacita kami mengundang Anda untuk hadir di pemberkatan pernikahan {pasangan}.
 
 📅 {tanggal}
 📍 {lokasi}
@@ -57,7 +57,7 @@ Kami mengundang Anda untuk hadir di pernikahan {pasangan}.
 Detail undangan:
 {link}
 
-Terima kasih, sampai jumpa!`,
+Tuhan memberkati, sampai jumpa!`,
   },
 ];
 

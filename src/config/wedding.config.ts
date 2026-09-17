@@ -62,7 +62,7 @@ export const wedding = {
   },
 
   intro:
-    "Dengan memohon rahmat dan berkat Tuhan Yang Maha Esa, kami bermaksud mengundang Bapak/Ibu/Saudara/i untuk hadir di acara pernikahan kami. Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan memberikan doa restu.",
+    "Dengan penuh sukacita dan mengucap syukur kepada Tuhan Yesus Kristus, kami mengundang Bapak/Ibu/Saudara/i untuk hadir dalam pemberkatan pernikahan kami. Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan mendoakan kami.",
 
   quote: "Constantly, consistently, continually, You.",
 
@@ -109,7 +109,7 @@ export const wedding = {
   gift: {
     title: "Wedding Gift",
     description:
-      "Doa restu Anda merupakan karunia yang sangat berarti bagi kami. Dan jika memberi adalah ungkapan tanda kasih Anda, Anda dapat memberi kado secara cashless.",
+      "Doa dan kehadiran Anda adalah berkat yang sangat berarti bagi kami. Jika memberi adalah ungkapan kasih Anda, Anda dapat memberikan kado secara cashless.",
     physicalAddress:
       "Perum. Taman Danau Indah Blok J No. 26, Kel. Pabuaran Tumpeng, Kec. Karawaci, Tangerang",
     accounts: [
@@ -130,8 +130,8 @@ export const wedding = {
 
   closing: {
     paragraphs: [
-      "Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Anda berkenan hadir dan memberikan do'a restunya untuk pernikahan kami.",
-      "Atas do'a & restunya, kami ucapkan terima kasih.",
+      "Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Anda berkenan hadir dan mendoakan pernikahan kami.",
+      "Atas doa dan kehadiran Anda, kami mengucapkan terima kasih. Tuhan memberkati.",
     ],
   },
 
