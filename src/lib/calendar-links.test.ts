@@ -51,7 +51,7 @@ describe("calendar-links", () => {
 
   it("builds Android insert intent with prefilled fields", () => {
     const intent = buildAndroidInsertIntent(event);
-    expect(intent).toContain("intent://");
+    expect(intent).toContain("intent:#Intent;");
     expect(intent).toContain("android.intent.action.INSERT");
     expect(intent).toContain("vnd.android.cursor.item/event");
     expect(intent).toContain("S.title=");
