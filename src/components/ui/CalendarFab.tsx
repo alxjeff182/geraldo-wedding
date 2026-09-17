@@ -1,5 +1,5 @@
 import { useWeddingContent } from "../../context/WeddingContentContext";
-import { openCalendarForEvent } from "../../lib/calendar-links";
+import { openCalendarForEvent, prefersAppleCalendar } from "../../lib/calendar-links";
 import type { WeddingEvent } from "../../config/wedding.config";
 
 function CalendarIcon() {
@@ -48,13 +48,15 @@ export function CalendarFab() {
     endsAt: event.endsAt,
   };
 
-  const label = content.eventsSection.calendarFabLabel;
   const filename = `${event.name.toLowerCase().replace(/\s+/g, "-")}.ics`;
+  const label = prefersAppleCalendar()
+    ? "Tambah ke Kalender"
+    : content.eventsSection.calendarFabLabel || "Tambah ke Google Calendar";
 
   return (
     <button
       type="button"
-      className="calendar-fab"
+      className="invite-fab invite-fab--calendar"
       aria-label={label}
       title={label}
       onClick={() => {

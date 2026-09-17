@@ -80,19 +80,45 @@ export function downloadIcsFile(filename: string, content: string) {
   URL.revokeObjectURL(url);
 }
 
-/** iPhone / iPad / Mac Safari — Google Calendar web add often fails; ICS opens Apple Calendar. */
+/** iPhone / iPad / any Mac browser — prefer Apple Calendar via .ics (not Google web). */
 export function prefersAppleCalendar(userAgent = typeof navigator !== "undefined" ? navigator.userAgent : ""): boolean {
   const ua = userAgent;
   const iOS = /iPad|iPhone|iPod/i.test(ua);
-  const iPadOs = typeof navigator !== "undefined" && navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
-  const macSafari = /Macintosh/i.test(ua) && /Safari/i.test(ua) && !/Chrome|CriOS|Edg|Firefox|Chromium/i.test(ua);
-  return iOS || iPadOs || macSafari;
+  const iPadOs =
+    typeof navigator !== "undefined" &&
+    navigator.platform === "MacIntel" &&
+    navigator.maxTouchPoints > 1;
+  const mac = /Macintosh|Mac OS X/i.test(ua);
+  return iOS || iPadOs || mac;
 }
 
-/** Open ICS via data-URI so iOS/macOS offers Add to Calendar. */
-export function openAppleCalendarIcs(content: string) {
-  const href = `data:text/calendar;charset=utf-8,${encodeURIComponent(content)}`;
-  window.location.href = href;
+function isIosLike(
+  userAgent = typeof navigator !== "undefined" ? navigator.userAgent : "",
+): boolean {
+  if (/iPad|iPhone|iPod/i.test(userAgent)) return true;
+  return (
+    typeof navigator !== "undefined" &&
+    navigator.platform === "MacIntel" &&
+    navigator.maxTouchPoints > 1
+  );
+}
+
+/** Open ICS so iOS/macOS offers Add to Calendar / Calendar.app. */
+export function openAppleCalendarIcs(content: string, filename = "wedding.ics") {
+  if (isIosLike()) {
+    const href = `data:text/calendar;charset=utf-8,${encodeURIComponent(content)}`;
+    window.location.href = href;
+    return;
+  }
+  // Mac Chrome/Safari/Firefox: downloading .ics opens Calendar.app reliably.
+  downloadIcsFile(filename, content);
+}
+
+export function openGoogleCalendar(event: CalendarEventInput): boolean {
+  const googleUrl = buildGoogleCalendarUrl(event);
+  if (!googleUrl) return false;
+  window.open(googleUrl, "_blank", "noopener,noreferrer");
+  return true;
 }
 
 export function openCalendarForEvent(
@@ -102,15 +128,11 @@ export function openCalendarForEvent(
   if (prefersAppleCalendar()) {
     const ics = buildIcsContent(event);
     if (!ics) return false;
-    openAppleCalendarIcs(ics);
+    openAppleCalendarIcs(ics, filename);
     return true;
   }
 
-  const googleUrl = buildGoogleCalendarUrl(event);
-  if (googleUrl) {
-    window.open(googleUrl, "_blank", "noopener,noreferrer");
-    return true;
-  }
+  if (openGoogleCalendar(event)) return true;
 
   const ics = buildIcsContent(event);
   if (!ics) return false;

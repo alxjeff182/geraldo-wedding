@@ -3,9 +3,10 @@ import { useWeddingContent } from "../../context/WeddingContentContext";
 import type { WeddingEvent } from "../../config/wedding.config";
 import { OPEN_EASE } from "../../constants/open-animation";
 import {
+  buildGoogleCalendarUrl,
   buildIcsContent,
   downloadIcsFile,
-  openCalendarForEvent,
+  openAppleCalendarIcs,
   prefersAppleCalendar,
 } from "../../lib/calendar-links";
 import { LocationIcon } from "../ui/LocationIcon";
@@ -27,12 +28,13 @@ function EventCalendarActions({ event }: { event: WeddingEvent }) {
     endsAt: event.endsAt,
   };
   const filename = `${event.name.toLowerCase().replace(/\s+/g, "-")}.ics`;
+  const googleUrl = buildGoogleCalendarUrl(calendarInput);
 
   const handleIcs = () => {
     const ics = buildIcsContent(calendarInput);
     if (!ics) return;
     if (prefersAppleCalendar()) {
-      openCalendarForEvent(calendarInput, filename);
+      openAppleCalendarIcs(ics, filename);
       return;
     }
     downloadIcsFile(filename, ics);
@@ -49,13 +51,16 @@ function EventCalendarActions({ event }: { event: WeddingEvent }) {
         <LocationIcon />
         {content.eventsSection.mapsButton}
       </a>
-      <button
-        type="button"
-        className="btn-gold btn-gold--compact btn-gold--ghost"
-        onClick={() => openCalendarForEvent(calendarInput, filename)}
-      >
-        {content.eventsSection.calendarGoogleButton}
-      </button>
+      {googleUrl && (
+        <a
+          href={googleUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-gold btn-gold--compact btn-gold--ghost"
+        >
+          {content.eventsSection.calendarGoogleButton}
+        </a>
+      )}
       <button type="button" className="btn-gold btn-gold--compact btn-gold--ghost" onClick={handleIcs}>
         {content.eventsSection.calendarIcsButton}
       </button>
@@ -83,6 +88,7 @@ function EmbeddedEventItem({
     endsAt: event.endsAt,
   };
   const filename = `${event.name.toLowerCase().replace(/\s+/g, "-")}.ics`;
+  const googleUrl = buildGoogleCalendarUrl(calendarInput);
 
   return (
     <>
@@ -144,13 +150,16 @@ function EmbeddedEventItem({
             <LocationIcon />
             {content.eventsSection.mapsButton}
           </motion.a>
-          <button
-            type="button"
-            className="btn-gold btn-gold--compact btn-gold--ghost"
-            onClick={() => openCalendarForEvent(calendarInput, filename)}
-          >
-            {content.eventsSection.calendarGoogleButton}
-          </button>
+          {googleUrl && (
+            <a
+              href={googleUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-gold btn-gold--compact btn-gold--ghost"
+            >
+              {content.eventsSection.calendarGoogleButton}
+            </a>
+          )}
           <button
             type="button"
             className="btn-gold btn-gold--compact btn-gold--ghost"
@@ -158,7 +167,7 @@ function EmbeddedEventItem({
               const ics = buildIcsContent(calendarInput);
               if (!ics) return;
               if (prefersAppleCalendar()) {
-                openCalendarForEvent(calendarInput, filename);
+                openAppleCalendarIcs(ics, filename);
                 return;
               }
               downloadIcsFile(filename, ics);

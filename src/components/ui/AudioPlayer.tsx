@@ -27,7 +27,7 @@ export function AudioPlayer({ playing, onToggle }: Props) {
     <button
       type="button"
       onClick={onToggle}
-      className={`audio-toggle ${playing ? "audio-toggle--playing" : ""}`}
+      className={`invite-fab invite-fab--music${playing ? " invite-fab--music-playing" : ""}`}
       aria-label={playing ? "Matikan musik" : "Putar musik"}
       aria-pressed={playing}
     >

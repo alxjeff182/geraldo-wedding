@@ -1628,29 +1628,12 @@ body {
 }
 
 .invite-fabs {
+  /* Portal mount only — FABs use position:fixed themselves */
+  display: contents;
+}
+
+.invite-fab {
   position: fixed;
-  z-index: 9998;
-  left: 50%;
-  bottom: 0;
-  width: min(100%, 500px);
-  height: 0;
-  transform: translateX(-50%);
-  pointer-events: none;
-}
-
-@media (min-width: 768px) {
-  .invite-fabs {
-    left: auto;
-    right: 0;
-    width: 500px;
-    transform: none;
-  }
-}
-
-.audio-toggle,
-.calendar-fab {
-  position: absolute;
-  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   z-index: 9998;
   display: flex;
   height: 2.75rem;
@@ -1671,24 +1654,36 @@ body {
   padding: 0;
 }
 
-.audio-toggle {
-  left: 12px;
+.invite-fab--music {
+  left: max(12px, env(safe-area-inset-left, 0px));
   right: auto;
   top: auto;
+  bottom: max(12px, env(safe-area-inset-bottom, 0px));
 }
 
-.calendar-fab {
-  right: 12px;
+.invite-fab--calendar {
+  right: max(12px, env(safe-area-inset-right, 0px));
   left: auto;
   top: auto;
+  bottom: max(12px, env(safe-area-inset-bottom, 0px));
 }
 
-.calendar-fab:hover,
-.audio-toggle:hover {
+@media (min-width: 768px) {
+  /* Pin to corners of the 500px invitation column (right side) */
+  .invite-fab--music {
+    left: calc(100% - 500px + 12px);
+  }
+
+  .invite-fab--calendar {
+    right: 12px;
+  }
+}
+
+.invite-fab:hover {
   background: #fff8f0;
 }
 
-.audio-toggle--playing {
+.invite-fab--music-playing {
   animation: audio-spin 4s linear infinite;
 }
 
@@ -1702,7 +1697,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .audio-toggle--playing {
+  .invite-fab--music-playing {
     animation: none;
   }
 }

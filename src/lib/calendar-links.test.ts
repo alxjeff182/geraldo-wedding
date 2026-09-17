@@ -34,7 +34,7 @@ describe("calendar-links", () => {
     expect(buildIcsContent({ ...event, endsAt: "" })).toBeNull();
   });
 
-  it("detects Apple calendar clients", () => {
+  it("detects Apple calendar clients including Mac Chrome", () => {
     expect(prefersAppleCalendar("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)")).toBe(
       true,
     );
@@ -46,6 +46,11 @@ describe("calendar-links", () => {
     expect(
       prefersAppleCalendar(
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      ),
+    ).toBe(true);
+    expect(
+      prefersAppleCalendar(
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
       ),
     ).toBe(false);
   });
