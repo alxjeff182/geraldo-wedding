@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { buildGoogleCalendarUrl, buildIcsContent } from "./calendar-links";
+import {
+  buildGoogleCalendarUrl,
+  buildIcsContent,
+  prefersAppleCalendar,
+} from "./calendar-links";
 
 describe("calendar-links", () => {
   const event = {
@@ -28,5 +32,21 @@ describe("calendar-links", () => {
   it("returns null for invalid dates", () => {
     expect(buildGoogleCalendarUrl({ ...event, startsAt: "bad" })).toBeNull();
     expect(buildIcsContent({ ...event, endsAt: "" })).toBeNull();
+  });
+
+  it("detects Apple calendar clients", () => {
+    expect(prefersAppleCalendar("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)")).toBe(
+      true,
+    );
+    expect(
+      prefersAppleCalendar(
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
+      ),
+    ).toBe(true);
+    expect(
+      prefersAppleCalendar(
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      ),
+    ).toBe(false);
   });
 });

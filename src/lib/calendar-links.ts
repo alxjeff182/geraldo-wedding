@@ -79,3 +79,41 @@ export function downloadIcsFile(filename: string, content: string) {
   anchor.remove();
   URL.revokeObjectURL(url);
 }
+
+/** iPhone / iPad / Mac Safari — Google Calendar web add often fails; ICS opens Apple Calendar. */
+export function prefersAppleCalendar(userAgent = typeof navigator !== "undefined" ? navigator.userAgent : ""): boolean {
+  const ua = userAgent;
+  const iOS = /iPad|iPhone|iPod/i.test(ua);
+  const iPadOs = typeof navigator !== "undefined" && navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+  const macSafari = /Macintosh/i.test(ua) && /Safari/i.test(ua) && !/Chrome|CriOS|Edg|Firefox|Chromium/i.test(ua);
+  return iOS || iPadOs || macSafari;
+}
+
+/** Open ICS via data-URI so iOS/macOS offers Add to Calendar. */
+export function openAppleCalendarIcs(content: string) {
+  const href = `data:text/calendar;charset=utf-8,${encodeURIComponent(content)}`;
+  window.location.href = href;
+}
+
+export function openCalendarForEvent(
+  event: CalendarEventInput,
+  filename = "wedding.ics",
+): boolean {
+  if (prefersAppleCalendar()) {
+    const ics = buildIcsContent(event);
+    if (!ics) return false;
+    openAppleCalendarIcs(ics);
+    return true;
+  }
+
+  const googleUrl = buildGoogleCalendarUrl(event);
+  if (googleUrl) {
+    window.open(googleUrl, "_blank", "noopener,noreferrer");
+    return true;
+  }
+
+  const ics = buildIcsContent(event);
+  if (!ics) return false;
+  downloadIcsFile(filename, ics);
+  return true;
+}

@@ -1,5 +1,3 @@
-import { createPortal } from "react-dom";
-
 type Props = {
   playing: boolean;
   onToggle: () => void;
@@ -25,7 +23,7 @@ function StopCircleIcon() {
 }
 
 export function AudioPlayer({ playing, onToggle }: Props) {
-  const button = (
+  return (
     <button
       type="button"
       onClick={onToggle}
@@ -36,7 +34,4 @@ export function AudioPlayer({ playing, onToggle }: Props) {
       {playing ? <VinylIcon /> : <StopCircleIcon />}
     </button>
   );
-
-  if (typeof document === "undefined") return button;
-  return createPortal(button, document.body);
 }

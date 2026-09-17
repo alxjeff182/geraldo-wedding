@@ -8,6 +8,7 @@ import { usePageMeta } from "./hooks/usePageMeta";
 import { CoverScreen } from "./components/layout/CoverScreen";
 import { AudioPlayer } from "./components/ui/AudioPlayer";
 import { CalendarFab } from "./components/ui/CalendarFab";
+import { InviteFabs } from "./components/ui/InviteFabs";
 import { Toast } from "./components/ui/Toast";
 import { useToast } from "./hooks/useToast";
 import { Hero } from "./components/sections/Hero";
@@ -213,8 +214,12 @@ export default function App({ adminMode = false }: AppProps) {
         </motion.main>
       </div>
 
-      {opened && <AudioPlayer playing={playing} onToggle={toggle} />}
-      {opened && <CalendarFab />}
+      {opened && (
+        <InviteFabs>
+          <AudioPlayer playing={playing} onToggle={toggle} />
+          <CalendarFab />
+        </InviteFabs>
+      )}
 
       <SectionModal
         open={shortcutModal !== null}

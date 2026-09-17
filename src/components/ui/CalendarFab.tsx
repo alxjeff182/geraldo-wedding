@@ -1,6 +1,5 @@
-import { createPortal } from "react-dom";
 import { useWeddingContent } from "../../context/WeddingContentContext";
-import { buildGoogleCalendarUrl } from "../../lib/calendar-links";
+import { openCalendarForEvent } from "../../lib/calendar-links";
 import type { WeddingEvent } from "../../config/wedding.config";
 
 function CalendarIcon() {
@@ -39,34 +38,30 @@ function pickPrimaryEvent(events: readonly WeddingEvent[]): WeddingEvent | null 
 export function CalendarFab() {
   const { content } = useWeddingContent();
   const event = pickPrimaryEvent(content.events);
-
   if (!event) return null;
 
-  const url = buildGoogleCalendarUrl({
+  const calendarEvent = {
     title: `${event.name} — ${content.site.title}`,
     details: `${event.time}\n${event.venue}\n${content.site.url}`,
     location: `${event.venue}, ${event.address}`,
     startsAt: event.startsAt,
     endsAt: event.endsAt,
-  });
-
-  if (!url) return null;
+  };
 
   const label = content.eventsSection.calendarFabLabel;
+  const filename = `${event.name.toLowerCase().replace(/\s+/g, "-")}.ics`;
 
-  const button = (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
+  return (
+    <button
+      type="button"
       className="calendar-fab"
       aria-label={label}
       title={label}
+      onClick={() => {
+        openCalendarForEvent(calendarEvent, filename);
+      }}
     >
       <CalendarIcon />
-    </a>
+    </button>
   );
-
-  if (typeof document === "undefined") return button;
-  return createPortal(button, document.body);
 }
