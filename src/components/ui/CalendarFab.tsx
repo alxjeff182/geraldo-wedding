@@ -1,5 +1,5 @@
 import { useWeddingContent } from "../../context/WeddingContentContext";
-import { openCalendarForEvent, prefersAppleCalendar } from "../../lib/calendar-links";
+import { openCalendarForEvents, prefersAppleCalendar } from "../../lib/calendar-links";
 import type { WeddingEvent } from "../../config/wedding.config";
 
 function CalendarIcon() {
@@ -28,27 +28,31 @@ function CalendarIcon() {
   );
 }
 
-function pickPrimaryEvent(events: readonly WeddingEvent[]): WeddingEvent | null {
-  if (events.length === 0) return null;
-  return [...events].sort(
-    (a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime(),
-  )[0];
-}
-
 export function CalendarFab() {
   const { content } = useWeddingContent();
-  const event = pickPrimaryEvent(content.events);
-  if (!event) return null;
+  if (content.events.length === 0) return null;
 
-  const calendarEvent = {
-    title: `${event.name} — ${content.site.title}`,
-    details: `${event.time}\n${event.venue}\n${content.site.url}`,
+  const sorted = [...content.events].sort(
+    (a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime(),
+  );
+
+  const calendarEvents = sorted.map((event: WeddingEvent) => ({
+    title: `${event.name} - ${content.site.title}`,
+    details: [
+      `Pernikahan ${content.site.title}`,
+      event.time,
+      event.venue,
+      event.address,
+      content.site.url,
+    ]
+      .filter(Boolean)
+      .join("\n"),
     location: `${event.venue}, ${event.address}`,
     startsAt: event.startsAt,
     endsAt: event.endsAt,
-  };
+  }));
 
-  const filename = `${event.name.toLowerCase().replace(/\s+/g, "-")}.ics`;
+  const calendarName = `Pernikahan ${content.site.title}`;
   const label = prefersAppleCalendar()
     ? "Tambah ke Kalender"
     : content.eventsSection.calendarFabLabel || "Tambah ke Google Calendar";
@@ -60,7 +64,7 @@ export function CalendarFab() {
       aria-label={label}
       title={label}
       onClick={() => {
-        openCalendarForEvent(calendarEvent, filename);
+        openCalendarForEvents(calendarEvents, calendarName, "pernikahan-geraldo-christin.ics");
       }}
     >
       <CalendarIcon />

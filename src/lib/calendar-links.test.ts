@@ -1,17 +1,26 @@
 import { describe, expect, it } from "vitest";
 import {
   buildGoogleCalendarUrl,
+  buildIcsCalendar,
   buildIcsContent,
   prefersAppleCalendar,
 } from "./calendar-links";
 
 describe("calendar-links", () => {
   const event = {
-    title: "Pemberkatan Geraldo & Christin",
+    title: "Pemberkatan - Geraldo & Christin",
     details: "Undangan pernikahan",
     location: "GPI Pondok Arum, Tangerang",
     startsAt: "2026-04-25T08:00:00+07:00",
     endsAt: "2026-04-25T10:00:00+07:00",
+  };
+
+  const reception = {
+    title: "Resepsi & Adat - Geraldo & Christin",
+    details: "Resepsi",
+    location: "UFIT HALL GK, Tangerang",
+    startsAt: "2026-04-25T11:00:00+07:00",
+    endsAt: "2026-04-25T15:00:00+07:00",
   };
 
   it("builds a Google Calendar URL", () => {
@@ -22,11 +31,20 @@ describe("calendar-links", () => {
     expect(url).toContain("20260425T030000Z");
   });
 
-  it("builds ICS content", () => {
+  it("builds ICS content with event title", () => {
     const ics = buildIcsContent(event);
     expect(ics).toContain("BEGIN:VEVENT");
-    expect(ics).toContain("SUMMARY:Pemberkatan Geraldo & Christin");
+    expect(ics).toContain("SUMMARY:Pemberkatan - Geraldo & Christin");
     expect(ics).toContain("DTSTART:20260425T010000Z");
+    expect(ics).toContain("X-WR-CALNAME:Pemberkatan - Geraldo & Christin");
+  });
+
+  it("builds multi-event ICS with calendar name", () => {
+    const ics = buildIcsCalendar([event, reception], "Pernikahan Geraldo & Christin");
+    expect(ics).toContain("X-WR-CALNAME:Pernikahan Geraldo & Christin");
+    expect(ics).toContain("SUMMARY:Pemberkatan - Geraldo & Christin");
+    expect(ics).toContain("SUMMARY:Resepsi & Adat - Geraldo & Christin");
+    expect(ics?.match(/BEGIN:VEVENT/g)?.length).toBe(2);
   });
 
   it("returns null for invalid dates", () => {
