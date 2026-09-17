@@ -114,7 +114,7 @@ export function GuestInvitePanel({
 
     const { data, error } = await supabase
       .from("guests")
-      .select("id, slug, display_name, phone, created_at")
+      .select("id, slug, display_name, phone, invite_sent_at, created_at")
       .order("display_name", { ascending: true });
 
     if (error) {
@@ -378,6 +378,37 @@ export function GuestInvitePanel({
     if (expandedId === guest.id) setExpandedId(null);
     onNotify(invite.guestDeleted);
     await loadGuests();
+  };
+
+  const handleMarkInviteSent = async (guest: Guest, sent: boolean) => {
+    setSavingId(guest.id);
+    const supabase = getSupabase();
+    if (!supabase) {
+      onNotify(invite.guestError);
+      setSavingId(null);
+      return;
+    }
+
+    const invite_sent_at = sent ? new Date().toISOString() : null;
+    const { error } = await supabase.from("guests").update({ invite_sent_at }).eq("id", guest.id);
+    setSavingId(null);
+
+    if (error) {
+      onNotify(invite.guestError);
+      return;
+    }
+
+    setGuests((prev) =>
+      prev.map((item) => (item.id === guest.id ? { ...item, invite_sent_at } : item)),
+    );
+    onNotify(sent ? invite.waMarkedSent : invite.waMarkedUnsent);
+  };
+
+  const openWhatsAppAndMark = (guest: Guest, waUrl: string) => {
+    window.open(waUrl, "_blank", "noopener,noreferrer");
+    if (!guest.invite_sent_at) {
+      void handleMarkInviteSent(guest, true);
+    }
   };
 
   const copyLink = async (guest: Guest) => {
@@ -756,6 +787,7 @@ export function GuestInvitePanel({
                     const isExpanded = expandedId === guest.id;
                     const rowNo = (currentPage - 1) * pageSize + index + 1;
                     const hasPhone = Boolean(guest.phone?.trim());
+                    const waSent = Boolean(guest.invite_sent_at);
 
                     return (
                       <Fragment key={guest.id}>
@@ -786,24 +818,30 @@ export function GuestInvitePanel({
                           <td className="admin-datalist__date">{formatDate(guest.created_at)}</td>
                           <td>
                             <span
-                              className={`admin-datalist__status${hasPhone ? " admin-datalist__status--ok" : " admin-datalist__status--warn"}`}
+                              className={`admin-datalist__status${waSent ? " admin-datalist__status--ok" : " admin-datalist__status--warn"}`}
+                              title={
+                                waSent
+                                  ? formatDate(guest.invite_sent_at ?? undefined)
+                                  : hasPhone
+                                    ? invite.waUnsentLabel
+                                    : invite.noPhone
+                              }
                             >
-                              {hasPhone ? "Siap WA" : "No WA kosong"}
+                              {waSent ? invite.waSentLabel : invite.waUnsentLabel}
                             </span>
                           </td>
                           <td className="admin-datalist__actions-cell">
                             <div className="admin-datalist__row-actions">
                               {waUrl ? (
-                                <a
-                                  href={waUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
+                                <button
+                                  type="button"
                                   className="admin-datalist__action"
                                   title={invite.openWhatsApp}
                                   aria-label={invite.openWhatsApp}
+                                  onClick={() => openWhatsAppAndMark(guest, waUrl)}
                                 >
                                   ✈
-                                </a>
+                                </button>
                               ) : (
                                 <button
                                   type="button"
@@ -884,6 +922,14 @@ export function GuestInvitePanel({
                                     onClick={() => void copyLink(guest)}
                                   >
                                     {invite.copyLink}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="admin-btn admin-btn--ghost admin-btn--sm"
+                                    disabled={savingId === guest.id}
+                                    onClick={() => void handleMarkInviteSent(guest, !waSent)}
+                                  >
+                                    {waSent ? invite.markWaUnsent : invite.markWaSent}
                                   </button>
                                   <button
                                     type="button"

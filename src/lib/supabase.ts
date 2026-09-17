@@ -7,6 +7,7 @@ export type Guest = {
   slug: string;
   display_name: string;
   phone: string | null;
+  invite_sent_at?: string | null;
   created_at?: string;
 };
 
@@ -57,7 +58,12 @@ export type WeddingDatabase = {
     Tables: {
       guests: {
         Row: Guest;
-        Insert: { slug: string; display_name: string; phone?: string | null };
+        Insert: {
+          slug: string;
+          display_name: string;
+          phone?: string | null;
+          invite_sent_at?: string | null;
+        };
         Update: Partial<Guest>;
         Relationships: [];
       };

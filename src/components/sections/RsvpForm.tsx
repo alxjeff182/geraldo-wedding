@@ -9,6 +9,10 @@ import {
   hasRsvpSubmitted,
   markRsvpSubmitted,
 } from "../../lib/rsvp-spam-guard";
+import {
+  formatRsvpDeadlineLabel,
+  isRsvpDeadlinePassed,
+} from "../../lib/rsvp-deadline";
 
 type Props = {
   guestId: string | null;
@@ -83,6 +87,8 @@ export function RsvpForm({ guestId, onSuccess, embedded = false }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [alreadySubmitted, setAlreadySubmitted] = useState(() => hasRsvpSubmitted(guestId));
+  const deadlinePassed = isRsvpDeadlinePassed(content.rsvp.deadline);
+  const deadlineHint = formatRsvpDeadlineLabel(content.rsvp.deadlineLabel, content.rsvp.deadline);
 
   useEffect(() => {
     const syncSubmitted = () => setAlreadySubmitted(hasRsvpSubmitted(guestId));
@@ -272,6 +278,9 @@ export function RsvpForm({ guestId, onSuccess, embedded = false }: Props) {
             {content.rsvp.title}
           </h2>
           <p className="section-card__subtitle">{content.rsvp.subtitle}</p>
+          {deadlineHint && !deadlinePassed ? (
+            <p className="section-card__note">{deadlineHint}</p>
+          ) : null}
         </motion.div>
 
         {!isSupabaseConfigured && (
@@ -283,6 +292,10 @@ export function RsvpForm({ guestId, onSuccess, embedded = false }: Props) {
         {alreadySubmitted ? (
           <p className="section-card__note section-card__note--success" role="status">
             {content.rsvp.alreadySubmittedMessage}
+          </p>
+        ) : deadlinePassed ? (
+          <p className="section-card__note" role="status">
+            {content.rsvp.deadlineClosedMessage}
           </p>
         ) : (
         <form

@@ -111,6 +111,48 @@ export function AdminUmumTab({ merged, updateDraft }: AdminTabProps) {
           />
         </div>
       </fieldset>
+      <fieldset className="admin-fieldset admin-field--wide">
+        <legend>Our Story</legend>
+        <div className="admin-form-grid">
+          <label className="admin-field">
+            <span className="admin-label">Tampilkan section</span>
+            <select
+              className="admin-input"
+              value={merged.story.enabled ? "1" : "0"}
+              onChange={(e) => updateDraft(["story", "enabled"], e.target.value === "1")}
+            >
+              <option value="1">Ya</option>
+              <option value="0">Tidak</option>
+            </select>
+          </label>
+          <AdminTextField
+            label="Judul"
+            value={merged.story.title}
+            onChange={(value) => updateDraft(["story", "title"], value)}
+          />
+          <AdminTextField
+            label="Subtitle"
+            wide
+            value={merged.story.subtitle}
+            onChange={(value) => updateDraft(["story", "subtitle"], value)}
+          />
+          <AdminTextField
+            label="Paragraf (pisah baris kosong = paragraf baru)"
+            wide
+            rows={6}
+            value={merged.story.paragraphs.join("\n\n")}
+            onChange={(value) =>
+              updateDraft(
+                ["story", "paragraphs"],
+                value
+                  .split(/\n\s*\n/)
+                  .map((p) => p.trim())
+                  .filter(Boolean),
+              )
+            }
+          />
+        </div>
+      </fieldset>
     </div>
   );
 }

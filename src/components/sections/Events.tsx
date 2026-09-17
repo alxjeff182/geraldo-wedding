@@ -2,6 +2,11 @@ import { motion } from "framer-motion";
 import { useWeddingContent } from "../../context/WeddingContentContext";
 import type { WeddingEvent } from "../../config/wedding.config";
 import { OPEN_EASE } from "../../constants/open-animation";
+import {
+  buildGoogleCalendarUrl,
+  buildIcsContent,
+  downloadIcsFile,
+} from "../../lib/calendar-links";
 import { LocationIcon } from "../ui/LocationIcon";
 import { PinDropIcon } from "../ui/PinDropIcon";
 
@@ -10,6 +15,51 @@ type Props = {
 };
 
 const EMBED_SPRING = { type: "spring" as const, stiffness: 380, damping: 26 };
+
+function EventCalendarActions({ event }: { event: WeddingEvent }) {
+  const { content } = useWeddingContent();
+  const calendarInput = {
+    title: `${event.name} — ${content.site.title}`,
+    details: `${event.time}\n${event.venue}`,
+    location: `${event.venue}, ${event.address}`,
+    startsAt: event.startsAt,
+    endsAt: event.endsAt,
+  };
+  const googleUrl = buildGoogleCalendarUrl(calendarInput);
+
+  const handleIcs = () => {
+    const ics = buildIcsContent(calendarInput);
+    if (!ics) return;
+    downloadIcsFile(`${event.name.toLowerCase().replace(/\s+/g, "-")}.ics`, ics);
+  };
+
+  return (
+    <div className="events-item__actions">
+      <a
+        href={event.mapsUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="btn-gold btn-gold--compact"
+      >
+        <LocationIcon />
+        {content.eventsSection.mapsButton}
+      </a>
+      {googleUrl ? (
+        <a
+          href={googleUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-gold btn-gold--compact btn-gold--ghost"
+        >
+          {content.eventsSection.calendarGoogleButton}
+        </a>
+      ) : null}
+      <button type="button" className="btn-gold btn-gold--compact btn-gold--ghost" onClick={handleIcs}>
+        {content.eventsSection.calendarIcsButton}
+      </button>
+    </div>
+  );
+}
 
 function EmbeddedEventItem({
   event,
@@ -23,6 +73,14 @@ function EmbeddedEventItem({
   const { content } = useWeddingContent();
   const [dayLine, dateLine] = event.dateLabel.split("\n");
   const enterDelay = 0.14 + index * 0.13;
+  const calendarInput = {
+    title: `${event.name} — ${content.site.title}`,
+    details: `${event.time}\n${event.venue}`,
+    location: `${event.venue}, ${event.address}`,
+    startsAt: event.startsAt,
+    endsAt: event.endsAt,
+  };
+  const googleUrl = buildGoogleCalendarUrl(calendarInput);
 
   return (
     <>
@@ -70,19 +128,42 @@ function EmbeddedEventItem({
           <p>{event.address}</p>
         </div>
 
-        <motion.a
-          href={event.mapsUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn-gold btn-gold--compact btn-gold--interactive"
-          whileHover={{ scale: 1.06, y: -2 }}
-          whileTap={{ scale: 0.95 }}
-          transition={EMBED_SPRING}
-        >
-          <span className="btn-gold__shine" aria-hidden />
-          <LocationIcon />
-          {content.eventsSection.mapsButton}
-        </motion.a>
+        <div className="events-item__actions events-item__actions--embedded">
+          <motion.a
+            href={event.mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-gold btn-gold--compact btn-gold--interactive"
+            whileHover={{ scale: 1.06, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            transition={EMBED_SPRING}
+          >
+            <span className="btn-gold__shine" aria-hidden />
+            <LocationIcon />
+            {content.eventsSection.mapsButton}
+          </motion.a>
+          {googleUrl ? (
+            <a
+              href={googleUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-gold btn-gold--compact btn-gold--ghost"
+            >
+              {content.eventsSection.calendarGoogleButton}
+            </a>
+          ) : null}
+          <button
+            type="button"
+            className="btn-gold btn-gold--compact btn-gold--ghost"
+            onClick={() => {
+              const ics = buildIcsContent(calendarInput);
+              if (!ics) return;
+              downloadIcsFile(`${event.name.toLowerCase().replace(/\s+/g, "-")}.ics`, ics);
+            }}
+          >
+            {content.eventsSection.calendarIcsButton}
+          </button>
+        </div>
       </motion.article>
 
       {showDivider && (
@@ -185,15 +266,7 @@ export function Events({ embedded = false }: Props) {
                   <p>{event.address}</p>
                 </div>
 
-                <a
-                  href={event.mapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-gold mt-5"
-                >
-                  <LocationIcon />
-                  {content.eventsSection.mapsButton}
-                </a>
+                <EventCalendarActions event={event} />
 
                 {index < content.events.length - 1 && (
                   <img

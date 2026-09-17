@@ -28,11 +28,20 @@ describe("mergeWeddingContent", () => {
           venue: "Venue",
           address: "Addr",
           mapsUrl: "https://maps.example",
+          startsAt: "2026-04-25T10:00:00+07:00",
+          endsAt: "2026-04-25T12:00:00+07:00",
         },
       ],
     });
     expect(merged.events).toHaveLength(1);
     expect(merged.events[0].name).toBe("Solo Event");
+  });
+
+  it("keeps story and guestGuide defaults", () => {
+    const merged = mergeWeddingContent({});
+    expect(merged.story.enabled).toBe(true);
+    expect(merged.guestGuide.enabled).toBe(true);
+    expect(merged.rsvp.deadline).toContain("2026-04-18");
   });
 
   it("provides 3 invite templates by default", () => {

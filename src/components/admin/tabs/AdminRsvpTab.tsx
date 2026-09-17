@@ -85,6 +85,24 @@ export function AdminRsvpTab({ merged, updateDraft, setMessage }: AdminRsvpTabPr
             onChange={(value) => updateDraft(["rsvp", "note"], value)}
           />
           <AdminTextField
+            label="Batas RSVP (ISO, kosong = tanpa batas)"
+            wide
+            value={merged.rsvp.deadline}
+            onChange={(value) => updateDraft(["rsvp", "deadline"], value)}
+          />
+          <AdminTextField
+            label="Label batas (pakai {date})"
+            wide
+            value={merged.rsvp.deadlineLabel}
+            onChange={(value) => updateDraft(["rsvp", "deadlineLabel"], value)}
+          />
+          <AdminTextField
+            label="Pesan saat batas lewat"
+            wide
+            value={merged.rsvp.deadlineClosedMessage}
+            onChange={(value) => updateDraft(["rsvp", "deadlineClosedMessage"], value)}
+          />
+          <AdminTextField
             label="Pesan Sukses"
             wide
             value={merged.rsvp.successMessage}

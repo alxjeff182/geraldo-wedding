@@ -24,10 +24,14 @@ const AdminPage = lazy(() =>
   import("./pages/AdminPage").then((m) => ({ default: m.AdminPage })),
 );
 const Couple = lazy(() => import("./components/sections/Couple").then((m) => ({ default: m.Couple })));
+const Story = lazy(() => import("./components/sections/Story").then((m) => ({ default: m.Story })));
 const Countdown = lazy(() =>
   import("./components/sections/Countdown").then((m) => ({ default: m.Countdown })),
 );
 const Events = lazy(() => import("./components/sections/Events").then((m) => ({ default: m.Events })));
+const GuestGuide = lazy(() =>
+  import("./components/sections/GuestGuide").then((m) => ({ default: m.GuestGuide })),
+);
 const Gift = lazy(() => import("./components/sections/Gift").then((m) => ({ default: m.Gift })));
 const Closing = lazy(() =>
   import("./components/sections/Closing").then((m) => ({ default: m.Closing })),
@@ -176,10 +180,16 @@ export default function App({ adminMode = false }: AppProps) {
             <Couple />
           </Suspense>
           <Suspense fallback={<SectionFallback />}>
+            <Story />
+          </Suspense>
+          <Suspense fallback={<SectionFallback />}>
             <Countdown />
           </Suspense>
           <Suspense fallback={<SectionFallback />}>
             <Events />
+          </Suspense>
+          <Suspense fallback={<SectionFallback />}>
+            <GuestGuide />
           </Suspense>
           <Suspense fallback={<SectionFallback />}>
             <Gallery />

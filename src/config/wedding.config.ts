@@ -10,6 +10,10 @@ export type WeddingEvent = {
   venue: string;
   address: string;
   mapsUrl: string;
+  /** ISO datetime for calendar export */
+  startsAt: string;
+  /** ISO datetime for calendar export */
+  endsAt: string;
 };
 
 export type GiftAccount = {
@@ -79,6 +83,8 @@ export const wedding = {
       address:
         "Perum. Pondok Arum, Blok J No. 26, Kel. Pabuaran Tumpeng, Kec. Karawaci, Tangerang",
       mapsUrl: "https://share.google/grqB2yx9JoR0Cdkdq",
+      startsAt: "2026-04-25T08:00:00+07:00",
+      endsAt: "2026-04-25T10:00:00+07:00",
     },
     {
       name: "Resepsi & Adat",
@@ -88,8 +94,32 @@ export const wedding = {
       address:
         "Jl. Palem Raja Raya No.31, Panunggangan Bar., Kec. Cibodas, Kab. Tangerang",
       mapsUrl: "https://share.google/xxDvbeTIhjN0hvbBg",
+      startsAt: "2026-04-25T11:00:00+07:00",
+      endsAt: "2026-04-25T15:00:00+07:00",
     },
   ] satisfies WeddingEvent[],
+
+  story: {
+    enabled: true,
+    title: "Our Story",
+    subtitle: "Constantly, consistently, continually, You.",
+    paragraphs: [
+      "Perjalanan kami dimulai dari pertemuan yang sederhana, lalu tumbuh menjadi kasih yang kami syukuri setiap hari.",
+      "Dengan penuh sukacita kami melangkah menuju pemberkatan pernikahan di hadapan Tuhan Yesus Kristus.",
+    ],
+  },
+
+  guestGuide: {
+    enabled: true,
+    title: "Info untuk Tamu",
+    subtitle: "Dress code dan tip lokasi agar kehadiran Anda lebih nyaman.",
+    dressCodeTitle: "Dress Code",
+    dressCode:
+      "Formal / Elegant dengan nuansa maroon & gold. Untuk tamu keluarga adat, ulos dipersilakan sesuai kebiasaan keluarga masing-masing.",
+    tipsTitle: "Parkir & Akomodasi",
+    tips:
+      "Parkir tersedia di area UFIT HALL GK untuk resepsi.\nTamu dari luar kota dapat menginap di sekitar Karawaci / Cibodas (akses mudah ke kedua venue).",
+  },
 
   gallery: {
     title: "Our Gallery",
@@ -155,6 +185,10 @@ export const wedding = {
     title: "Rsvp",
     subtitle: "Konfirmasi kehadiran Anda dengan mengisi form berikut",
     note: "*Mohon maaf! Khusus untuk tamu undangan",
+    deadline: "2026-04-18T23:59:59+07:00",
+    deadlineLabel: "Mohon konfirmasi kehadiran sebelum {date}",
+    deadlineClosedMessage:
+      "Batas konfirmasi kehadiran telah berakhir. Terima kasih atas perhatiannya.",
     nameLabel: "Nama*",
     namePlaceholder: "Nama Anda",
     attendanceLabel: "Konfirmasi Kehadiran*",
@@ -255,6 +289,8 @@ export const wedding = {
     venueLabel: "Bertempat di",
     venueLabelColon: "Bertempat di:",
     mapsButton: "Open Maps",
+    calendarGoogleButton: "Google Calendar",
+    calendarIcsButton: "Unduh .ics",
   },
 
   giftUi: {
@@ -329,6 +365,12 @@ export const wedding = {
     bulkImported: "{n} tamu berhasil diimpor",
     bulkImportError: "Gagal mengimpor tamu",
     bulkEmptyPreview: "Belum ada baris untuk dipreview. Tempel daftar atau unggah CSV.",
+    waSentLabel: "Terkirim",
+    waUnsentLabel: "Belum",
+    markWaSent: "Tandai terkirim",
+    markWaUnsent: "Tandai belum",
+    waMarkedSent: "Ditandai sudah dikirim WA",
+    waMarkedUnsent: "Status WA dikembalikan ke belum",
   },
 } as const;
 

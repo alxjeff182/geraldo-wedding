@@ -40,8 +40,71 @@ export function AdminAcaraTab({ merged, updateDraft }: AdminTabProps) {
             value={merged.eventsSection.mapsButton}
             onChange={(value) => updateDraft(["eventsSection", "mapsButton"], value)}
           />
+          <AdminTextField
+            label="Tombol Google Calendar"
+            value={merged.eventsSection.calendarGoogleButton}
+            onChange={(value) => updateDraft(["eventsSection", "calendarGoogleButton"], value)}
+          />
+          <AdminTextField
+            label="Tombol Unduh .ics"
+            value={merged.eventsSection.calendarIcsButton}
+            onChange={(value) => updateDraft(["eventsSection", "calendarIcsButton"], value)}
+          />
         </div>
       </fieldset>
+
+      <fieldset className="admin-fieldset">
+        <legend>Info Tamu (Dress Code & Tips)</legend>
+        <div className="admin-form-grid">
+          <label className="admin-field">
+            <span className="admin-label">Tampilkan section</span>
+            <select
+              className="admin-input"
+              value={merged.guestGuide.enabled ? "1" : "0"}
+              onChange={(e) => updateDraft(["guestGuide", "enabled"], e.target.value === "1")}
+            >
+              <option value="1">Ya</option>
+              <option value="0">Tidak</option>
+            </select>
+          </label>
+          <AdminTextField
+            label="Judul"
+            value={merged.guestGuide.title}
+            onChange={(value) => updateDraft(["guestGuide", "title"], value)}
+          />
+          <AdminTextField
+            label="Subtitle"
+            wide
+            value={merged.guestGuide.subtitle}
+            onChange={(value) => updateDraft(["guestGuide", "subtitle"], value)}
+          />
+          <AdminTextField
+            label="Judul Dress Code"
+            value={merged.guestGuide.dressCodeTitle}
+            onChange={(value) => updateDraft(["guestGuide", "dressCodeTitle"], value)}
+          />
+          <AdminTextField
+            label="Isi Dress Code"
+            wide
+            rows={3}
+            value={merged.guestGuide.dressCode}
+            onChange={(value) => updateDraft(["guestGuide", "dressCode"], value)}
+          />
+          <AdminTextField
+            label="Judul Tips"
+            value={merged.guestGuide.tipsTitle}
+            onChange={(value) => updateDraft(["guestGuide", "tipsTitle"], value)}
+          />
+          <AdminTextField
+            label="Isi Tips (baris baru = paragraf)"
+            wide
+            rows={4}
+            value={merged.guestGuide.tips}
+            onChange={(value) => updateDraft(["guestGuide", "tips"], value)}
+          />
+        </div>
+      </fieldset>
+
       {merged.events.map((event, index) => (
         <fieldset key={index} className="admin-fieldset">
           <legend>Acara {index + 1}</legend>
@@ -79,6 +142,30 @@ export function AdminAcaraTab({ merged, updateDraft }: AdminTabProps) {
                 onChange={(e) => {
                   const events = [...merged.events];
                   events[index] = { ...events[index], time: e.target.value };
+                  updateDraft(["events"], events);
+                }}
+              />
+            </label>
+            <label className="admin-field">
+              <span className="admin-label">Mulai (ISO, untuk kalender)</span>
+              <input
+                className="admin-input"
+                value={event.startsAt}
+                onChange={(e) => {
+                  const events = [...merged.events];
+                  events[index] = { ...events[index], startsAt: e.target.value };
+                  updateDraft(["events"], events);
+                }}
+              />
+            </label>
+            <label className="admin-field">
+              <span className="admin-label">Selesai (ISO, untuk kalender)</span>
+              <input
+                className="admin-input"
+                value={event.endsAt}
+                onChange={(e) => {
+                  const events = [...merged.events];
+                  events[index] = { ...events[index], endsAt: e.target.value };
                   updateDraft(["events"], events);
                 }}
               />

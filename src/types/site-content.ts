@@ -5,6 +5,9 @@ export type RsvpContent = {
   title?: string;
   subtitle?: string;
   note?: string;
+  deadline?: string;
+  deadlineLabel?: string;
+  deadlineClosedMessage?: string;
   nameLabel?: string;
   namePlaceholder?: string;
   guestCountLabel?: string;
@@ -128,6 +131,23 @@ export type SiteContentOverrides = {
     venueLabel?: string;
     venueLabelColon?: string;
     mapsButton?: string;
+    calendarGoogleButton?: string;
+    calendarIcsButton?: string;
+  };
+  story?: {
+    enabled?: boolean;
+    title?: string;
+    subtitle?: string;
+    paragraphs?: string[];
+  };
+  guestGuide?: {
+    enabled?: boolean;
+    title?: string;
+    subtitle?: string;
+    dressCodeTitle?: string;
+    dressCode?: string;
+    tipsTitle?: string;
+    tips?: string;
   };
   gallery?: {
     title?: string;
@@ -253,6 +273,12 @@ export type SiteContentOverrides = {
     bulkImported?: string;
     bulkImportError?: string;
     bulkEmptyPreview?: string;
+    waSentLabel?: string;
+    waUnsentLabel?: string;
+    markWaSent?: string;
+    markWaUnsent?: string;
+    waMarkedSent?: string;
+    waMarkedUnsent?: string;
   };
 };
 
