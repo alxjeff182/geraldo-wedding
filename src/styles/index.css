@@ -3613,6 +3613,64 @@ textarea.admin-input {
   }
 }
 
+.admin-invite__bulk {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.35rem;
+}
+
+.admin-invite__bulk-toggle {
+  justify-self: start;
+  font-size: 0.82rem;
+}
+
+.admin-invite__bulk-panel {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.admin-invite__bulk-textarea {
+  width: 100%;
+  min-height: 6.5rem;
+  resize: vertical;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.admin-invite__bulk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.admin-invite__bulk-file {
+  cursor: pointer;
+}
+
+.admin-invite__bulk-hint {
+  margin: 0;
+  font-size: 0.78rem;
+  color: rgba(245, 240, 232, 0.62);
+  line-height: 1.4;
+}
+
+.admin-invite__bulk-summary {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(245, 240, 232, 0.88);
+}
+
+.admin-invite__bulk-preview {
+  max-height: 14rem;
+}
+
 .admin-invite__empty {
   margin: 0;
   padding: 1rem;

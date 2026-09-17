@@ -239,6 +239,20 @@ export type SiteContentOverrides = {
     guestUpdated?: string;
     guestDeleted?: string;
     guestError?: string;
+    bulkToggle?: string;
+    bulkPastePlaceholder?: string;
+    bulkPasteHint?: string;
+    bulkCsvHint?: string;
+    bulkCsvButton?: string;
+    bulkPreviewButton?: string;
+    bulkImportButton?: string;
+    bulkCancelButton?: string;
+    bulkReadyLabel?: string;
+    bulkColStatus?: string;
+    bulkStatusOk?: string;
+    bulkImported?: string;
+    bulkImportError?: string;
+    bulkEmptyPreview?: string;
   };
 };
 
