@@ -125,8 +125,8 @@ function toBase64Url(text: string): string {
 }
 
 /**
- * Open ICS so Calendar.app / iOS Calendar imports events with SUMMARY prefilled.
- * Uses https://api (inline .ics) on Mac — not webcal subscribe (that often blanks the name).
+ * Open ICS in Calendar.app / iOS Calendar with event titles prefilled.
+ * Mac desktop must use webcal:// — https:// makes Chrome/Safari download the .ics.
  */
 export function openAppleCalendarIcs(content: string, _filename = "wedding.ics") {
   const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
@@ -143,8 +143,8 @@ export function openAppleCalendarIcs(content: string, _filename = "wedding.ics")
 
   const encoded = toBase64Url(content);
   const httpsUrl = `${window.location.origin}/api/calendar?ics=${encoded}`;
-  // https + text/calendar → Calendar.app "Add" dialog with event title filled
-  window.location.assign(httpsUrl);
+  const webcalUrl = httpsUrl.replace(/^https:/i, "webcal:").replace(/^http:/i, "webcal:");
+  window.location.assign(webcalUrl);
 }
 
 export function openGoogleCalendar(event: CalendarEventInput): boolean {
