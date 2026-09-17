@@ -160,13 +160,19 @@ export function isAndroid(
   return /Android/i.test(userAgent);
 }
 
-/** Chrome Intent URL → opens Calendar app with fields prefilled. */
+/** Force Google Calendar app (com.google.android.calendar) with prefilled event. */
 export function buildAndroidInsertIntent(event: CalendarEventInput): string | null {
   const begin = new Date(event.startsAt).getTime();
   const end = new Date(event.endsAt).getTime();
   if (Number.isNaN(begin) || Number.isNaN(end)) return null;
 
-  const extras = [
+  const googleUrl = buildGoogleCalendarUrl(event);
+  const fallback = googleUrl ? encodeURIComponent(googleUrl) : "";
+
+  const parts = [
+    "action=android.intent.action.INSERT",
+    "type=vnd.android.cursor.item/event",
+    "package=com.google.android.calendar",
     `S.title=${encodeURIComponent(event.title)}`,
     event.details?.trim()
       ? `S.description=${encodeURIComponent(event.details.trim())}`
@@ -176,47 +182,53 @@ export function buildAndroidInsertIntent(event: CalendarEventInput): string | nu
       : null,
     `l.beginTime=${begin}`,
     `l.endTime=${end}`,
+    fallback ? `S.browser_fallback_url=${fallback}` : null,
+    "end",
   ].filter(Boolean);
 
-  return `intent://#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.item/event;${extras.join(";")};end`;
+  return `intent://#Intent;${parts.join(";")}`;
 }
 
-/**
- * Android: open Calendar / Google Calendar app.
- * Intent alone can fail silently — always include browser fallback + timeout to Google URL.
- */
+/** Deep-link intent into Google Calendar's event template screen. */
+export function buildAndroidGoogleCalendarIntent(event: CalendarEventInput): string | null {
+  const googleUrl = buildGoogleCalendarUrl(event);
+  if (!googleUrl) return null;
+  const path = googleUrl.replace(/^https:\/\//i, "");
+  const fallback = encodeURIComponent(googleUrl);
+  return (
+    `intent://${path}#Intent;scheme=https;package=com.google.android.calendar;` +
+    `S.browser_fallback_url=${fallback};end`
+  );
+}
+
+function launchAndroidHref(href: string) {
+  // <a>.click() keeps the user-gesture chain — more reliable than location.assign for intents.
+  const anchor = document.createElement("a");
+  anchor.href = href;
+  anchor.rel = "noopener";
+  anchor.style.display = "none";
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+}
+
+/** Android browser → open Google Calendar app directly with event prefilled. */
 export function openAndroidCalendar(event: CalendarEventInput): boolean {
+  const insertIntent = buildAndroidInsertIntent(event);
+  if (insertIntent) {
+    launchAndroidHref(insertIntent);
+    return true;
+  }
+
+  const gcalIntent = buildAndroidGoogleCalendarIntent(event);
+  if (gcalIntent) {
+    launchAndroidHref(gcalIntent);
+    return true;
+  }
+
   const googleUrl = buildGoogleCalendarUrl(event);
   if (!googleUrl) return false;
-
-  const fallback = encodeURIComponent(googleUrl);
-  const path = googleUrl.replace(/^https:\/\//i, "");
-
-  // Deep-link into Google Calendar app (prefilled template); web fallback if not installed.
-  const gcalIntent =
-    `intent://${path}#Intent;scheme=https;package=com.google.android.calendar;` +
-    `S.browser_fallback_url=${fallback};end`;
-
-  let handedOff = false;
-  const markHandedOff = () => {
-    handedOff = true;
-  };
-  document.addEventListener("visibilitychange", markHandedOff);
-  window.addEventListener("pagehide", markHandedOff);
-  window.addEventListener("blur", markHandedOff);
-
-  window.location.href = gcalIntent;
-
-  window.setTimeout(() => {
-    document.removeEventListener("visibilitychange", markHandedOff);
-    window.removeEventListener("pagehide", markHandedOff);
-    window.removeEventListener("blur", markHandedOff);
-    // Intent ignored by the browser — navigate so something always happens.
-    if (!handedOff && document.visibilityState === "visible") {
-      window.location.href = googleUrl;
-    }
-  }, 700);
-
+  launchAndroidHref(googleUrl);
   return true;
 }
 

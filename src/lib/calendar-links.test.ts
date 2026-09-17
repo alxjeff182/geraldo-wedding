@@ -49,11 +49,12 @@ describe("calendar-links", () => {
     expect(ics?.match(/BEGIN:VEVENT/g)?.length).toBe(2);
   });
 
-  it("builds Android insert intent with prefilled fields", () => {
+  it("builds Android insert intent targeting Google Calendar app", () => {
     const intent = buildAndroidInsertIntent(event);
-    expect(intent).toContain("intent:#Intent;");
+    expect(intent).toContain("intent://");
     expect(intent).toContain("android.intent.action.INSERT");
     expect(intent).toContain("vnd.android.cursor.item/event");
+    expect(intent).toContain("package=com.google.android.calendar");
     expect(intent).toContain("S.title=");
     expect(intent).toContain(encodeURIComponent("Pemberkatan - Geraldo & Christin"));
     expect(intent).toContain("l.beginTime=");
