@@ -166,10 +166,7 @@ export function buildAndroidInsertIntent(event: CalendarEventInput): string | nu
   const end = new Date(event.endsAt).getTime();
   if (Number.isNaN(begin) || Number.isNaN(end)) return null;
 
-  // intent:#Intent;… (no empty host) — Chrome Android parses this reliably
-  const parts = [
-    "action=android.intent.action.INSERT",
-    "type=vnd.android.cursor.item/event",
+  const extras = [
     `S.title=${encodeURIComponent(event.title)}`,
     event.details?.trim()
       ? `S.description=${encodeURIComponent(event.details.trim())}`
@@ -179,52 +176,46 @@ export function buildAndroidInsertIntent(event: CalendarEventInput): string | nu
       : null,
     `l.beginTime=${begin}`,
     `l.endTime=${end}`,
-    "end",
   ].filter(Boolean);
 
-  return `intent:#Intent;${parts.join(";")}`;
-}
-
-/** Google Calendar app deep-link with https fallback baked in. */
-export function buildAndroidGoogleCalendarIntent(event: CalendarEventInput): string | null {
-  const googleUrl = buildGoogleCalendarUrl(event);
-  if (!googleUrl) return null;
-  const path = googleUrl.replace(/^https:\/\//i, "");
-  return (
-    `intent://${path}#Intent;scheme=https;package=com.google.android.calendar;` +
-    `S.browser_fallback_url=${encodeURIComponent(googleUrl)};end`
-  );
+  return `intent://#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.item/event;${extras.join(";")};end`;
 }
 
 /**
- * Open Android Calendar / Google Calendar.
- * intent:// often fails silently on some browsers — always keep an https fallback.
+ * Android: open Calendar / Google Calendar app.
+ * Intent alone can fail silently — always include browser fallback + timeout to Google URL.
  */
 export function openAndroidCalendar(event: CalendarEventInput): boolean {
   const googleUrl = buildGoogleCalendarUrl(event);
   if (!googleUrl) return false;
 
-  const insertIntent = buildAndroidInsertIntent(event);
-  const gcalIntent = buildAndroidGoogleCalendarIntent(event);
+  const fallback = encodeURIComponent(googleUrl);
+  const path = googleUrl.replace(/^https:\/\//i, "");
 
-  // 1) Generic INSERT → chooser (Samsung Calendar / Google Calendar / etc.)
-  if (insertIntent) {
-    window.location.href = insertIntent;
-  }
+  // Deep-link into Google Calendar app (prefilled template); web fallback if not installed.
+  const gcalIntent =
+    `intent://${path}#Intent;scheme=https;package=com.google.android.calendar;` +
+    `S.browser_fallback_url=${fallback};end`;
 
-  // 2) If still on the page, try Google Calendar app intent
+  let handedOff = false;
+  const markHandedOff = () => {
+    handedOff = true;
+  };
+  document.addEventListener("visibilitychange", markHandedOff);
+  window.addEventListener("pagehide", markHandedOff);
+  window.addEventListener("blur", markHandedOff);
+
+  window.location.href = gcalIntent;
+
   window.setTimeout(() => {
-    if (document.visibilityState !== "visible") return;
-    if (gcalIntent) {
-      window.location.href = gcalIntent;
+    document.removeEventListener("visibilitychange", markHandedOff);
+    window.removeEventListener("pagehide", markHandedOff);
+    window.removeEventListener("blur", markHandedOff);
+    // Intent ignored by the browser — navigate so something always happens.
+    if (!handedOff && document.visibilityState === "visible") {
+      window.location.href = googleUrl;
     }
-  }, 400);
-
-  // 3) Last resort: open Google Calendar URL (web or app link) so something always happens
-  window.setTimeout(() => {
-    if (document.visibilityState !== "visible") return;
-    window.location.href = googleUrl;
-  }, 1100);
+  }, 700);
 
   return true;
 }
