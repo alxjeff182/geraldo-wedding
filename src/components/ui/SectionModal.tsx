@@ -94,31 +94,136 @@ function BackIcon() {
   );
 }
 
+function hideModalElement(el: HTMLElement | null) {
+  if (!el) return;
+  el.style.visibility = "hidden";
+  el.style.pointerEvents = "none";
+  el.style.opacity = "0";
+}
+
 export function SectionModal({ open, title, modalId, onClose, children }: Props) {
   const Icon = modalId ? MODAL_ICONS[modalId] : null;
   const modalRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const historyPushedRef = useRef(false);
   const ignoreNextPopRef = useRef(false);
+  const openRef = useRef(open);
+  const onCloseRef = useRef(onClose);
   const [instantHide, setInstantHide] = useState(false);
 
-  /** Close via UI button: animate out, then sync history without re-handling popstate. */
+  openRef.current = open;
+  onCloseRef.current = onClose;
+
+  /** Close via UI: sync history first so the stable popstate listener can clear ignoreNextPop. */
   const closeFromUi = () => {
+    setInstantHide(false);
+
     if (historyPushedRef.current) {
       ignoreNextPopRef.current = true;
       historyPushedRef.current = false;
-      setInstantHide(false);
-      onClose();
+      // history.back() must run while the popstate listener is still mounted,
+      // otherwise ignoreNextPop stays stuck and the next hardware back is eaten.
       window.history.back();
-      return;
     }
-    setInstantHide(false);
+
     onClose();
   };
+
+  // Stable listener for the component lifetime — must outlive UI close so
+  // history.back() from closeFromUi can clear ignoreNextPop.
+  useEffect(() => {
+    const closeFromHistory = () => {
+      if (ignoreNextPopRef.current) {
+        ignoreNextPopRef.current = false;
+        return;
+      }
+
+      if (!historyPushedRef.current && !openRef.current) return;
+
+      historyPushedRef.current = false;
+      hideModalElement(modalRef.current);
+
+      flushSync(() => {
+        setInstantHide(true);
+        onCloseRef.current();
+      });
+    };
+
+    // Edge swipe-back: hide before the browser gesture preview ends so the
+    // live modal cannot flash after the snapshot dismisses.
+    let edgeSwipe = false;
+    let preempted = false;
+    let restoreTimer = 0;
+    const EDGE_PX = 28;
+    const COMMIT_PX = 48;
+
+    const clearRestoreTimer = () => {
+      if (restoreTimer) {
+        window.clearTimeout(restoreTimer);
+        restoreTimer = 0;
+      }
+    };
+
+    const onTouchStart = (event: TouchEvent) => {
+      if (!openRef.current) return;
+      clearRestoreTimer();
+      const touch = event.touches[0];
+      edgeSwipe = !!touch && touch.clientX <= EDGE_PX;
+      preempted = false;
+    };
+
+    const onTouchMove = (event: TouchEvent) => {
+      if (!openRef.current || !edgeSwipe || preempted) return;
+      const touch = event.touches[0];
+      if (!touch) return;
+      if (touch.clientX - EDGE_PX >= COMMIT_PX) {
+        preempted = true;
+        hideModalElement(modalRef.current);
+        flushSync(() => setInstantHide(true));
+      }
+    };
+
+    const onTouchEnd = () => {
+      // Completed swipe fires popstate after touchend. Restoring too early
+      // briefly re-opens the modal (the flicker). Wait long enough for popstate.
+      if (preempted && historyPushedRef.current && openRef.current) {
+        clearRestoreTimer();
+        restoreTimer = window.setTimeout(() => {
+          restoreTimer = 0;
+          if (historyPushedRef.current && openRef.current) {
+            flushSync(() => setInstantHide(false));
+          }
+        }, 350);
+      }
+      edgeSwipe = false;
+      preempted = false;
+    };
+
+    const onPopState = () => {
+      clearRestoreTimer();
+      closeFromHistory();
+    };
+
+    window.addEventListener("popstate", onPopState);
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("touchend", onTouchEnd);
+    window.addEventListener("touchcancel", onTouchEnd);
+
+    return () => {
+      clearRestoreTimer();
+      window.removeEventListener("popstate", onPopState);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("touchcancel", onTouchEnd);
+    };
+  }, []);
 
   useEffect(() => {
     if (!open || !modalId) return;
 
+    ignoreNextPopRef.current = false;
     setInstantHide(false);
 
     if (historyPushedRef.current) {
@@ -127,87 +232,7 @@ export function SectionModal({ open, title, modalId, onClose, children }: Props)
       window.history.pushState({ sectionModal: modalId }, "");
       historyPushedRef.current = true;
     }
-
-    const hideForHistoryBack = () => {
-      if (ignoreNextPopRef.current) {
-        ignoreNextPopRef.current = false;
-        return;
-      }
-
-      // Swipe-back / system back: hide in the same paint as the gesture
-      // commit so the popup does not flash back in after the preview ends.
-      historyPushedRef.current = false;
-
-      // Imperative hide first — covers iOS where edge swipe may not emit
-      // touch events to the page before popstate.
-      const el = modalRef.current;
-      if (el) {
-        el.style.visibility = "hidden";
-        el.style.pointerEvents = "none";
-        el.style.opacity = "0";
-      }
-
-      flushSync(() => {
-        setInstantHide(true);
-        onClose();
-      });
-    };
-
-    // Preemptively hide while an edge swipe-back is in progress (iOS/Android).
-    // Otherwise the live DOM (still showing the modal) flashes after the
-    // gesture preview ends and before popstate runs.
-    let edgeSwipe = false;
-    let preempted = false;
-    const EDGE_PX = 28;
-    const COMMIT_PX = 48;
-
-    const onTouchStart = (event: TouchEvent) => {
-      const touch = event.touches[0];
-      edgeSwipe = !!touch && touch.clientX <= EDGE_PX;
-      preempted = false;
-    };
-
-    const onTouchMove = (event: TouchEvent) => {
-      if (!edgeSwipe || preempted) return;
-      const touch = event.touches[0];
-      if (!touch) return;
-      if (touch.clientX - EDGE_PX >= COMMIT_PX) {
-        preempted = true;
-        flushSync(() => setInstantHide(true));
-      }
-    };
-
-    const onTouchEnd = () => {
-      // Wait briefly for popstate: a completed swipe fires popstate after
-      // touchend. Restoring immediately would flash the modal back open.
-      if (preempted) {
-        window.setTimeout(() => {
-          if (historyPushedRef.current) {
-            flushSync(() => setInstantHide(false));
-          }
-        }, 80);
-      }
-      edgeSwipe = false;
-      preempted = false;
-    };
-
-    const onPopState = () => {
-      hideForHistoryBack();
-    };
-
-    window.addEventListener("popstate", onPopState);
-    window.addEventListener("touchstart", onTouchStart, { passive: true });
-    window.addEventListener("touchmove", onTouchMove, { passive: true });
-    window.addEventListener("touchend", onTouchEnd);
-    window.addEventListener("touchcancel", onTouchEnd);
-    return () => {
-      window.removeEventListener("popstate", onPopState);
-      window.removeEventListener("touchstart", onTouchStart);
-      window.removeEventListener("touchmove", onTouchMove);
-      window.removeEventListener("touchend", onTouchEnd);
-      window.removeEventListener("touchcancel", onTouchEnd);
-    };
-  }, [open, modalId, onClose]);
+  }, [open, modalId]);
 
   useEffect(() => {
     if (!open) return;
@@ -254,7 +279,7 @@ export function SectionModal({ open, title, modalId, onClose, children }: Props)
       window.removeEventListener("keydown", onKeyDown);
       previousFocusRef.current?.focus();
     };
-  }, [open, onClose]);
+  }, [open]);
 
   return (
     <AnimatePresence>
@@ -270,7 +295,7 @@ export function SectionModal({ open, title, modalId, onClose, children }: Props)
           initial="hidden"
           animate="visible"
           exit={instantHide ? instantExit : "exit"}
-          style={instantHide ? { pointerEvents: "none", visibility: "hidden" } : undefined}
+          style={instantHide ? { pointerEvents: "none", visibility: "hidden", opacity: 0 } : undefined}
         >
           <motion.header
             className="section-modal__header"
