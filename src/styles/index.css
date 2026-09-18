@@ -808,7 +808,7 @@ body {
   position: relative;
   overflow: hidden;
   padding: 10px 0;
-  background-color: #1a120e;
+  background-color: var(--color-maroon-dark);
   background-position: bottom center;
   background-size: cover;
   background-repeat: no-repeat;
@@ -818,9 +818,8 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(130deg, rgba(0, 0, 0, 0.62) 0%, #661c18 100%);
-  opacity: 0.79;
-  mix-blend-mode: multiply;
+  background: var(--color-maroon-dark);
+  opacity: 0.92;
   pointer-events: none;
 }
 
@@ -860,7 +859,7 @@ body {
   height: 450px;
   padding: 0;
   border: none;
-  background: transparent;
+  background: var(--color-maroon-dark);
   overflow: hidden;
   cursor: pointer;
 }
@@ -898,7 +897,7 @@ body {
   aspect-ratio: 4 / 3;
   padding: 0;
   border: 2px solid transparent;
-  background: transparent;
+  background: var(--color-maroon-dark);
   overflow: hidden;
   opacity: 0.55;
   cursor: pointer;
@@ -929,7 +928,7 @@ body {
   aspect-ratio: 2 / 3;
   padding: 0;
   border: none;
-  background: transparent;
+  background: var(--color-maroon-dark);
   overflow: hidden;
   cursor: pointer;
 }
@@ -2318,7 +2317,7 @@ body {
   padding: 1.4rem 1.1rem 1.6rem;
   text-align: center;
   border: 1px solid rgba(212, 175, 55, 0.28);
-  background: rgba(55, 12, 18, 0.55);
+  background: var(--color-maroon-dark);
 }
 
 .story-title,
