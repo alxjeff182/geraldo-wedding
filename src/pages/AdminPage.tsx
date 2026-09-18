@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { mergeWeddingContent } from "../lib/merge-content";
+import { mergeWeddingContent, stripLockedMedia } from "../lib/merge-content";
 import { getSupabase, isSupabaseConfigured } from "../lib/supabase";
 import type { SiteContentOverrides } from "../types/site-content";
 import { useWeddingContent } from "../context/WeddingContentContext";
@@ -174,7 +174,7 @@ export function AdminPage() {
           return;
         }
         if (data?.content && typeof data.content === "object") {
-          setDraft(data.content as SiteContentOverrides);
+          setDraft(stripLockedMedia(data.content as SiteContentOverrides));
         }
       });
   }, [sessionEmail, isAdmin, showError]);
@@ -192,7 +192,7 @@ export function AdminPage() {
 
     const { error } = await supabase.from("site_content").upsert({
       id: "main",
-      content: draft,
+      content: stripLockedMedia(draft),
       updated_at: new Date().toISOString(),
     });
 

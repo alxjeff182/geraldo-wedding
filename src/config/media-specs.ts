@@ -33,7 +33,7 @@ export const MEDIA_SPECS = {
     maxSize: "250 KB",
     maxBytes: 280 * 1024,
     formats: "WebP / PNG",
-    notes: "Foto hero fullscreen setelah video. Ideal 1080×1920 untuk retina.",
+    notes: "Foto section pertama dikunci. Tidak bisa diganti dari CMS.",
   },
   desktopBg: {
     dimensions: "1080 × 1920 px",

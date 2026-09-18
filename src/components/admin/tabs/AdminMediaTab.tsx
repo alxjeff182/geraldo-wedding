@@ -24,10 +24,9 @@ export function AdminMediaTab({ merged, updateDraft }: AdminTabProps) {
         folder="media"
         spec={MEDIA_SPECS.heroPhoto}
         value={merged.media.heroPhoto}
-        onChange={(url) => {
-          updateDraft(["media", "heroPhoto"], url);
-          updateDraft(["media", "portrait"], url);
-        }}
+        locked
+        lockedNote="Foto section pertama dikunci dan tidak bisa diganti."
+        onChange={() => undefined}
       />
       <ImageUploader
         label="Video Hero"

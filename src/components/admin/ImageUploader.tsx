@@ -8,10 +8,21 @@ type Props = {
   folder: string;
   accept?: string;
   spec?: MediaSpec;
+  locked?: boolean;
+  lockedNote?: string;
   onChange: (url: string) => void;
 };
 
-export function ImageUploader({ label, value, folder, accept = "image/*", spec, onChange }: Props) {
+export function ImageUploader({
+  label,
+  value,
+  folder,
+  accept = "image/*",
+  spec,
+  locked = false,
+  lockedNote = "Aset ini dikunci dan tidak bisa diganti.",
+  onChange,
+}: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -75,6 +86,9 @@ export function ImageUploader({ label, value, folder, accept = "image/*", spec, 
           )}
         </div>
       )}
+      {locked ? (
+        <p className="admin-hint">{lockedNote}</p>
+      ) : (
       <div className="admin-uploader__actions">
         <input
           ref={inputRef}
@@ -103,6 +117,7 @@ export function ImageUploader({ label, value, folder, accept = "image/*", spec, 
           onChange={(e) => onChange(e.target.value)}
         />
       </div>
+      )}
       {warning && <p className="admin-uploader__warning">{warning}</p>}
       {error && <p className="admin-error">{error}</p>}
       {!spec && (

@@ -37,7 +37,13 @@ describe("mergeWeddingContent", () => {
     expect(merged.events[0].name).toBe("Solo Event");
   });
 
-  it("keeps story and guestGuide defaults", () => {
+  it("ignores CMS overrides for the locked first-section photo", () => {
+    const merged = mergeWeddingContent({
+      media: { heroPhoto: "https://example.com/other.png", portrait: "https://example.com/other.png" },
+    });
+    expect(merged.media.heroPhoto).toBe(wedding.media.heroPhoto);
+    expect(merged.media.portrait).toBe(wedding.media.portrait);
+  });
     const merged = mergeWeddingContent({});
     expect(merged.story.enabled).toBe(true);
     expect(merged.guestGuide.enabled).toBe(true);

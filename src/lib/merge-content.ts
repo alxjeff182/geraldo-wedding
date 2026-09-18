@@ -27,6 +27,15 @@ function deepMerge<T>(base: T, overrides: unknown): T {
   return overrides as T;
 }
 
+/** Drop CMS overrides for the locked first-section couple photo. */
+export function stripLockedMedia(overrides: SiteContentOverrides): SiteContentOverrides {
+  if (!overrides.media) return overrides;
+  const media = { ...overrides.media };
+  delete media.heroPhoto;
+  delete media.portrait;
+  return { ...overrides, media };
+}
+
 export function mergeWeddingContent(overrides: SiteContentOverrides = {}): WeddingConfig {
   const normalized = structuredClone(overrides) as SiteContentOverrides;
 
@@ -56,6 +65,12 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
       ...merged.invite,
       whatsappTemplates,
       defaultTemplateId,
+    },
+    media: {
+      ...merged.media,
+      // First-section couple photo is locked to the bundled asset.
+      heroPhoto: wedding.media.heroPhoto,
+      portrait: wedding.media.portrait,
     },
   };
 }
