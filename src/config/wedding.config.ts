@@ -185,7 +185,7 @@ export const wedding = {
     title: "Rsvp",
     subtitle: "Konfirmasi kehadiran Anda dengan mengisi form berikut",
     note: "*Mohon maaf! Khusus untuk tamu undangan",
-    deadline: "2026-04-18T23:59:59+07:00",
+    deadline: "2026-12-31T23:59:59+07:00",
     deadlineLabel: "Mohon konfirmasi kehadiran sebelum {date}",
     deadlineClosedMessage:
       "Batas konfirmasi kehadiran telah berakhir. Terima kasih atas perhatiannya.",

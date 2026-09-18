@@ -41,7 +41,7 @@ describe("mergeWeddingContent", () => {
     const merged = mergeWeddingContent({});
     expect(merged.story.enabled).toBe(true);
     expect(merged.guestGuide.enabled).toBe(true);
-    expect(merged.rsvp.deadline).toContain("2026-04-18");
+    expect(merged.rsvp.deadline).toContain("2026-12-31");
   });
 
   it("provides 3 invite templates by default", () => {
