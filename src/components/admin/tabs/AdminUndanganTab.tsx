@@ -2,7 +2,7 @@ import { GuestInvitePanel } from "../GuestInvitePanel";
 import type { AdminTabProps } from "../types";
 
 type AdminUndanganTabProps = AdminTabProps & {
-  setMessage: (text: string | null) => void;
+  setMessage: (text: string | null, options?: { retry?: () => void }) => void;
 };
 
 export function AdminUndanganTab({ merged, updateDraft, setMessage }: AdminUndanganTabProps) {
@@ -16,7 +16,7 @@ export function AdminUndanganTab({ merged, updateDraft, setMessage }: AdminUndan
       onTemplatesChange={(value) => updateDraft(["invite", "whatsappTemplates"], value)}
       onDefaultTemplateChange={(value) => updateDraft(["invite", "defaultTemplateId"], value)}
       onSalutationChange={(value) => updateDraft(["invite", "salutation"], value)}
-      onNotify={(text) => setMessage(text)}
+      onNotify={(text, options) => setMessage(text, options)}
     />
   );
 }

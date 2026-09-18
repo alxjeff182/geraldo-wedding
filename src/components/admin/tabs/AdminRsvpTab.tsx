@@ -3,7 +3,7 @@ import { RsvpSubmissionsPanel } from "../RsvpSubmissionsPanel";
 import type { AdminTabProps } from "../types";
 
 type AdminRsvpTabProps = AdminTabProps & {
-  setMessage: (text: string | null) => void;
+  setMessage: (text: string | null, options?: { retry?: () => void }) => void;
 };
 
 export function AdminRsvpTab({ merged, updateDraft, setMessage }: AdminRsvpTabProps) {
@@ -117,7 +117,7 @@ export function AdminRsvpTab({ merged, updateDraft, setMessage }: AdminRsvpTabPr
         </div>
       </fieldset>
 
-      <RsvpSubmissionsPanel rsvp={merged.rsvp} onNotify={(text) => setMessage(text)} />
+      <RsvpSubmissionsPanel rsvp={merged.rsvp} onNotify={(text, options) => setMessage(text, options)} />
     </div>
   );
 }

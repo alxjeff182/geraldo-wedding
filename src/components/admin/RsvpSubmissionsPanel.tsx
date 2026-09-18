@@ -7,7 +7,7 @@ type RsvpCopy = WeddingConfig["rsvp"];
 
 type Props = {
   rsvp: RsvpCopy;
-  onNotify: (message: string) => void;
+  onNotify: (message: string, options?: { retry?: () => void }) => void;
 };
 
 type AttendanceFilter = "all" | RsvpSubmission["attendance"];
@@ -55,7 +55,9 @@ export function RsvpSubmissionsPanel({ rsvp, onNotify }: Props) {
     ]);
 
     if (rsvpResult.error) {
-      onNotify(rsvp.loadError);
+      onNotify(rsvpResult.error.message || rsvp.loadError, {
+        retry: () => void loadData(),
+      });
       setLoading(false);
       return;
     }
@@ -73,6 +75,20 @@ export function RsvpSubmissionsPanel({ rsvp, onNotify }: Props) {
   useEffect(() => {
     void loadData();
   }, [loadData]);
+
+  useEffect(() => {
+    if (!loading) return;
+    const stuckTimer = window.setTimeout(() => {
+      setLoading(false);
+      onNotify("Memuat daftar RSVP terlalu lama. Periksa koneksi, lalu coba lagi.", {
+        retry: () => {
+          setLoading(true);
+          void loadData();
+        },
+      });
+    }, 15000);
+    return () => window.clearTimeout(stuckTimer);
+  }, [loading, loadData, onNotify]);
 
   useEffect(() => {
     const supabase = getSupabase();

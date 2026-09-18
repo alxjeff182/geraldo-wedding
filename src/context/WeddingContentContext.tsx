@@ -8,6 +8,7 @@ type WeddingContentContextValue = {
   content: WeddingConfig;
   loading: boolean;
   cmsLoaded: boolean;
+  loadError: string | null;
   refresh: () => Promise<void>;
 };
 
@@ -15,6 +16,7 @@ const WeddingContentContext = createContext<WeddingContentContextValue>({
   content: wedding as WeddingConfig,
   loading: false,
   cmsLoaded: false,
+  loadError: null,
   refresh: async () => undefined,
 });
 
@@ -22,8 +24,10 @@ export function WeddingContentProvider({ children }: { children: ReactNode }) {
   const [overrides, setOverrides] = useState<SiteContentOverrides>({});
   const [loading, setLoading] = useState(isSupabaseConfigured);
   const [cmsLoaded, setCmsLoaded] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const loadContent = async () => {
+    setLoadError(null);
     if (!isSupabaseConfigured) {
       setLoading(false);
       return;
@@ -32,16 +36,24 @@ export function WeddingContentProvider({ children }: { children: ReactNode }) {
     const supabase = getSupabase();
     if (!supabase) {
       setLoading(false);
+      setLoadError("Supabase belum dikonfigurasi.");
       return;
     }
 
+    setLoading(true);
     const { data, error } = await supabase
       .from("site_content")
       .select("content")
       .eq("id", "main")
       .maybeSingle();
 
-    if (!error && data?.content && typeof data.content === "object") {
+    if (error) {
+      setLoadError(error.message || "Gagal memuat konten undangan.");
+      setLoading(false);
+      return;
+    }
+
+    if (data?.content && typeof data.content === "object") {
       setOverrides(data.content as SiteContentOverrides);
       setCmsLoaded(true);
     }
@@ -59,9 +71,10 @@ export function WeddingContentProvider({ children }: { children: ReactNode }) {
       content,
       loading,
       cmsLoaded,
+      loadError,
       refresh: loadContent,
     }),
-    [content, loading, cmsLoaded],
+    [content, loading, cmsLoaded, loadError],
   );
 
   return (

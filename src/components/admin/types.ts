@@ -21,5 +21,5 @@ export type AdminTabProps = {
 
 export type AdminTabContentProps = AdminTabProps & {
   tab: AdminTab;
-  setMessage: (text: string | null) => void;
+  setMessage: (text: string | null, options?: { retry?: () => void }) => void;
 };

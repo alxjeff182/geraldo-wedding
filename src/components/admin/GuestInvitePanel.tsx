@@ -35,7 +35,7 @@ type Props = {
   onTemplatesChange: (templates: InviteMessageTemplate[]) => void;
   onDefaultTemplateChange: (templateId: string) => void;
   onSalutationChange: (value: string) => void;
-  onNotify: (message: string) => void;
+  onNotify: (message: string, options?: { retry?: () => void }) => void;
 };
 
 type GuestDraft = {
@@ -118,7 +118,7 @@ export function GuestInvitePanel({
       .order("display_name", { ascending: true });
 
     if (error) {
-      onNotify(invite.guestError);
+      onNotify(error.message || invite.guestError, { retry: () => void loadGuests() });
       setLoading(false);
       return;
     }
@@ -130,6 +130,20 @@ export function GuestInvitePanel({
   useEffect(() => {
     void loadGuests();
   }, [loadGuests]);
+
+  useEffect(() => {
+    if (!loading) return;
+    const stuckTimer = window.setTimeout(() => {
+      setLoading(false);
+      onNotify("Memuat daftar tamu terlalu lama. Periksa koneksi, lalu coba lagi.", {
+        retry: () => {
+          setLoading(true);
+          void loadGuests();
+        },
+      });
+    }, 15000);
+    return () => window.clearTimeout(stuckTimer);
+  }, [loading, loadGuests, onNotify]);
 
   useEffect(() => {
     setPage(1);

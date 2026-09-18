@@ -13,8 +13,12 @@ import {
 } from "../lib/admin-login-guard";
 import { AdminLoginScreen } from "../components/admin/AdminLoginScreen";
 import { AdminTabContent } from "../components/admin/AdminTabContent";
+import { AlertDialog } from "../components/ui/AlertDialog";
 import { TABS } from "../components/admin/admin-tabs";
 import type { AdminTab } from "../components/admin/types";
+import { useAlertDialog } from "../hooks/useAlertDialog";
+
+const LOAD_STUCK_MS = 15000;
 
 export function AdminPage() {
   const { refresh, content } = useWeddingContent();
@@ -27,7 +31,23 @@ export function AdminPage() {
   const [tab, setTab] = useState<AdminTab>("umum");
   const [draft, setDraft] = useState<SiteContentOverrides>({});
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+  const { alert, showFromNotify, showError, showSuccess, hideAlert } = useAlertDialog();
+
+  const setMessage = (text: string | null, options?: { retry?: () => void }) => {
+    if (!text) {
+      hideAlert();
+      return;
+    }
+    if (options?.retry) {
+      showError(text, {
+        title: "Loading stuck / error",
+        actionLabel: "Coba lagi",
+        onAction: options.retry,
+      });
+      return;
+    }
+    showFromNotify(text);
+  };
 
   usePageMeta(content, { noIndex: true });
 
@@ -53,8 +73,39 @@ export function AdminPage() {
       return;
     }
 
-    void checkAdminAccess().then(setIsAdmin);
-  }, [sessionEmail]);
+    let cancelled = false;
+    let resolved = false;
+
+    const stuckTimer = window.setTimeout(() => {
+      if (cancelled || resolved) return;
+      showError(
+        "Verifikasi akses terlalu lama. Periksa koneksi, lalu coba lagi.",
+        {
+          title: "Loading stuck",
+          actionLabel: "Coba lagi",
+          onAction: () => {
+            void checkAdminAccess().then((ok) => {
+              if (!cancelled) {
+                resolved = true;
+                setIsAdmin(ok);
+              }
+            });
+          },
+        },
+      );
+    }, LOAD_STUCK_MS);
+
+    void checkAdminAccess().then((ok) => {
+      if (cancelled) return;
+      resolved = true;
+      setIsAdmin(ok);
+    });
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(stuckTimer);
+    };
+  }, [sessionEmail, showError]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,7 +131,7 @@ export function AdminPage() {
     setLoggingIn(false);
     if (error) {
       recordFailedAdminLogin();
-      setAuthError("Login gagal. Periksa email dan password.");
+      setAuthError(error.message || "Login gagal. Periksa email dan password.");
       return;
     }
 
@@ -117,21 +168,24 @@ export function AdminPage() {
       .select("content")
       .eq("id", "main")
       .maybeSingle()
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) {
+          showError(error.message || "Gagal memuat konten CMS.");
+          return;
+        }
         if (data?.content && typeof data.content === "object") {
           setDraft(data.content as SiteContentOverrides);
         }
       });
-  }, [sessionEmail, isAdmin]);
+  }, [sessionEmail, isAdmin, showError]);
 
   const merged = mergeWeddingContent(draft);
 
   const handleSave = async () => {
     setSaving(true);
-    setMessage(null);
     const supabase = getSupabase();
     if (!supabase) {
-      setMessage("Supabase tidak tersedia");
+      showError("Supabase tidak tersedia");
       setSaving(false);
       return;
     }
@@ -144,11 +198,11 @@ export function AdminPage() {
 
     setSaving(false);
     if (error) {
-      setMessage("Gagal menyimpan.");
+      showError(error.message || "Gagal menyimpan.");
       return;
     }
 
-    setMessage("Konten berhasil disimpan!");
+    showSuccess("Konten berhasil disimpan!");
     await refresh();
   };
 
@@ -179,6 +233,7 @@ export function AdminPage() {
     return (
       <div className="admin-page admin-page--login">
         <p className="admin-login__subtitle">Memverifikasi akses admin...</p>
+        <AlertDialog alert={alert} onClose={hideAlert} />
       </div>
     );
   }
@@ -195,13 +250,13 @@ export function AdminPage() {
             Keluar
           </button>
         </div>
+        <AlertDialog alert={alert} onClose={hideAlert} />
       </div>
     );
   }
 
   const activeTab = TABS.find((t) => t.id === tab);
   const isDenseTab = tab === "undangan" || tab === "rsvp";
-  const isSuccessMessage = message?.includes("berhasil");
 
   return (
     <div className="admin-page admin-page--dashboard">
@@ -221,20 +276,16 @@ export function AdminPage() {
             <button type="button" className="admin-btn admin-btn--ghost" onClick={() => void handleLogout()}>
               Keluar
             </button>
-            <button type="button" className="admin-btn admin-btn--primary" disabled={saving} onClick={() => void handleSave()}>
+            <button
+              type="button"
+              className="admin-btn admin-btn--primary"
+              disabled={saving}
+              onClick={() => void handleSave()}
+            >
               {saving ? "Menyimpan..." : "Simpan Perubahan"}
             </button>
           </div>
         </header>
-
-        {message && (
-          <p
-            className={`admin-toast${isSuccessMessage ? " admin-toast--success" : " admin-toast--error"}`}
-            role="status"
-          >
-            {message}
-          </p>
-        )}
 
         <nav className="admin-tabs" aria-label="Bagian editor">
           {TABS.map((t) => (
@@ -250,9 +301,7 @@ export function AdminPage() {
         </nav>
 
         <section className="admin-panel" aria-labelledby="admin-panel-title">
-          <header
-            className={`admin-panel__head${isDenseTab ? " admin-panel__head--compact" : ""}`}
-          >
+          <header className={`admin-panel__head${isDenseTab ? " admin-panel__head--compact" : ""}`}>
             <h2 id="admin-panel-title" className="admin-panel__title">
               {activeTab?.label}
             </h2>
@@ -260,10 +309,17 @@ export function AdminPage() {
           </header>
 
           <div className={`admin-panel__body${isDenseTab ? " admin-panel__body--dense" : ""}`}>
-            <AdminTabContent tab={tab} merged={merged} updateDraft={updateDraft} setMessage={setMessage} />
+            <AdminTabContent
+              tab={tab}
+              merged={merged}
+              updateDraft={updateDraft}
+              setMessage={setMessage}
+            />
           </div>
         </section>
       </div>
+
+      <AlertDialog alert={alert} onClose={hideAlert} />
     </div>
   );
 }

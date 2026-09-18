@@ -3837,6 +3837,201 @@ textarea.admin-input {
   min-width: 28rem;
 }
 
+/* Guest list table: always scrollable on mobile / short viewports */
+.admin-invite__main > .admin-datalist-wrap:not(.admin-invite__bulk-preview) {
+  max-height: min(52dvh, 26rem);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.admin-rsvp-list__table-wrap {
+  max-height: min(52dvh, 26rem);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+@media (min-width: 1024px) {
+  .admin-invite__main > .admin-datalist-wrap:not(.admin-invite__bulk-preview) {
+    max-height: none;
+  }
+
+  .admin-rsvp-list__table-wrap {
+    max-height: none;
+  }
+}
+
+/* Interactive alert dialog */
+.alert-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+}
+
+.alert-dialog__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  background: rgba(10, 6, 5, 0.72);
+  backdrop-filter: blur(6px);
+}
+
+.alert-dialog__panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 22.5rem);
+  padding: 1.35rem 1.25rem 1.15rem;
+  border-radius: 1.15rem;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  background:
+    linear-gradient(165deg, rgba(72, 38, 32, 0.98) 0%, rgba(26, 15, 14, 0.98) 100%);
+  box-shadow:
+    0 24px 48px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  color: #f5e6c8;
+  text-align: center;
+  overflow: hidden;
+}
+
+.alert-dialog__glow {
+  position: absolute;
+  inset: -40% -20% auto;
+  height: 7rem;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.22), transparent 70%);
+  pointer-events: none;
+}
+
+.alert-dialog__panel--error {
+  border-color: rgba(248, 113, 113, 0.45);
+}
+
+.alert-dialog__panel--error .alert-dialog__glow {
+  background: radial-gradient(circle, rgba(248, 113, 113, 0.2), transparent 70%);
+}
+
+.alert-dialog__panel--success {
+  border-color: rgba(74, 222, 128, 0.4);
+}
+
+.alert-dialog__panel--success .alert-dialog__glow {
+  background: radial-gradient(circle, rgba(74, 222, 128, 0.18), transparent 70%);
+}
+
+.alert-dialog__panel--warning {
+  border-color: rgba(251, 191, 36, 0.45);
+}
+
+.alert-dialog__eyebrow {
+  position: relative;
+  margin: 0 0 0.35rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(245, 230, 200, 0.55);
+}
+
+.alert-dialog__panel--error .alert-dialog__eyebrow {
+  color: #fca5a5;
+}
+
+.alert-dialog__panel--success .alert-dialog__eyebrow {
+  color: #86efac;
+}
+
+.alert-dialog__panel--warning .alert-dialog__eyebrow {
+  color: #fcd34d;
+}
+
+.alert-dialog__title {
+  position: relative;
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #fff8ef;
+}
+
+.alert-dialog__message {
+  position: relative;
+  margin: 0.65rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: rgba(245, 230, 200, 0.82);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.alert-dialog__actions {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.15rem;
+}
+
+.alert-dialog__btn {
+  min-width: 6.5rem;
+  padding: 0.65rem 1rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.alert-dialog__btn:active {
+  transform: scale(0.97);
+}
+
+.alert-dialog__btn--primary {
+  background: linear-gradient(180deg, #e0c070 0%, #c9a227 100%);
+  color: #3d211c;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.alert-dialog__btn--primary:hover {
+  filter: brightness(1.05);
+}
+
+.alert-dialog__panel--error .alert-dialog__btn--primary {
+  background: linear-gradient(180deg, #f87171 0%, #dc2626 100%);
+  color: #fff5f5;
+}
+
+.alert-dialog__panel--success .alert-dialog__btn--primary {
+  background: linear-gradient(180deg, #86efac 0%, #22c55e 100%);
+  color: #052e16;
+}
+
+.alert-dialog__btn--ghost {
+  background: rgba(0, 0, 0, 0.25);
+  border-color: rgba(212, 175, 55, 0.3);
+  color: rgba(245, 230, 200, 0.9);
+}
+
+.alert-dialog__btn--ghost:hover {
+  border-color: rgba(212, 175, 55, 0.55);
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.admin-boot-error {
+  max-width: 22rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+
 .admin-invite__empty {
   margin: 0;
   padding: 1rem;

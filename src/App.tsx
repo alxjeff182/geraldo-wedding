@@ -5,10 +5,12 @@ import { useWeddingContent } from "./context/WeddingContentContext";
 import { useGuestName } from "./hooks/useGuestName";
 import { useAudio } from "./hooks/useAudio";
 import { usePageMeta } from "./hooks/usePageMeta";
+import { useAlertDialog } from "./hooks/useAlertDialog";
 import { CoverScreen } from "./components/layout/CoverScreen";
 import { AudioPlayer } from "./components/ui/AudioPlayer";
 import { CalendarFab } from "./components/ui/CalendarFab";
 import { InviteFabs } from "./components/ui/InviteFabs";
+import { AlertDialog } from "./components/ui/AlertDialog";
 import { Toast } from "./components/ui/Toast";
 import { useToast } from "./hooks/useToast";
 import { Hero } from "./components/sections/Hero";
@@ -89,15 +91,45 @@ type AppProps = {
 };
 
 export default function App({ adminMode = false }: AppProps) {
-  const { content, loading: contentLoading } = useWeddingContent();
+  const { content, loading: contentLoading, loadError, refresh } = useWeddingContent();
   const { guestName, guestId, loading: guestLoading } = useGuestName();
   const [opened, setOpened] = useState(false);
   const [heroRevealReady, setHeroRevealReady] = useState(false);
   const [shortcutModal, setShortcutModal] = useState<HeroShortcutId | null>(null);
+  const [bootStuck, setBootStuck] = useState(false);
   const { audioRef, playing, play, toggle } = useAudio();
   const { message, show, hide } = useToast();
+  const { alert, showError, hideAlert } = useAlertDialog();
 
   usePageMeta(content);
+
+  useEffect(() => {
+    if (!contentLoading && !guestLoading) {
+      setBootStuck(false);
+      return;
+    }
+    const timer = window.setTimeout(() => setBootStuck(true), 15000);
+    return () => window.clearTimeout(timer);
+  }, [contentLoading, guestLoading]);
+
+  useEffect(() => {
+    if (loadError) {
+      showError(loadError, {
+        title: "Gagal memuat undangan",
+        actionLabel: "Coba lagi",
+        onAction: () => void refresh(),
+      });
+    }
+  }, [loadError, refresh, showError]);
+
+  useEffect(() => {
+    if (!bootStuck) return;
+    showError("Memuat undangan terlalu lama. Periksa koneksi internet Anda.", {
+      title: "Loading stuck",
+      actionLabel: "Muat ulang",
+      onAction: () => window.location.reload(),
+    });
+  }, [bootStuck, showError]);
 
   useEffect(() => {
     if (adminMode) return;
@@ -146,8 +178,9 @@ export default function App({ adminMode = false }: AppProps) {
 
   if (guestLoading || contentLoading) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-maroon-dark text-gold">
-        Memuat undangan...
+      <div className="flex min-h-dvh flex-col items-center justify-center gap-3 bg-maroon-dark px-6 text-gold">
+        <p>Memuat undangan...</p>
+        <AlertDialog alert={alert} onClose={hideAlert} />
       </div>
     );
   }
@@ -249,6 +282,7 @@ export default function App({ adminMode = false }: AppProps) {
       </AnimatePresence>
 
       {message && <Toast message={message} onClose={hide} />}
+      <AlertDialog alert={alert} onClose={hideAlert} />
     </>
   );
 }
