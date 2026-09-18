@@ -128,24 +128,74 @@ export function SectionModal({ open, title, modalId, onClose, children }: Props)
       historyPushedRef.current = true;
     }
 
-    const onPopState = () => {
+    const hideForHistoryBack = () => {
       if (ignoreNextPopRef.current) {
         ignoreNextPopRef.current = false;
         return;
       }
 
-      // Swipe-back / system back: hide immediately so the popup does not
-      // flash back in after the browser gesture preview ends.
+      // Swipe-back / system back: hide in the same paint as the gesture
+      // commit so the popup does not flash back in after the preview ends.
       historyPushedRef.current = false;
       flushSync(() => {
         setInstantHide(true);
+        onClose();
       });
-      onClose();
+    };
+
+    // Preemptively hide while an edge swipe-back is in progress (iOS/Android).
+    // Otherwise the live DOM (still showing the modal) flashes after the
+    // gesture preview ends and before popstate runs.
+    let edgeSwipe = false;
+    let preempted = false;
+    const EDGE_PX = 28;
+    const COMMIT_PX = 48;
+
+    const onTouchStart = (event: TouchEvent) => {
+      const touch = event.touches[0];
+      edgeSwipe = !!touch && touch.clientX <= EDGE_PX;
+      preempted = false;
+    };
+
+    const onTouchMove = (event: TouchEvent) => {
+      if (!edgeSwipe || preempted) return;
+      const touch = event.touches[0];
+      if (!touch) return;
+      if (touch.clientX - EDGE_PX >= COMMIT_PX) {
+        preempted = true;
+        flushSync(() => setInstantHide(true));
+      }
+    };
+
+    const onTouchEnd = () => {
+      // Wait briefly for popstate: a completed swipe fires popstate after
+      // touchend. Restoring immediately would flash the modal back open.
+      if (preempted) {
+        window.setTimeout(() => {
+          if (historyPushedRef.current) {
+            flushSync(() => setInstantHide(false));
+          }
+        }, 80);
+      }
+      edgeSwipe = false;
+      preempted = false;
+    };
+
+    const onPopState = () => {
+      hideForHistoryBack();
     };
 
     window.addEventListener("popstate", onPopState);
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("touchend", onTouchEnd);
+    window.addEventListener("touchcancel", onTouchEnd);
     return () => {
       window.removeEventListener("popstate", onPopState);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("touchcancel", onTouchEnd);
     };
   }, [open, modalId, onClose]);
 
