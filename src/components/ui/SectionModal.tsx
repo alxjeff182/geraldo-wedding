@@ -91,6 +91,39 @@ export function SectionModal({ open, title, modalId, onClose, children }: Props)
   const Icon = modalId ? MODAL_ICONS[modalId] : null;
   const modalRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+  const historyPushedRef = useRef(false);
+
+  /** Close via UI: pop history so Android/iOS system back stays in sync. */
+  const closeFromUi = () => {
+    const state = window.history.state as { sectionModal?: string } | null;
+    if (historyPushedRef.current && state?.sectionModal) {
+      historyPushedRef.current = false;
+      window.history.back();
+      return;
+    }
+    onClose();
+  };
+
+  useEffect(() => {
+    if (!open || !modalId) return;
+
+    if (historyPushedRef.current) {
+      window.history.replaceState({ sectionModal: modalId }, "");
+    } else {
+      window.history.pushState({ sectionModal: modalId }, "");
+      historyPushedRef.current = true;
+    }
+
+    const onPopState = () => {
+      historyPushedRef.current = false;
+      onClose();
+    };
+
+    window.addEventListener("popstate", onPopState);
+    return () => {
+      window.removeEventListener("popstate", onPopState);
+    };
+  }, [open, modalId, onClose]);
 
   useEffect(() => {
     if (!open) return;
@@ -99,7 +132,7 @@ export function SectionModal({ open, title, modalId, onClose, children }: Props)
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        onClose();
+        closeFromUi();
         return;
       }
 
@@ -163,7 +196,7 @@ export function SectionModal({ open, title, modalId, onClose, children }: Props)
             <motion.button
               type="button"
               className="section-modal__back"
-              onClick={onClose}
+              onClick={closeFromUi}
               aria-label="Kembali"
               initial={{ opacity: 0, x: 8 }}
               animate={{ opacity: 1, x: 0 }}

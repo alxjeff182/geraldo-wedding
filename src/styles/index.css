@@ -3822,7 +3822,19 @@ textarea.admin-input {
 }
 
 .admin-invite__bulk-preview {
-  max-height: 14rem;
+  flex: 0 0 auto !important;
+  max-height: min(42vh, 16rem);
+  height: auto;
+  overflow-x: auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-x pan-y;
+}
+
+.admin-invite__bulk-preview .admin-datalist {
+  width: 100%;
+  min-width: 28rem;
 }
 
 .admin-invite__empty {
