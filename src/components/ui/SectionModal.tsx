@@ -137,6 +137,16 @@ export function SectionModal({ open, title, modalId, onClose, children }: Props)
       // Swipe-back / system back: hide in the same paint as the gesture
       // commit so the popup does not flash back in after the preview ends.
       historyPushedRef.current = false;
+
+      // Imperative hide first — covers iOS where edge swipe may not emit
+      // touch events to the page before popstate.
+      const el = modalRef.current;
+      if (el) {
+        el.style.visibility = "hidden";
+        el.style.pointerEvents = "none";
+        el.style.opacity = "0";
+      }
+
       flushSync(() => {
         setInstantHide(true);
         onClose();
