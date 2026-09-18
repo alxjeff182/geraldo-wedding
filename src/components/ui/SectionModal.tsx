@@ -107,6 +107,7 @@ export function SectionModal({ open, title, modalId, onClose, children }: Props)
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const historyPushedRef = useRef(false);
   const ignoreNextPopRef = useRef(false);
+  const wasOpenRef = useRef(false);
   const openRef = useRef(open);
   const onCloseRef = useRef(onClose);
   const [instantHide, setInstantHide] = useState(false);
@@ -116,8 +117,6 @@ export function SectionModal({ open, title, modalId, onClose, children }: Props)
 
   /** Close via UI: sync history first so the stable popstate listener can clear ignoreNextPop. */
   const closeFromUi = () => {
-    setInstantHide(false);
-
     if (historyPushedRef.current) {
       ignoreNextPopRef.current = true;
       historyPushedRef.current = false;
@@ -129,10 +128,11 @@ export function SectionModal({ open, title, modalId, onClose, children }: Props)
     onClose();
   };
 
-  // Stable listener for the component lifetime — must outlive UI close so
-  // history.back() from closeFromUi can clear ignoreNextPop.
+  // Single close path for swipe-back / hardware back. No touch preempt + restore
+  // timer — that race was the reopen flicker (hidden → setInstantHide(false) →
+  // visible → popstate close).
   useEffect(() => {
-    const closeFromHistory = () => {
+    const onPopState = () => {
       if (ignoreNextPopRef.current) {
         ignoreNextPopRef.current = false;
         return;
@@ -149,82 +149,23 @@ export function SectionModal({ open, title, modalId, onClose, children }: Props)
       });
     };
 
-    // Edge swipe-back: hide before the browser gesture preview ends so the
-    // live modal cannot flash after the snapshot dismisses.
-    let edgeSwipe = false;
-    let preempted = false;
-    let restoreTimer = 0;
-    const EDGE_PX = 28;
-    const COMMIT_PX = 48;
-
-    const clearRestoreTimer = () => {
-      if (restoreTimer) {
-        window.clearTimeout(restoreTimer);
-        restoreTimer = 0;
-      }
-    };
-
-    const onTouchStart = (event: TouchEvent) => {
-      if (!openRef.current) return;
-      clearRestoreTimer();
-      const touch = event.touches[0];
-      edgeSwipe = !!touch && touch.clientX <= EDGE_PX;
-      preempted = false;
-    };
-
-    const onTouchMove = (event: TouchEvent) => {
-      if (!openRef.current || !edgeSwipe || preempted) return;
-      const touch = event.touches[0];
-      if (!touch) return;
-      if (touch.clientX - EDGE_PX >= COMMIT_PX) {
-        preempted = true;
-        hideModalElement(modalRef.current);
-        flushSync(() => setInstantHide(true));
-      }
-    };
-
-    const onTouchEnd = () => {
-      // Completed swipe fires popstate after touchend. Restoring too early
-      // briefly re-opens the modal (the flicker). Wait long enough for popstate.
-      if (preempted && historyPushedRef.current && openRef.current) {
-        clearRestoreTimer();
-        restoreTimer = window.setTimeout(() => {
-          restoreTimer = 0;
-          if (historyPushedRef.current && openRef.current) {
-            flushSync(() => setInstantHide(false));
-          }
-        }, 350);
-      }
-      edgeSwipe = false;
-      preempted = false;
-    };
-
-    const onPopState = () => {
-      clearRestoreTimer();
-      closeFromHistory();
-    };
-
     window.addEventListener("popstate", onPopState);
-    window.addEventListener("touchstart", onTouchStart, { passive: true });
-    window.addEventListener("touchmove", onTouchMove, { passive: true });
-    window.addEventListener("touchend", onTouchEnd);
-    window.addEventListener("touchcancel", onTouchEnd);
-
-    return () => {
-      clearRestoreTimer();
-      window.removeEventListener("popstate", onPopState);
-      window.removeEventListener("touchstart", onTouchStart);
-      window.removeEventListener("touchmove", onTouchMove);
-      window.removeEventListener("touchend", onTouchEnd);
-      window.removeEventListener("touchcancel", onTouchEnd);
-    };
+    return () => window.removeEventListener("popstate", onPopState);
   }, []);
 
   useEffect(() => {
-    if (!open || !modalId) return;
+    if (!open || !modalId) {
+      wasOpenRef.current = false;
+      return;
+    }
 
-    ignoreNextPopRef.current = false;
-    setInstantHide(false);
+    // Only clear instantHide on a fresh open (false → true), never while a
+    // history/gesture close is in flight.
+    if (!wasOpenRef.current) {
+      setInstantHide(false);
+      ignoreNextPopRef.current = false;
+    }
+    wasOpenRef.current = true;
 
     if (historyPushedRef.current) {
       window.history.replaceState({ sectionModal: modalId }, "");
