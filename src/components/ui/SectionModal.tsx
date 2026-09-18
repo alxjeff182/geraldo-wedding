@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { flushSync } from "react-dom";
 import { OPEN_EASE } from "../../constants/open-animation";
 import type { HeroShortcutId } from "../../types/hero-shortcut";
 import { ClockIcon } from "./ClockIcon";
@@ -33,6 +34,12 @@ const panelVariants = {
     x: "100%",
     transition: { duration: 0.38, ease: EXIT_EASE },
   },
+};
+
+const instantExit = {
+  x: "100%",
+  opacity: 0,
+  transition: { duration: 0 },
 };
 
 const headerVariants = {
@@ -92,20 +99,27 @@ export function SectionModal({ open, title, modalId, onClose, children }: Props)
   const modalRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const historyPushedRef = useRef(false);
+  const ignoreNextPopRef = useRef(false);
+  const [instantHide, setInstantHide] = useState(false);
 
-  /** Close via UI: pop history so Android/iOS system back stays in sync. */
+  /** Close via UI button: animate out, then sync history without re-handling popstate. */
   const closeFromUi = () => {
-    const state = window.history.state as { sectionModal?: string } | null;
-    if (historyPushedRef.current && state?.sectionModal) {
+    if (historyPushedRef.current) {
+      ignoreNextPopRef.current = true;
       historyPushedRef.current = false;
+      setInstantHide(false);
+      onClose();
       window.history.back();
       return;
     }
+    setInstantHide(false);
     onClose();
   };
 
   useEffect(() => {
     if (!open || !modalId) return;
+
+    setInstantHide(false);
 
     if (historyPushedRef.current) {
       window.history.replaceState({ sectionModal: modalId }, "");
@@ -115,7 +129,17 @@ export function SectionModal({ open, title, modalId, onClose, children }: Props)
     }
 
     const onPopState = () => {
+      if (ignoreNextPopRef.current) {
+        ignoreNextPopRef.current = false;
+        return;
+      }
+
+      // Swipe-back / system back: hide immediately so the popup does not
+      // flash back in after the browser gesture preview ends.
       historyPushedRef.current = false;
+      flushSync(() => {
+        setInstantHide(true);
+      });
       onClose();
     };
 
@@ -173,7 +197,7 @@ export function SectionModal({ open, title, modalId, onClose, children }: Props)
   }, [open, onClose]);
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence>
       {open && modalId && (
         <motion.div
           key={modalId}
@@ -185,7 +209,8 @@ export function SectionModal({ open, title, modalId, onClose, children }: Props)
           variants={panelVariants}
           initial="hidden"
           animate="visible"
-          exit="exit"
+          exit={instantHide ? instantExit : "exit"}
+          style={instantHide ? { pointerEvents: "none", visibility: "hidden" } : undefined}
         >
           <motion.header
             className="section-modal__header"
@@ -238,7 +263,7 @@ export function SectionModal({ open, title, modalId, onClose, children }: Props)
             variants={bodyVariants}
             initial="hidden"
             animate="visible"
-            exit="exit"
+            exit={instantHide ? { opacity: 0, transition: { duration: 0 } } : "exit"}
           >
             {children}
           </motion.div>
