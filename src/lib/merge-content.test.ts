@@ -44,6 +44,8 @@ describe("mergeWeddingContent", () => {
     expect(merged.media.heroPhoto).toBe(wedding.media.heroPhoto);
     expect(merged.media.portrait).toBe(wedding.media.portrait);
   });
+
+  it("keeps story and guestGuide defaults", () => {
     const merged = mergeWeddingContent({});
     expect(merged.story.enabled).toBe(true);
     expect(merged.guestGuide.enabled).toBe(true);
