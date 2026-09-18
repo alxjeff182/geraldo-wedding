@@ -15,6 +15,8 @@ type Props = {
   children: ReactNode;
 };
 
+type CloseReason = "ui" | "gesture" | "history";
+
 const PAGE_SPRING = {
   type: "spring" as const,
   stiffness: 300,
@@ -80,6 +82,12 @@ const MODAL_ICONS: Record<HeroShortcutId, typeof ClockIcon> = {
   rsvp: RsvpIcon,
 };
 
+/** Left-edge back swipe (finger moves right), same direction as system back. */
+const EDGE_PX = 28;
+const EDGE_COMMIT_PX = 56;
+/** In-panel horizontal dismiss toward the exit direction (off to the right). */
+const PANEL_COMMIT_PX = 72;
+
 function BackIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -107,63 +115,149 @@ export function SectionModal({ open, title, modalId, onClose, children }: Props)
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const historyPushedRef = useRef(false);
   const ignoreNextPopRef = useRef(false);
+  const closingRef = useRef(false);
   const wasOpenRef = useRef(false);
   const openRef = useRef(open);
   const onCloseRef = useRef(onClose);
+  const closeModalRef = useRef<(reason: CloseReason) => void>(() => {});
   const [instantHide, setInstantHide] = useState(false);
 
   openRef.current = open;
   onCloseRef.current = onClose;
 
-  /** Close via UI: sync history first so the stable popstate listener can clear ignoreNextPop. */
-  const closeFromUi = () => {
+  /**
+   * Unified close pipeline for UI / gesture / history.
+   * Gesture commits close immediately (no hide-only preempt, no restore timer).
+   */
+  const closeModal = (reason: CloseReason) => {
+    if (closingRef.current) return;
+    if (!openRef.current && !historyPushedRef.current) return;
+
+    closingRef.current = true;
+
+    const instant = reason === "gesture" || reason === "history";
+    if (instant) {
+      hideModalElement(modalRef.current);
+      flushSync(() => setInstantHide(true));
+    }
+
+    if (reason === "history") {
+      historyPushedRef.current = false;
+      onCloseRef.current();
+      return;
+    }
+
+    // ui + gesture: sync history ourselves; ignore the matching popstate.
     if (historyPushedRef.current) {
       ignoreNextPopRef.current = true;
       historyPushedRef.current = false;
-      // history.back() must run while the popstate listener is still mounted,
-      // otherwise ignoreNextPop stays stuck and the next hardware back is eaten.
       window.history.back();
     }
 
-    onClose();
+    onCloseRef.current();
   };
 
-  // Single close path for swipe-back / hardware back. No touch preempt + restore
-  // timer — that race was the reopen flicker (hidden → setInstantHide(false) →
-  // visible → popstate close).
+  closeModalRef.current = closeModal;
+
+  // Stable popstate + swipe detection for component lifetime.
   useEffect(() => {
     const onPopState = () => {
       if (ignoreNextPopRef.current) {
         ignoreNextPopRef.current = false;
         return;
       }
+      closeModalRef.current("history");
+    };
 
-      if (!historyPushedRef.current && !openRef.current) return;
+    let tracking: null | {
+      mode: "edge" | "panel";
+      startX: number;
+      startY: number;
+    } = null;
 
-      historyPushedRef.current = false;
-      hideModalElement(modalRef.current);
+    const onTouchStart = (event: TouchEvent) => {
+      if (!openRef.current || closingRef.current) return;
+      const touch = event.touches[0];
+      if (!touch) return;
 
-      flushSync(() => {
-        setInstantHide(true);
-        onCloseRef.current();
-      });
+      const target = event.target;
+      if (
+        target instanceof Element &&
+        target.closest("input, textarea, select, [contenteditable=true]")
+      ) {
+        tracking = null;
+        return;
+      }
+
+      if (touch.clientX <= EDGE_PX) {
+        tracking = { mode: "edge", startX: touch.clientX, startY: touch.clientY };
+        return;
+      }
+
+      if (modalRef.current?.contains(target instanceof Node ? target : null)) {
+        tracking = { mode: "panel", startX: touch.clientX, startY: touch.clientY };
+      }
+    };
+
+    const onTouchMove = (event: TouchEvent) => {
+      if (!tracking || !openRef.current || closingRef.current) return;
+      const touch = event.touches[0];
+      if (!touch) return;
+
+      const dx = touch.clientX - tracking.startX;
+      const dy = touch.clientY - tracking.startY;
+
+      // Vertical scroll wins — abort horizontal dismiss tracking.
+      if (Math.abs(dy) > 36 && Math.abs(dy) > Math.abs(dx)) {
+        tracking = null;
+        return;
+      }
+
+      if (tracking.mode === "edge" && dx >= EDGE_COMMIT_PX) {
+        tracking = null;
+        closeModalRef.current("gesture");
+        return;
+      }
+
+      // Panel dismiss: drag toward exit (right / positive x).
+      if (tracking.mode === "panel" && dx >= PANEL_COMMIT_PX && Math.abs(dx) > Math.abs(dy) * 1.2) {
+        tracking = null;
+        closeModalRef.current("gesture");
+      }
+    };
+
+    const onTouchEnd = () => {
+      // Cancelled swipe: do nothing. Never schedule a restore / reopen.
+      tracking = null;
     };
 
     window.addEventListener("popstate", onPopState);
-    return () => window.removeEventListener("popstate", onPopState);
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("touchend", onTouchEnd);
+    window.addEventListener("touchcancel", onTouchEnd);
+
+    return () => {
+      window.removeEventListener("popstate", onPopState);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("touchcancel", onTouchEnd);
+    };
   }, []);
 
   useEffect(() => {
     if (!open || !modalId) {
       wasOpenRef.current = false;
+      closingRef.current = false;
       return;
     }
 
-    // Only clear instantHide on a fresh open (false → true), never while a
-    // history/gesture close is in flight.
+    // Reset hide flag only on fresh open (false → true).
     if (!wasOpenRef.current) {
       setInstantHide(false);
       ignoreNextPopRef.current = false;
+      closingRef.current = false;
     }
     wasOpenRef.current = true;
 
@@ -182,7 +276,7 @@ export function SectionModal({ open, title, modalId, onClose, children }: Props)
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        closeFromUi();
+        closeModalRef.current("ui");
         return;
       }
 
@@ -247,7 +341,7 @@ export function SectionModal({ open, title, modalId, onClose, children }: Props)
             <motion.button
               type="button"
               className="section-modal__back"
-              onClick={closeFromUi}
+              onClick={() => closeModal("ui")}
               aria-label="Kembali"
               initial={{ opacity: 0, x: 8 }}
               animate={{ opacity: 1, x: 0 }}
