@@ -180,11 +180,12 @@ export function SectionModal({ open, title, modalId, onClose, children }: Props)
       const touch = event.touches[0];
       if (!touch) return;
 
-      const target = event.target;
-      if (
-        target instanceof Element &&
-        target.closest("input, textarea, select, [contenteditable=true]")
-      ) {
+      // Prefer hit-testing — listeners are on window, so event.target is unreliable.
+      const target =
+        document.elementFromPoint(touch.clientX, touch.clientY) ??
+        (touch.target instanceof Element ? touch.target : null);
+
+      if (target?.closest("input, textarea, select, [contenteditable=true]")) {
         tracking = null;
         return;
       }
@@ -194,7 +195,7 @@ export function SectionModal({ open, title, modalId, onClose, children }: Props)
         return;
       }
 
-      if (modalRef.current?.contains(target instanceof Node ? target : null)) {
+      if (target && modalRef.current?.contains(target)) {
         tracking = { mode: "panel", startX: touch.clientX, startY: touch.clientY };
       }
     };
