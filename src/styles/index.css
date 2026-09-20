@@ -3868,7 +3868,7 @@ textarea.admin-input {
   }
 
   .admin-invite__main {
-    overflow: hidden;
+    overflow: auto;
     min-height: 0;
   }
 
@@ -3985,6 +3985,10 @@ textarea.admin-input {
   border-radius: 0.75rem;
   border: 1px solid rgba(212, 175, 55, 0.22);
   background: rgba(0, 0, 0, 0.18);
+  max-height: min(72dvh, 36rem);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .admin-invite__bulk-textarea {
@@ -4023,18 +4027,27 @@ textarea.admin-input {
 
 .admin-invite__bulk-preview {
   flex: 0 0 auto !important;
-  max-height: min(42vh, 16rem);
-  height: auto;
-  overflow-x: auto;
-  overflow-y: auto;
+  min-height: 10rem;
+  max-height: min(48vh, 20rem);
+  height: auto !important;
+  max-width: 100%;
+  overflow: auto !important;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   touch-action: pan-x pan-y;
+  scrollbar-gutter: stable;
 }
 
 .admin-invite__bulk-preview .admin-datalist {
-  width: 100%;
-  min-width: 28rem;
+  width: max-content;
+  min-width: 100%;
+  max-width: none;
+}
+
+.admin-invite__bulk-preview .admin-datalist thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 
 /* Guest list table: always scrollable on mobile / short viewports */
@@ -4053,8 +4066,17 @@ textarea.admin-input {
 }
 
 @media (min-width: 1024px) {
+  .admin-invite__main {
+    overflow: auto;
+  }
+
   .admin-invite__main > .admin-datalist-wrap:not(.admin-invite__bulk-preview) {
     max-height: none;
+  }
+
+  .admin-invite__bulk-preview {
+    min-height: 12rem;
+    max-height: min(42vh, 22rem);
   }
 
   .admin-rsvp-list__table-wrap {
