@@ -535,7 +535,7 @@ export function GuestInvitePanel({
               <span className="admin-label">{invite.templateMessageLabel}</span>
               <textarea
                 className="admin-input admin-invite__message"
-                rows={5}
+                rows={14}
                 value={editingTemplate.message}
                 onChange={(e) => updateTemplate(editingTemplateId, { message: e.target.value })}
               />
