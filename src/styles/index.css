@@ -226,6 +226,17 @@ body {
   );
 }
 
+/* Mobile: lift title + Waktu/Lokasi/RSVP above music/calendar FABs */
+@media (max-width: 767px) {
+  .hero-pill__footer {
+    padding-bottom: max(5.75rem, calc(env(safe-area-inset-bottom, 0px) + 5rem));
+  }
+
+  .hero-pill__caption {
+    margin-bottom: 1rem;
+  }
+}
+
 .hero-pill__caption {
   margin-bottom: 0.85rem;
   text-align: center;
