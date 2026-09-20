@@ -3,9 +3,11 @@ import type { InviteMessageTemplate } from "../../config/invite-templates";
 import { getInviteTemplateById } from "../../config/invite-templates";
 import type { WeddingConfig } from "../../config/wedding.config";
 import {
+  allocateUniqueSlug,
   bulkRowsReady,
   parseGuestBulkCsv,
   parseGuestBulkText,
+  phoneUniquenessKey,
   type BulkGuestRow,
 } from "../../lib/guest-bulk";
 import {
@@ -102,6 +104,14 @@ export function GuestInvitePanel({
   const templates = invite.whatsappTemplates;
   const editingTemplate = getInviteTemplateById(templates, editingTemplateId);
   const existingSlugs = useMemo(() => guests.map((g) => g.slug), [guests]);
+  const existingPhones = useMemo(() => {
+    const keys: string[] = [];
+    for (const g of guests) {
+      const key = phoneUniquenessKey(g.phone);
+      if (key) keys.push(key);
+    }
+    return keys;
+  }, [guests]);
   const bulkReady = useMemo(() => bulkRowsReady(bulkRows), [bulkRows]);
   const bulkErrorCount = bulkRows.length - bulkReady.length;
 
@@ -238,9 +248,21 @@ export function GuestInvitePanel({
   const handleAddGuest = async () => {
     const display_name = newGuest.display_name.trim();
     const phone = newGuest.phone.trim();
-    const slug = slugifyGuestName(display_name);
+    const phoneKey = phoneUniquenessKey(phone);
 
-    if (!display_name || !slug) return;
+    if (!display_name) return;
+
+    if (phone && !phoneKey) {
+      onNotify("Nomor WA tidak valid");
+      return;
+    }
+
+    if (phoneKey && existingPhones.includes(phoneKey)) {
+      onNotify("Nomor WA sudah ada di daftar");
+      return;
+    }
+
+    const slug = allocateUniqueSlug(slugifyGuestName(display_name), new Set(existingSlugs));
 
     setAdding(true);
     const supabase = getSupabase();
@@ -277,8 +299,8 @@ export function GuestInvitePanel({
   const runBulkPreview = (raw: string, source: "paste" | "csv") => {
     const rows =
       source === "csv"
-        ? parseGuestBulkCsv(raw, { existingSlugs })
-        : parseGuestBulkText(raw, { existingSlugs });
+        ? parseGuestBulkCsv(raw, { existingSlugs, existingPhones })
+        : parseGuestBulkText(raw, { existingSlugs, existingPhones });
     setBulkRows(rows);
     if (rows.length === 0) {
       onNotify(invite.bulkEmptyPreview);
@@ -343,14 +365,35 @@ export function GuestInvitePanel({
     }
 
     const display_name = guest.display_name.trim();
-    const slug = slugifyGuestName(display_name);
+    const phone = guest.phone?.trim() || "";
+    const phoneKey = phoneUniquenessKey(phone);
+
+    if (phone && !phoneKey) {
+      onNotify("Nomor WA tidak valid");
+      setSavingId(null);
+      return;
+    }
+
+    if (
+      phoneKey &&
+      guests.some((g) => g.id !== guest.id && phoneUniquenessKey(g.phone) === phoneKey)
+    ) {
+      onNotify("Nomor WA sudah ada di daftar");
+      setSavingId(null);
+      return;
+    }
+
+    const takenSlugs = new Set(
+      guests.filter((g) => g.id !== guest.id).map((g) => g.slug.toLowerCase()),
+    );
+    const slug = allocateUniqueSlug(slugifyGuestName(display_name), takenSlugs);
 
     const { error } = await supabase
       .from("guests")
       .update({
         display_name,
         slug,
-        phone: guest.phone?.trim() || null,
+        phone: phone || null,
       })
       .eq("id", guest.id);
 

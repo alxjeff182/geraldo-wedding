@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+  allocateUniqueSlug,
   bulkRowsReady,
   normalizeBulkPhone,
   parseGuestBulkCsv,
   parseGuestBulkText,
+  phoneUniquenessKey,
 } from "./guest-bulk";
 
 describe("guest-bulk", () => {
@@ -46,14 +48,25 @@ describe("guest-bulk", () => {
     expect(rows[1].ok).toBe(true);
   });
 
-  it("flags duplicate slugs in batch and against existing", () => {
+  it("allows same name with different phones and suffixes the slug", () => {
     const rows = parseGuestBulkText(
       "Budi Santoso, 081234567801\nBudi Santoso, 081234567802\nAndi Wijaya, 081234567803",
-      { existingSlugs: ["andi-wijaya"] },
+      { existingSlugs: ["andi-wijaya"], existingPhones: ["6281234567803"] },
+    );
+    expect(rows[0]).toMatchObject({ ok: true, slug: "budi-santoso", phone: "081234567801" });
+    expect(rows[1]).toMatchObject({ ok: true, slug: "budi-santoso-2", phone: "081234567802" });
+    expect(rows[2].ok).toBe(false);
+    expect(rows[2].error).toMatch(/Nomor WA sudah ada/);
+  });
+
+  it("flags duplicate phones in batch and against existing", () => {
+    const rows = parseGuestBulkText(
+      "Budi, 081234567801\nSiti, 081234567801\nAndi, +62 812-3456-7802",
+      { existingPhones: ["6281234567802"] },
     );
     expect(rows[0].ok).toBe(true);
     expect(rows[1].ok).toBe(false);
-    expect(rows[1].error).toMatch(/Duplikat/);
+    expect(rows[1].error).toMatch(/Duplikat nomor/);
     expect(rows[2].ok).toBe(false);
     expect(rows[2].error).toMatch(/sudah ada/);
   });
@@ -83,6 +96,8 @@ describe("guest-bulk", () => {
   it("normalizes phones and filters ready rows", () => {
     expect(normalizeBulkPhone("+62 812-3456-7890")).toBe("081234567890");
     expect(normalizeBulkPhone("6281234567890")).toBe("081234567890");
+    expect(phoneUniquenessKey("081234567890")).toBe("6281234567890");
+    expect(allocateUniqueSlug("budi", new Set(["budi"]))).toBe("budi-2");
     const rows = parseGuestBulkText("A, 081234567801\n, 0812\nB, bad");
     expect(bulkRowsReady(rows)).toHaveLength(1);
   });

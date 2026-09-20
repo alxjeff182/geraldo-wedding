@@ -10,15 +10,18 @@ export type BulkGuestRow = {
 };
 
 export type ParseGuestBulkOptions = {
+  /** Used only to allocate unique invite slugs when names collide. */
   existingSlugs?: ReadonlySet<string> | readonly string[];
+  /** Uniqueness is enforced by normalized phone (WA), not by name. */
+  existingPhones?: ReadonlySet<string> | readonly string[];
 };
 
 const HEADER_RE = /^(slug|display_name|nama|name|phone|nomor|wa)([,;\t| ]|$)/i;
 
-function toSlugSet(existing?: ParseGuestBulkOptions["existingSlugs"]): Set<string> {
+function toLowerSet(existing?: ReadonlySet<string> | readonly string[]): Set<string> {
   if (!existing) return new Set();
   const list = existing instanceof Set ? [...existing] : [...existing];
-  return new Set(list.map((s) => s.toLowerCase()));
+  return new Set(list.map((s) => s.toLowerCase()).filter(Boolean));
 }
 
 /** Keep display-friendly local digits (08…); reject numbers that cannot be WA’d. */
@@ -29,6 +32,26 @@ export function normalizeBulkPhone(raw: string): string | null {
   if (!wa || wa.length < 10 || wa.length > 15) return null;
   if (wa.startsWith("62")) return `0${wa.slice(2)}`;
   return wa;
+}
+
+/** Canonical key for phone uniqueness (62…). */
+export function phoneUniquenessKey(raw: string | null | undefined): string | null {
+  if (!raw?.trim()) return null;
+  const wa = normalizePhoneForWhatsApp(raw);
+  if (!wa || wa.length < 10 || wa.length > 15) return null;
+  return wa;
+}
+
+export function allocateUniqueSlug(base: string, taken: Set<string>): string {
+  const root = (base || "tamu").toLowerCase();
+  let slug = root;
+  let n = 2;
+  while (taken.has(slug)) {
+    slug = `${root}-${n}`;
+    n += 1;
+  }
+  taken.add(slug);
+  return slug;
 }
 
 function splitLine(line: string): string[] {
@@ -104,8 +127,10 @@ function mapHeaderIndexes(headerCells: string[]): {
 function finalizeRows(
   drafts: Array<{ line: number; display_name: string; phoneRaw: string }>,
   existingSlugs: Set<string>,
+  existingPhones: Set<string>,
 ): BulkGuestRow[] {
-  const seen = new Set<string>();
+  const seenPhones = new Set<string>();
+  const takenSlugs = new Set(existingSlugs);
   const rows: BulkGuestRow[] = [];
 
   for (const draft of drafts) {
@@ -122,38 +147,43 @@ function finalizeRows(
       continue;
     }
 
-    const slug = slugifyGuestName(display_name);
     const phoneRaw = draft.phoneRaw.trim();
     let phone: string | null = null;
+    let phoneKey: string | null = null;
 
     if (phoneRaw) {
       phone = normalizeBulkPhone(phoneRaw);
-      if (!phone) {
+      phoneKey = phoneUniquenessKey(phoneRaw);
+      if (!phone || !phoneKey) {
         rows.push({
           line: draft.line,
           display_name,
           phone: null,
-          slug,
+          slug: slugifyGuestName(display_name),
           ok: false,
           error: "Nomor WA tidak valid",
         });
         continue;
       }
+
+      if (existingPhones.has(phoneKey) || seenPhones.has(phoneKey)) {
+        rows.push({
+          line: draft.line,
+          display_name,
+          phone,
+          slug: slugifyGuestName(display_name),
+          ok: false,
+          error: existingPhones.has(phoneKey)
+            ? "Nomor WA sudah ada di daftar"
+            : "Duplikat nomor dalam batch",
+        });
+        continue;
+      }
+
+      seenPhones.add(phoneKey);
     }
 
-    if (existingSlugs.has(slug) || seen.has(slug)) {
-      rows.push({
-        line: draft.line,
-        display_name,
-        phone,
-        slug,
-        ok: false,
-        error: existingSlugs.has(slug) ? "Slug sudah ada di daftar" : "Duplikat dalam batch",
-      });
-      continue;
-    }
-
-    seen.add(slug);
+    const slug = allocateUniqueSlug(slugifyGuestName(display_name), takenSlugs);
     rows.push({
       line: draft.line,
       display_name,
@@ -170,7 +200,8 @@ export function parseGuestBulkText(
   raw: string,
   options: ParseGuestBulkOptions = {},
 ): BulkGuestRow[] {
-  const existing = toSlugSet(options.existingSlugs);
+  const existingSlugs = toLowerSet(options.existingSlugs);
+  const existingPhones = toLowerSet(options.existingPhones);
   const lines = raw.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
   const drafts: Array<{ line: number; display_name: string; phoneRaw: string }> = [];
 
@@ -187,14 +218,15 @@ export function parseGuestBulkText(
     drafts.push({ line: idx + 1, display_name, phoneRaw });
   });
 
-  return finalizeRows(drafts, existing);
+  return finalizeRows(drafts, existingSlugs, existingPhones);
 }
 
 export function parseGuestBulkCsv(
   raw: string,
   options: ParseGuestBulkOptions = {},
 ): BulkGuestRow[] {
-  const existing = toSlugSet(options.existingSlugs);
+  const existingSlugs = toLowerSet(options.existingSlugs);
+  const existingPhones = toLowerSet(options.existingPhones);
   const lines = raw.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
   if (lines.length === 0) return [];
 
@@ -224,7 +256,7 @@ export function parseGuestBulkCsv(
     });
   }
 
-  return finalizeRows(drafts, existing);
+  return finalizeRows(drafts, existingSlugs, existingPhones);
 }
 
 export function bulkRowsReady(rows: readonly BulkGuestRow[]): BulkGuestRow[] {
