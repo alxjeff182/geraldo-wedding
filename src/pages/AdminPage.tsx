@@ -258,6 +258,8 @@ export function AdminPage() {
   const activeTab = TABS.find((t) => t.id === tab);
   const isDenseTab = tab === "undangan" || tab === "rsvp";
 
+  const saveLabel = saving ? "Menyimpan..." : "Simpan Perubahan";
+
   return (
     <div className="admin-page admin-page--dashboard">
       <div className="admin-dashboard-bg" aria-hidden />
@@ -278,45 +280,61 @@ export function AdminPage() {
             </button>
             <button
               type="button"
-              className="admin-btn admin-btn--primary"
+              className="admin-btn admin-btn--primary admin-topbar__save"
               disabled={saving}
               onClick={() => void handleSave()}
             >
-              {saving ? "Menyimpan..." : "Simpan Perubahan"}
+              {saveLabel}
             </button>
           </div>
         </header>
 
-        <nav className="admin-tabs" aria-label="Bagian editor">
-          {TABS.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              className={`admin-tab${tab === t.id ? " admin-tab--active" : ""}`}
-              onClick={() => setTab(t.id)}
-            >
-              {t.label}
-            </button>
-          ))}
-        </nav>
+        <div className="admin-workspace">
+          <nav className="admin-tabs" aria-label="Bagian editor">
+            {TABS.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                className={`admin-tab${tab === t.id ? " admin-tab--active" : ""}`}
+                onClick={() => setTab(t.id)}
+              >
+                {t.label}
+              </button>
+            ))}
+          </nav>
 
-        <section className="admin-panel" aria-labelledby="admin-panel-title">
-          <header className={`admin-panel__head${isDenseTab ? " admin-panel__head--compact" : ""}`}>
-            <h2 id="admin-panel-title" className="admin-panel__title">
-              {activeTab?.label}
-            </h2>
-            <p className="admin-panel__desc">{activeTab?.description}</p>
-          </header>
+          <section className="admin-panel" aria-labelledby="admin-panel-title">
+            <header className={`admin-panel__head${isDenseTab ? " admin-panel__head--compact" : ""}`}>
+              <h2 id="admin-panel-title" className="admin-panel__title">
+                {activeTab?.label}
+              </h2>
+              <p className="admin-panel__desc">{activeTab?.description}</p>
+            </header>
 
-          <div className={`admin-panel__body${isDenseTab ? " admin-panel__body--dense" : ""}`}>
-            <AdminTabContent
-              tab={tab}
-              merged={merged}
-              updateDraft={updateDraft}
-              setMessage={setMessage}
-            />
-          </div>
-        </section>
+            <div className={`admin-panel__body${isDenseTab ? " admin-panel__body--dense" : ""}`}>
+              <AdminTabContent
+                tab={tab}
+                merged={merged}
+                updateDraft={updateDraft}
+                setMessage={setMessage}
+              />
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <div className="admin-mobile-bar">
+        <a href="/" className="admin-btn admin-btn--ghost admin-mobile-bar__link" target="_blank" rel="noreferrer">
+          Situs
+        </a>
+        <button
+          type="button"
+          className="admin-btn admin-btn--primary admin-mobile-bar__save"
+          disabled={saving}
+          onClick={() => void handleSave()}
+        >
+          {saveLabel}
+        </button>
       </div>
 
       <AlertDialog alert={alert} onClose={hideAlert} />
