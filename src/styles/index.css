@@ -1440,6 +1440,24 @@ body {
   background-size: cover;
 }
 
+/* Darken peacock/floral zone so gold names + white hashtag stay readable */
+.section-closing-wrap::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: min(52%, 280px);
+  background: linear-gradient(
+    180deg,
+    rgba(61, 20, 18, 0) 0%,
+    rgba(61, 20, 18, 0.45) 38%,
+    rgba(40, 12, 10, 0.78) 100%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
 .closing-inner {
   position: relative;
   z-index: 1;
@@ -1472,6 +1490,7 @@ body {
   font-weight: 300;
   line-height: 1.6;
   color: #fff;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
 }
 
 .closing-copy p + p {
@@ -1484,18 +1503,27 @@ body {
   font-size: 31px;
   font-weight: 500;
   line-height: 0.9;
-  color: var(--color-gold);
+  color: #f3e0b0;
   text-align: center;
+  text-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.95),
+    0 2px 10px rgba(0, 0, 0, 0.75),
+    0 0 18px rgba(40, 12, 10, 0.9);
 }
 
 .closing-hashtag {
   margin: 14px 20px 0;
   font-family: var(--font-body);
   font-size: 12px;
-  font-weight: 300;
+  font-weight: 500;
+  letter-spacing: 0.04em;
   line-height: 1.6;
-  color: #fff;
+  color: #fffef8;
   text-align: center;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.95),
+    0 2px 12px rgba(0, 0, 0, 0.8),
+    0 0 10px rgba(40, 12, 10, 0.95);
 }
 
 .site-footer {
