@@ -2356,17 +2356,18 @@ body {
 .section-story-wrap,
 .section-guide-wrap {
   position: relative;
-  padding: 1.5rem 1rem 0.5rem;
+  padding: 1.5rem 1rem 1.5rem;
+  background-color: var(--color-maroon-dark);
 }
 
 .story-card,
 .guide-card {
-  width: min(100%, 28rem);
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
   padding: 1.4rem 1.1rem 1.6rem;
   text-align: center;
   border: 1px solid rgba(212, 175, 55, 0.28);
-  background: var(--color-maroon-dark);
+  background: transparent;
 }
 
 .story-title,
