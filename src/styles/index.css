@@ -2998,7 +2998,7 @@ body {
 }
 
 @media (max-width: 767px) {
-  .admin-topbar__save {
+  .admin-topbar__actions .admin-topbar__save {
     display: none;
   }
 
