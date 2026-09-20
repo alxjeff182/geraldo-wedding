@@ -3848,14 +3848,15 @@ textarea.admin-input {
 @media (min-width: 1024px) {
   .admin-invite-layout {
     grid-template-columns: minmax(15rem, 20rem) minmax(0, 1fr);
-    align-items: stretch;
-    max-height: calc(100dvh - 12rem);
-    overflow: hidden;
+    align-items: start;
+    max-height: none;
+    overflow: visible;
   }
 
   .admin-invite__side {
-    min-height: 0;
-    max-height: 100%;
+    position: sticky;
+    top: 6.25rem;
+    max-height: calc(100dvh - 8rem);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -3868,14 +3869,14 @@ textarea.admin-input {
   }
 
   .admin-invite__main {
-    overflow: auto;
+    overflow: visible;
     min-height: 0;
   }
 
-  .admin-invite__table-wrap,
-  .admin-datalist-wrap {
-    flex: 1;
-    min-height: 0;
+  /* Guest list grows with rows; do not flex-shrink into a tiny scroll box */
+  .admin-invite__main > .admin-datalist-wrap:not(.admin-invite__bulk-preview) {
+    flex: 0 0 auto !important;
+    min-height: 0 !important;
   }
 }
 
@@ -4022,14 +4023,22 @@ textarea.admin-input {
   color: rgba(245, 240, 232, 0.88);
 }
 
-/* ~15 rows visible before scroll (header + 15 × row) */
+/* Grow with content; scroll only after ~15 rows */
+.admin-invite,
+.admin-rsvp-list,
+.admin-panel__body {
+  --admin-table-fit-15: calc(3rem + 15 * 3.25rem);
+}
+
 .admin-invite__bulk-preview,
 .admin-invite__main > .admin-datalist-wrap:not(.admin-invite__bulk-preview),
 .admin-rsvp-list__table-wrap,
 .admin-table-wrap {
-  --admin-table-fit-15: calc(2.75rem + 15 * 2.7rem);
+  height: auto !important;
+  min-height: 0 !important;
   max-height: var(--admin-table-fit-15);
-  overflow: auto !important;
+  overflow-x: auto;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
@@ -4037,8 +4046,6 @@ textarea.admin-input {
 
 .admin-invite__bulk-preview {
   flex: 0 0 auto !important;
-  min-height: var(--admin-table-fit-15);
-  height: var(--admin-table-fit-15) !important;
   max-width: 100%;
   touch-action: pan-x pan-y;
 }
@@ -4055,24 +4062,9 @@ textarea.admin-input {
   z-index: 2;
 }
 
-.admin-invite__main > .admin-datalist-wrap:not(.admin-invite__bulk-preview) {
-  min-height: min(var(--admin-table-fit-15), 70dvh);
-}
-
-.admin-rsvp-list__table-wrap {
-  min-height: min(var(--admin-table-fit-15), 70dvh);
-}
-
 @media (min-width: 1024px) {
   .admin-invite__main {
-    overflow: auto;
-  }
-
-  .admin-invite__main > .admin-datalist-wrap:not(.admin-invite__bulk-preview),
-  .admin-rsvp-list__table-wrap,
-  .admin-table-wrap {
-    min-height: var(--admin-table-fit-15);
-    max-height: var(--admin-table-fit-15);
+    overflow: visible;
   }
 }
 
@@ -4387,13 +4379,13 @@ textarea.admin-input {
 
 @media (min-width: 1024px) {
   .admin-rsvp-list {
-    max-height: calc(100dvh - 14rem);
+    max-height: none;
   }
 
   .admin-rsvp-list__table-wrap {
-    flex: 1 1 auto;
-    min-height: var(--admin-table-fit-15, calc(2.75rem + 15 * 2.7rem));
-    max-height: var(--admin-table-fit-15, calc(2.75rem + 15 * 2.7rem));
+    flex: 0 0 auto;
+    min-height: 0;
+    max-height: var(--admin-table-fit-15, calc(3rem + 15 * 3.25rem));
   }
 }
 
