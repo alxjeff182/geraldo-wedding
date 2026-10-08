@@ -14,6 +14,8 @@ export type ParseGuestBulkOptions = {
   existingSlugs?: ReadonlySet<string> | readonly string[];
   /** Uniqueness is enforced by normalized phone (WA), not by name. */
   existingPhones?: ReadonlySet<string> | readonly string[];
+  /** Optional map of normalized phone key → guest display name (for clearer errors). */
+  existingPhoneOwners?: ReadonlyMap<string, string> | Readonly<Record<string, string>>;
 };
 
 const HEADER_RE = /^(slug|display_name|nama|name|phone|nomor|wa)([,;\t| ]|$)/i;
@@ -22,6 +24,26 @@ function toLowerSet(existing?: ReadonlySet<string> | readonly string[]): Set<str
   if (!existing) return new Set();
   const list = existing instanceof Set ? [...existing] : [...existing];
   return new Set(list.map((s) => s.toLowerCase()).filter(Boolean));
+}
+
+function toPhoneOwnerMap(
+  existing?: ReadonlyMap<string, string> | Readonly<Record<string, string>>,
+): Map<string, string> {
+  if (!existing) return new Map();
+  const entries =
+    existing instanceof Map ? [...existing.entries()] : Object.entries(existing);
+  return new Map(
+    entries
+      .map(([key, name]) => [key.trim().toLowerCase(), name.trim()] as const)
+      .filter(([key, name]) => Boolean(key) && Boolean(name)),
+  );
+}
+
+export function phoneAlreadyTakenMessage(ownerName?: string | null): string {
+  const name = ownerName?.trim();
+  return name
+    ? `Nomor WA sudah dipakai oleh "${name}"`
+    : "Nomor WA sudah ada di daftar";
 }
 
 /** Keep display-friendly local digits (08…); reject numbers that cannot be WA’d. */
@@ -128,6 +150,7 @@ function finalizeRows(
   drafts: Array<{ line: number; display_name: string; phoneRaw: string }>,
   existingSlugs: Set<string>,
   existingPhones: Set<string>,
+  existingPhoneOwners: Map<string, string>,
 ): BulkGuestRow[] {
   const seenPhones = new Set<string>();
   const takenSlugs = new Set(existingSlugs);
@@ -174,7 +197,7 @@ function finalizeRows(
           slug: slugifyGuestName(display_name),
           ok: false,
           error: existingPhones.has(phoneKey)
-            ? "Nomor WA sudah ada di daftar"
+            ? phoneAlreadyTakenMessage(existingPhoneOwners.get(phoneKey))
             : "Duplikat nomor dalam batch",
         });
         continue;
@@ -202,6 +225,7 @@ export function parseGuestBulkText(
 ): BulkGuestRow[] {
   const existingSlugs = toLowerSet(options.existingSlugs);
   const existingPhones = toLowerSet(options.existingPhones);
+  const existingPhoneOwners = toPhoneOwnerMap(options.existingPhoneOwners);
   const lines = raw.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
   const drafts: Array<{ line: number; display_name: string; phoneRaw: string }> = [];
 
@@ -218,7 +242,7 @@ export function parseGuestBulkText(
     drafts.push({ line: idx + 1, display_name, phoneRaw });
   });
 
-  return finalizeRows(drafts, existingSlugs, existingPhones);
+  return finalizeRows(drafts, existingSlugs, existingPhones, existingPhoneOwners);
 }
 
 export function parseGuestBulkCsv(
@@ -227,6 +251,7 @@ export function parseGuestBulkCsv(
 ): BulkGuestRow[] {
   const existingSlugs = toLowerSet(options.existingSlugs);
   const existingPhones = toLowerSet(options.existingPhones);
+  const existingPhoneOwners = toPhoneOwnerMap(options.existingPhoneOwners);
   const lines = raw.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
   if (lines.length === 0) return [];
 
@@ -256,7 +281,7 @@ export function parseGuestBulkCsv(
     });
   }
 
-  return finalizeRows(drafts, existingSlugs, existingPhones);
+  return finalizeRows(drafts, existingSlugs, existingPhones, existingPhoneOwners);
 }
 
 export function bulkRowsReady(rows: readonly BulkGuestRow[]): BulkGuestRow[] {

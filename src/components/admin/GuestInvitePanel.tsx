@@ -7,6 +7,7 @@ import {
   bulkRowsReady,
   parseGuestBulkCsv,
   parseGuestBulkText,
+  phoneAlreadyTakenMessage,
   phoneUniquenessKey,
   type BulkGuestRow,
 } from "../../lib/guest-bulk";
@@ -111,6 +112,14 @@ export function GuestInvitePanel({
       if (key) keys.push(key);
     }
     return keys;
+  }, [guests]);
+  const existingPhoneOwners = useMemo(() => {
+    const owners: Record<string, string> = {};
+    for (const g of guests) {
+      const key = phoneUniquenessKey(g.phone);
+      if (key && !owners[key]) owners[key] = g.display_name;
+    }
+    return owners;
   }, [guests]);
   const bulkReady = useMemo(() => bulkRowsReady(bulkRows), [bulkRows]);
   const bulkErrorCount = bulkRows.length - bulkReady.length;
@@ -258,7 +267,7 @@ export function GuestInvitePanel({
     }
 
     if (phoneKey && existingPhones.includes(phoneKey)) {
-      onNotify("Nomor WA sudah ada di daftar");
+      onNotify(phoneAlreadyTakenMessage(existingPhoneOwners[phoneKey]));
       return;
     }
 
@@ -299,8 +308,16 @@ export function GuestInvitePanel({
   const runBulkPreview = (raw: string, source: "paste" | "csv") => {
     const rows =
       source === "csv"
-        ? parseGuestBulkCsv(raw, { existingSlugs, existingPhones })
-        : parseGuestBulkText(raw, { existingSlugs, existingPhones });
+        ? parseGuestBulkCsv(raw, {
+            existingSlugs,
+            existingPhones,
+            existingPhoneOwners,
+          })
+        : parseGuestBulkText(raw, {
+            existingSlugs,
+            existingPhones,
+            existingPhoneOwners,
+          });
     setBulkRows(rows);
     if (rows.length === 0) {
       onNotify(invite.bulkEmptyPreview);
@@ -374,13 +391,15 @@ export function GuestInvitePanel({
       return;
     }
 
-    if (
-      phoneKey &&
-      guests.some((g) => g.id !== guest.id && phoneUniquenessKey(g.phone) === phoneKey)
-    ) {
-      onNotify("Nomor WA sudah ada di daftar");
-      setSavingId(null);
-      return;
+    if (phoneKey) {
+      const owner = guests.find(
+        (g) => g.id !== guest.id && phoneUniquenessKey(g.phone) === phoneKey,
+      );
+      if (owner) {
+        onNotify(phoneAlreadyTakenMessage(owner.display_name));
+        setSavingId(null);
+        return;
+      }
     }
 
     const takenSlugs = new Set(

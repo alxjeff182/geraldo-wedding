@@ -62,13 +62,16 @@ describe("guest-bulk", () => {
   it("flags duplicate phones in batch and against existing", () => {
     const rows = parseGuestBulkText(
       "Budi, 081234567801\nSiti, 081234567801\nAndi, +62 812-3456-7802",
-      { existingPhones: ["6281234567802"] },
+      {
+        existingPhones: ["6281234567802"],
+        existingPhoneOwners: { "6281234567802": "Geraldo-2" },
+      },
     );
     expect(rows[0].ok).toBe(true);
     expect(rows[1].ok).toBe(false);
     expect(rows[1].error).toMatch(/Duplikat nomor/);
     expect(rows[2].ok).toBe(false);
-    expect(rows[2].error).toMatch(/sudah ada/);
+    expect(rows[2].error).toBe('Nomor WA sudah dipakai oleh "Geraldo-2"');
   });
 
   it("parses CSV with header and optional slug column", () => {
