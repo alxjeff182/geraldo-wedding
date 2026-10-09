@@ -35,11 +35,15 @@ type Props = {
   coupleTitle: string;
   dateLabel: string;
   location: string;
+  acaraSummary?: string;
+  venueSummary?: string;
   onTemplatesChange: (templates: InviteMessageTemplate[]) => void;
   onDefaultTemplateChange: (templateId: string) => void;
   onSalutationChange: (value: string) => void;
   onNotify: (message: string, options?: { retry?: () => void }) => void;
 };
+
+type SentFilter = "all" | "unsent" | "sent";
 
 type GuestDraft = {
   display_name: string;
@@ -79,6 +83,8 @@ export function GuestInvitePanel({
   coupleTitle,
   dateLabel,
   location,
+  acaraSummary = "",
+  venueSummary = "",
   onTemplatesChange,
   onDefaultTemplateChange,
   onSalutationChange,
@@ -90,6 +96,7 @@ export function GuestInvitePanel({
   const [adding, setAdding] = useState(false);
   const [newGuest, setNewGuest] = useState<GuestDraft>(emptyDraft);
   const [search, setSearch] = useState("");
+  const [sentFilter, setSentFilter] = useState<SentFilter>("all");
   const [templateByGuest, setTemplateByGuest] = useState<Record<string, string>>({});
   const [editingTemplateId, setEditingTemplateId] = useState(invite.defaultTemplateId);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -185,12 +192,14 @@ export function GuestInvitePanel({
       pasangan: coupleTitle,
       salam: invite.salutation,
       slug: guest.slug,
+      acara: acaraSummary,
+      venue: venueSummary,
     });
   };
 
   const filteredGuests = useMemo(() => {
     const q = search.trim().toLowerCase();
-    const list = !q
+    let list = !q
       ? guests
       : guests.filter(
           (guest) =>
@@ -198,6 +207,11 @@ export function GuestInvitePanel({
             guest.slug.toLowerCase().includes(q) ||
             (guest.phone ?? "").toLowerCase().includes(q),
         );
+    if (sentFilter === "sent") {
+      list = list.filter((guest) => Boolean(guest.invite_sent_at));
+    } else if (sentFilter === "unsent") {
+      list = list.filter((guest) => !guest.invite_sent_at);
+    }
 
     const sorted = [...list].sort((a, b) => {
       let cmp = 0;
@@ -217,7 +231,16 @@ export function GuestInvitePanel({
     });
 
     return sorted;
-  }, [guests, search, sortKey, sortDir, templates, templateByGuest, invite.defaultTemplateId]);
+  }, [
+    guests,
+    search,
+    sentFilter,
+    sortKey,
+    sortDir,
+    templates,
+    templateByGuest,
+    invite.defaultTemplateId,
+  ]);
 
   const totalPages = Math.max(1, Math.ceil(filteredGuests.length / pageSize));
   const currentPage = Math.min(page, totalPages);
@@ -230,7 +253,7 @@ export function GuestInvitePanel({
   const pageNumbers = useMemo(() => {
     const maxButtons = 5;
     let start = Math.max(1, currentPage - Math.floor(maxButtons / 2));
-    let end = Math.min(totalPages, start + maxButtons - 1);
+    const end = Math.min(totalPages, start + maxButtons - 1);
     start = Math.max(1, end - maxButtons + 1);
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   }, [currentPage, totalPages]);
@@ -487,6 +510,22 @@ export function GuestInvitePanel({
     }
   };
 
+  const sendNextUnsent = () => {
+    const next = guests.find((guest) => !guest.invite_sent_at && guest.phone);
+    if (!next) {
+      onNotify("Semua tamu dengan nomor WA sudah ditandai terkirim.");
+      return;
+    }
+    const templateId = getGuestTemplateId(next.id);
+    const message = buildMessage(next, templateId);
+    const waUrl = buildWhatsAppUrl(next.phone ?? "", message);
+    if (!waUrl) {
+      onNotify(invite.noPhone);
+      return;
+    }
+    openWhatsAppAndMark(next, waUrl);
+  };
+
   const copyLink = async (guest: Guest) => {
     try {
       await navigator.clipboard.writeText(buildGuestInviteUrl(siteUrl, guest.slug));
@@ -614,6 +653,28 @@ export function GuestInvitePanel({
               placeholder={invite.searchPlaceholder}
               onChange={(e) => setSearch(e.target.value)}
             />
+
+            <select
+              className="admin-input"
+              value={sentFilter}
+              aria-label="Filter status WA"
+              onChange={(e) => {
+                setSentFilter(e.target.value as SentFilter);
+                setPage(1);
+              }}
+            >
+              <option value="all">Semua</option>
+              <option value="unsent">Belum terkirim</option>
+              <option value="sent">Terkirim</option>
+            </select>
+
+            <button
+              type="button"
+              className="admin-btn"
+              onClick={sendNextUnsent}
+            >
+              Kirim berikutnya
+            </button>
 
             <div className="admin-invite__stats" aria-label="Ringkasan tamu">
               <span className="admin-invite__stat">

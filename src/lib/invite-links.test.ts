@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildGuestInviteUrl,
+  resolveInviteSlug,
   buildWhatsAppUrl,
   formatInviteMessage,
   normalizePhoneForWhatsApp,
@@ -41,5 +42,20 @@ describe("invite-links", () => {
   it("builds WhatsApp deep links", () => {
     const url = buildWhatsAppUrl("081234567890", "Halo");
     expect(url).toBe("https://wa.me/6281234567890?text=Halo");
+  });
+
+  it("resolves canonical guest= over legacy to=", () => {
+    expect(resolveInviteSlug(new URLSearchParams("guest=jeffry-istri"))).toEqual({
+      slug: "jeffry-istri",
+      displayFallback: "jeffry istri",
+      fromLegacyTo: false,
+    });
+    expect(resolveInviteSlug(new URLSearchParams("to=Keluarga%20Tampubolon"))).toEqual({
+      slug: "keluarga-tampubolon",
+      displayFallback: "Keluarga Tampubolon",
+      fromLegacyTo: true,
+    });
+    expect(resolveInviteSlug(new URLSearchParams("guest=budi&to=Other")).slug).toBe("budi");
+    expect(resolveInviteSlug(new URLSearchParams("")).slug).toBeNull();
   });
 });

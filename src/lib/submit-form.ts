@@ -24,6 +24,8 @@ type SubmitRsvp = {
 type SubmitWish = {
   type: "wish";
   honeypot?: string;
+  companyHoneypot?: string;
+  formOpenedAt?: number;
   payload: WishInsert;
   messages?: Pick<
     GuestbookContent,

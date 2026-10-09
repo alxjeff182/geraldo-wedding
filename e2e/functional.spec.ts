@@ -34,7 +34,12 @@ test.beforeAll(async ({ request }) => {
       Authorization: `Bearer ${anonKey}`,
       "Content-Type": "application/json",
     },
-    data: { type: "rsvp", honeypot: "", formOpenedAt: Date.now() - 5000, payload: { name: "probe", guest_count: 1, attendance: "hadir" } },
+    data: {
+      type: "rsvp",
+      honeypot: "",
+      formOpenedAt: Date.now() - 5000,
+      payload: { name: "probe", guest_count: 1, attendance: "hadir" },
+    },
     failOnStatusCode: false,
   });
 
@@ -42,10 +47,13 @@ test.beforeAll(async ({ request }) => {
 });
 
 async function openInvitation(page: import("@playwright/test").Page) {
-  await page.goto("/?to=Functional+Test");
+  await page.goto("/?guest=functional-test");
   await page.getByRole("button", { name: /buka undangan/i }).click();
-  await expect(page.getByLabel("Sampul mempelai")).toBeVisible();
-  await page.getByRole("button", { name: /buka waktu/i }).waitFor({ timeout: 15_000 });
+  const skip = page.getByRole("button", { name: /lewati/i });
+  if (await skip.isVisible().catch(() => false)) {
+    await skip.click();
+  }
+  await expect(page.locator("#invitation")).toBeVisible({ timeout: 15000 });
 }
 
 test("rsvp form submits to edge function", async ({ page }) => {
@@ -55,17 +63,19 @@ test("rsvp form submits to edge function", async ({ page }) => {
   );
 
   await openInvitation(page);
+  await page.locator("#invitation").evaluate((el) => {
+    (el as HTMLElement).scrollTop = 400;
+  });
 
-  const rsvp = page.getByRole("region", { name: /^rsvp$/i });
-  await rsvp.scrollIntoViewIfNeeded();
+  await page.getByRole("button", { name: /rsvp/i }).first().click();
+  const sheet = page.locator("#sheet-rsvp");
+  await expect(sheet).toBeVisible();
 
-  await rsvp.getByRole("textbox", { name: /^nama/i }).fill("Functional Test");
-  await rsvp.getByRole("combobox", { name: /konfirmasi kehadiran/i }).selectOption("hadir");
-  await rsvp.getByRole("combobox", { name: /jumlah kehadiran/i }).selectOption("1");
+  await sheet.getByPlaceholder(/nama/i).fill("Functional Test");
 
   const [submitRequest] = await Promise.all([
     page.waitForRequest((req) => req.url().includes("/functions/v1/submit"), { timeout: 15_000 }),
-    rsvp.getByRole("button", { name: /^submit$/i }).click(),
+    sheet.locator('button[type="submit"]').click(),
   ]);
 
   const response = await submitRequest.response();
@@ -80,10 +90,13 @@ test("guestbook form submits to edge function", async ({ page }) => {
 
   await openInvitation(page);
 
-  const guestbook = page.getByRole("region", { name: /best wishes/i });
+  const guestbook = page.locator("#wishes");
   await guestbook.scrollIntoViewIfNeeded();
-  await guestbook.getByPlaceholder(/nama/i).fill("Functional Tester");
-  await guestbook.getByPlaceholder(/ucapan/i).fill("Selamat menempuh hidup baru!");
+  await expect(guestbook.locator(".wishes-namechip")).toBeVisible();
+  await guestbook.getByPlaceholder(/ucapan|doa/i).fill("Selamat menempuh hidup baru!");
+
+  // Wait past client anti-spam min form time
+  await page.waitForTimeout(3200);
 
   const [submitRequest] = await Promise.all([
     page.waitForRequest((req) => req.url().includes("/functions/v1/submit"), { timeout: 15_000 }),
@@ -94,13 +107,11 @@ test("guestbook form submits to edge function", async ({ page }) => {
   expect(response?.status(), "Edge function submit should return 200").toBe(200);
 });
 
-test("gift section expands with bank details", async ({ page }) => {
+test("gift section shows bank details", async ({ page }) => {
   await openInvitation(page);
 
-  const gift = page.getByRole("region", { name: /wedding gift/i });
+  const gift = page.locator("#gift");
   await gift.scrollIntoViewIfNeeded();
-  await gift.getByRole("button", { name: /klik di sini/i }).click();
-
-  await expect(gift.getByText(/bank bca/i)).toBeVisible();
-  await expect(gift.getByRole("button", { name: /salin nomor rekening/i })).toBeVisible();
+  await expect(gift.getByText(/bca/i)).toBeVisible();
+  await expect(gift.getByRole("button", { name: /salin/i }).first()).toBeVisible();
 });

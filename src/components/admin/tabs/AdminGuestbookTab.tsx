@@ -1,9 +1,25 @@
 import { AdminTextField } from "../AdminFields";
-import type { AdminTabProps } from "../types";
+import { WishesModerationPanel } from "../WishesModerationPanel";
+import type { AdminTabContentProps } from "../types";
 
-export function AdminGuestbookTab({ merged, updateDraft }: AdminTabProps) {
+export function AdminGuestbookTab({
+  merged,
+  updateDraft,
+  setMessage,
+}: Pick<AdminTabContentProps, "merged" | "updateDraft" | "setMessage">) {
   return (
     <div className="admin-form-grid">
+      <label className="admin-field">
+        <span className="admin-label">Tampilkan section Ucapan</span>
+        <select
+          className="admin-input"
+          value={merged.guestbook.enabled ? "1" : "0"}
+          onChange={(e) => updateDraft(["guestbook", "enabled"], e.target.value === "1")}
+        >
+          <option value="1">Ya</option>
+          <option value="0">Tidak</option>
+        </select>
+      </label>
       <AdminTextField
         label="Judul"
         value={merged.guestbook.title}
@@ -14,11 +30,6 @@ export function AdminGuestbookTab({ merged, updateDraft }: AdminTabProps) {
         wide
         value={merged.guestbook.subtitle}
         onChange={(value) => updateDraft(["guestbook", "subtitle"], value)}
-      />
-      <AdminTextField
-        label="Placeholder Nama"
-        value={merged.guestbook.namePlaceholder}
-        onChange={(value) => updateDraft(["guestbook", "namePlaceholder"], value)}
       />
       <AdminTextField
         label="Placeholder Ucapan"
@@ -42,6 +53,23 @@ export function AdminGuestbookTab({ merged, updateDraft }: AdminTabProps) {
         onChange={(value) => updateDraft(["guestbook", "emptyMessage"], value)}
       />
       <AdminTextField
+        label="Pesan Tanpa Link Tamu"
+        wide
+        value={merged.guestbook.lockedMessage}
+        onChange={(value) => updateDraft(["guestbook", "lockedMessage"], value)}
+      />
+      <AdminTextField
+        label="Pesan Batas Ucapan"
+        wide
+        value={merged.guestbook.limitReachedMessage}
+        onChange={(value) => updateDraft(["guestbook", "limitReachedMessage"], value)}
+      />
+      <AdminTextField
+        label="Label Sisa Ucapan"
+        value={merged.guestbook.remainingLabel}
+        onChange={(value) => updateDraft(["guestbook", "remainingLabel"], value)}
+      />
+      <AdminTextField
         label="Pager Sebelumnya"
         value={merged.guestbook.pagerPrev}
         onChange={(value) => updateDraft(["guestbook", "pagerPrev"], value)}
@@ -63,6 +91,8 @@ export function AdminGuestbookTab({ merged, updateDraft }: AdminTabProps) {
         value={merged.guestbook.errorMessage}
         onChange={(value) => updateDraft(["guestbook", "errorMessage"], value)}
       />
+
+      <WishesModerationPanel onNotify={(text, options) => setMessage(text, options)} />
     </div>
   );
 }

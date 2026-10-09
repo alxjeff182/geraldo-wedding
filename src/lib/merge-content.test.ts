@@ -37,19 +37,25 @@ describe("mergeWeddingContent", () => {
     expect(merged.events[0].name).toBe("Solo Event");
   });
 
-  it("ignores CMS overrides for the locked first-section photo", () => {
+  it("ignores obsolete Batak media keys from CMS overrides", () => {
     const merged = mergeWeddingContent({
-      media: { heroPhoto: "https://example.com/other.png", portrait: "https://example.com/other.png" },
+      media: {
+        coverBg: "/assets/ballroom/cover-frame.jpg",
+        // @ts-expect-error obsolete key from old CMS rows
+        desktopBg: "https://example.com/batak.jpg",
+      },
     });
-    expect(merged.media.heroPhoto).toBe(wedding.media.heroPhoto);
-    expect(merged.media.portrait).toBe(wedding.media.portrait);
+    expect(merged.media.coverBg).toBe("/assets/ballroom/cover-frame.jpg");
+    expect("desktopBg" in merged.media).toBe(false);
   });
 
-  it("keeps story and guestGuide defaults", () => {
+  it("keeps story off; guestGuide and guestbook on by default", () => {
     const merged = mergeWeddingContent({});
-    expect(merged.story.enabled).toBe(true);
+    expect(merged.story.enabled).toBe(false);
     expect(merged.guestGuide.enabled).toBe(true);
-    expect(merged.rsvp.deadline).toContain("2026-12-31");
+    expect(merged.guestbook.enabled).toBe(true);
+    expect(merged.rsvp.deadline).toContain("2026-04-18");
+    expect(merged.rsvp.guestCountOptions).toEqual(["1", "2", "3"]);
   });
 
   it("provides 3 invite templates by default", () => {

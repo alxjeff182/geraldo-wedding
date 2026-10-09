@@ -1,0 +1,317 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useWeddingContent } from "../../context/WeddingContentContext";
+import { useAudio } from "../../hooks/useAudio";
+import { useToast } from "../../hooks/useToast";
+import { Toast } from "../../components/ui/Toast";
+import { usePageMeta } from "../../hooks/usePageMeta";
+import { Cover } from "./components/Cover";
+import { OpeningVideo } from "./components/OpeningVideo";
+import { Hero } from "./components/Hero";
+import { CoupleStory } from "./components/CoupleStory";
+import { StorySection } from "./components/StorySection";
+import { EventCard } from "./components/EventCard";
+import { GuestGuideSection } from "./components/GuestGuideSection";
+import { Gallery3D } from "./components/Gallery3D";
+import { GiftHub } from "./components/GiftHub";
+import { IntroSection } from "./components/IntroSection";
+import { HashtagSection } from "./components/HashtagSection";
+import { Wishes } from "./components/Wishes";
+import { FloatDock } from "./components/FloatDock";
+import { RsvpSheet } from "./sheets/RsvpSheet";
+import { LocationSheet } from "./sheets/LocationSheet";
+import { GiftSheet } from "./sheets/GiftSheet";
+import { useSheet } from "./hooks/useSheet";
+import { useInvitationFx } from "./hooks/useInvitationFx";
+import "./ballroom.css";
+
+const DOCK_AT = 0.58;
+
+type Props = {
+  guestName: string;
+  guestId: string | null;
+  inviteSlug?: string | null;
+};
+
+function QuoteWithEm({ text }: { text: string }) {
+  const parts = text.split(/(\bsatu\b)/i);
+  return (
+    <p>
+      {parts.map((part, i) =>
+        /^satu$/i.test(part) ? <em key={i}>{part}</em> : <span key={i}>{part}</span>,
+      )}
+    </p>
+  );
+}
+
+export function BallroomApp({ guestName, guestId, inviteSlug = null }: Props) {
+  const { content } = useWeddingContent();
+  usePageMeta(content);
+
+  const stageRef = useRef<HTMLDivElement>(null);
+  const inviteRef = useRef<HTMLElement>(null);
+  const [leaving, setLeaving] = useState(false);
+  const [opening, setOpening] = useState(false);
+  const [revealed, setRevealed] = useState(false);
+  const [heroProgress, setHeroProgress] = useState(0);
+  const [inFirstSection, setInFirstSection] = useState(true);
+  const { audioRef, play } = useAudio();
+  const { message, show, hide } = useToast();
+
+  const inertTargets = useMemo(
+    () => [inviteRef.current, document.getElementById("ballroom-dock")],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [revealed],
+  );
+  const sheet = useSheet({ inertTargets });
+
+  useInvitationFx(inviteRef, revealed);
+
+  useEffect(() => {
+    document.body.classList.add("theme-ballroom-host");
+    return () => document.body.classList.remove("theme-ballroom-host");
+  }, []);
+
+  useEffect(() => {
+    const root = inviteRef.current;
+    if (!root || !revealed) return;
+    const onScroll = () => {
+      const hero = document.getElementById("hero");
+      if (!hero) return;
+      const viewH = root.clientHeight || 1;
+      setInFirstSection(root.scrollTop < hero.offsetHeight - viewH * 0.2);
+    };
+    root.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => root.removeEventListener("scroll", onScroll);
+  }, [revealed]);
+
+  const startOpening = () => {
+    if (opening || revealed) return;
+    setLeaving(true);
+    setOpening(true);
+    play();
+  };
+
+  const onReveal = useCallback(() => {
+    setOpening(false);
+    setRevealed(true);
+    setLeaving(true);
+  }, []);
+
+  const coupleTitle = `${content.couple.groom.shortName} & ${content.couple.bride.shortName}`;
+  const dockVisible =
+    revealed && inFirstSection && heroProgress >= DOCK_AT && !sheet.isOpen;
+
+  const dateFooter = content.dateLabel.includes("·")
+    ? content.dateLabel
+    : content.dateLabel.replace(", ", " · ");
+
+  return (
+    <div className={`theme-ballroom${!revealed ? " is-locked" : ""}`}>
+      <div
+        ref={stageRef}
+        className={`stage${sheet.isOpen ? " is-sheet-open" : ""}`}
+        id="stage"
+      >
+        <audio ref={audioRef} src={content.media.audio} loop preload="none" />
+
+        {!revealed ? (
+          <Cover
+            guestName={guestName === "Tamu Undangan" ? "" : guestName}
+            salutation={content.cover.salutation}
+            dateLabel={content.dateLabel}
+            openLabel={content.cover.openButton}
+            openAria={content.cover.openButtonAriaLabel}
+            logoSrc={content.media.logo}
+            coverBg={content.media.coverBg}
+            onOpen={startOpening}
+            leaving={leaving}
+          />
+        ) : null}
+
+        <OpeningVideo
+          active={opening}
+          src={content.media.openingVideo}
+          poster={content.media.coverBg}
+          onReveal={onReveal}
+        />
+
+        <main
+          id="invitation"
+          ref={inviteRef}
+          className={`invitation${revealed ? " is-revealed" : ""}`}
+          hidden={!revealed}
+        >
+          <Hero
+            scrollRootRef={inviteRef}
+            eyebrow={content.hero.eyebrow}
+            groomName={content.couple.groom.shortName}
+            brideName={content.couple.bride.shortName}
+            weddingDate={content.date}
+            dateLabel={content.dateLabel}
+            labels={content.countdown.labels}
+            framesBase={content.media.heroFramesBase}
+            frameCount={content.media.heroFrameCount}
+            posterSrc={content.media.heroPoster}
+            enabled={revealed}
+            onProgress={setHeroProgress}
+          />
+          <CoupleStory
+            scrollRootRef={inviteRef}
+            eyebrow="The Couple"
+            title={`${content.coupleSection.prefix} ${content.coupleSection.title}`}
+            groom={{
+              role: "Mempelai Pria",
+              name: content.couple.groom.shortName,
+              parents: content.couple.groom.parents,
+              photo: content.couple.groom.photo,
+            }}
+            bride={{
+              role: "Mempelai Wanita",
+              name: content.couple.bride.shortName,
+              parents: content.couple.bride.parents,
+              photo: content.couple.bride.photo,
+            }}
+            enabled={revealed}
+          />
+          <IntroSection text={content.intro} />
+          <section id="quote" className="quote" aria-label="Ayat">
+            <blockquote className="quote__card">
+              <span className="quote__mark" aria-hidden="true">
+                “
+              </span>
+              <QuoteWithEm text={content.bibleQuote} />
+              <div className="quote__divider" aria-hidden="true">
+                <span />
+                <i />
+                <span />
+              </div>
+              <cite>{content.bibleReference}</cite>
+            </blockquote>
+          </section>
+          <EventCard
+            eyebrow="Save the Date"
+            title={content.eventsSection.titleEmbedded}
+            events={[...content.events]}
+            mapsLabel={content.eventsSection.mapsButton}
+            calendarLabel={content.eventsSection.calendarGoogleButton}
+          />
+          <Gallery3D
+            eyebrow="Moments"
+            title={content.gallery.title}
+            images={[...content.gallery.images]}
+            scrollRootRef={inviteRef}
+            enabled={revealed}
+          />
+          <GiftHub
+            title={content.gift.title}
+            description={content.gift.description}
+            accounts={[...content.gift.accounts]}
+            qris={content.gift.qris}
+            physicalAddress={content.gift.physicalAddress}
+            copySuccess={content.giftUi.copyAccountSuccess}
+            copyError={content.giftUi.copyError}
+            waNumber={content.contact.whatsappNumber}
+            waTemplate={content.contact.giftWhatsappTemplate}
+            guestName={guestName}
+            coupleTitle={coupleTitle}
+            onToast={show}
+          />
+          {content.story.enabled ? (
+            <StorySection
+              subtitle={content.story.subtitle}
+              title={content.story.title}
+              paragraphs={[...content.story.paragraphs]}
+            />
+          ) : null}
+          {content.guestGuide.enabled ? (
+            <GuestGuideSection
+              subtitle={content.guestGuide.subtitle}
+              title={content.guestGuide.title}
+              dressCodeTitle={content.guestGuide.dressCodeTitle}
+              dressCode={content.guestGuide.dressCode}
+              tipsTitle={content.guestGuide.tipsTitle}
+              tips={content.guestGuide.tips}
+            />
+          ) : null}
+          {content.guestbook.enabled ? (
+            <Wishes
+              guestId={guestId}
+              inviteSlug={inviteSlug}
+              guestName={guestName}
+              onToast={show}
+            />
+          ) : null}
+          <HashtagSection
+            title={content.hashtag.title}
+            tag={content.hashtag.tag}
+            photo={content.hashtag.photo}
+          />
+          <footer className="footer">
+            <div className="footer__glow" aria-hidden="true" />
+            <img
+              className="footer__logo"
+              src={content.media.logo}
+              alt=""
+              width={562}
+              height={562}
+              aria-hidden="true"
+            />
+            <p className="eyebrow">Dengan penuh kasih</p>
+            <p className="footer__names">{content.site.title}</p>
+            <div className="ornament" aria-hidden="true" />
+            {content.closing.paragraphs.map((p) => (
+              <p key={p.slice(0, 24)} className="footer__msg">
+                {p}
+              </p>
+            ))}
+            <p className="footer__date">{dateFooter}</p>
+            <p className="footer__copy">{content.footer.creditPrefix}</p>
+          </footer>
+        </main>
+
+        <FloatDock
+          visible={dockVisible}
+          onOpen={sheet.open}
+          labels={{
+            rsvp: content.shortcuts.rsvp,
+            location: content.shortcuts.events,
+            gift: content.giftUi.openButton,
+          }}
+        />
+
+        <div
+          className={`sheet-backdrop${sheet.isOpen ? " is-open" : ""}`}
+          hidden={!sheet.isOpen}
+          onClick={sheet.close}
+        />
+        <RsvpSheet
+          open={sheet.activeId === "rsvp"}
+          guestId={guestId}
+          guestName={guestName === "Tamu Undangan" ? "" : guestName}
+          onClose={sheet.close}
+          setSheetRef={(el) => sheet.setSheetRef("rsvp", el)}
+          onToast={show}
+        />
+        <LocationSheet
+          open={sheet.activeId === "location"}
+          events={[...content.events]}
+          mapsLabel={content.eventsSection.sheetMapsButton}
+          calendarLabel={content.eventsSection.sheetCalendarButton}
+          onClose={sheet.close}
+          setSheetRef={(el) => sheet.setSheetRef("location", el)}
+          onToast={show}
+        />
+        <GiftSheet
+          open={sheet.activeId === "gift"}
+          guestName={guestName === "Tamu Undangan" ? "" : guestName}
+          onClose={sheet.close}
+          setSheetRef={(el) => sheet.setSheetRef("gift", el)}
+          onToast={show}
+        />
+
+        {message ? <Toast message={message} onClose={hide} /> : null}
+      </div>
+    </div>
+  );
+}

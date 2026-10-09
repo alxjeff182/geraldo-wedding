@@ -41,21 +41,32 @@ export const wedding = {
     groom: {
       shortName: "Geraldo",
       fullName: "Geraldo Gracedo Sudena Tampubolon",
+      parents: "Putra dari A. Tampubolon / br. Situmorang",
       instagram: "https://instagram.com/geraldo.gracedo",
       instagramHandle: "@geraldo.gracedo",
-      photo: "/assets/images/groom-placeholder.svg",
+      photo: "/assets/ballroom/couple/groom.jpg",
     },
     bride: {
       shortName: "Christin",
       fullName: "Christin Samosir, S.M.",
+      parents: "Putri dari R. Samosir / br. Silalahi",
       instagram: "https://instagram.com/christin.samosir",
       instagramHandle: "@christin.samosir",
-      photo: "/assets/images/bride-placeholder.svg",
+      photo: "/assets/ballroom/couple/bride.jpg",
     },
   },
 
+  contact: {
+    whatsappNumber: "6281234567890",
+    rsvpWhatsappEnabled: true,
+    rsvpWhatsappTemplate:
+      "Halo, saya *{nama}* mengkonfirmasi kehadiran untuk pernikahan {pasangan}.\nKehadiran: {kehadiran}\nJumlah tamu: {jumlah}{ucapan}",
+    giftWhatsappTemplate:
+      "Halo, saya *{nama}* sudah mengirim hadiah untuk {pasangan}.\nMetode: {metode}",
+  },
+
   date: "2026-04-25T08:00:00+07:00",
-  dateLabel: "25 APRIL 2026",
+  dateLabel: "Sabtu, 25 April 2026",
   dateShort: "25 . 04 . 2026",
   location: "Tangerang",
 
@@ -78,7 +89,7 @@ export const wedding = {
     {
       name: "Pemberkatan",
       dateLabel: "Sabtu\n25 . 04 . 2026",
-      time: "Pukul 08.00 WIB",
+      time: "08.00 WIB",
       venue: "GPI Pondok Arum",
       address:
         "Perum. Pondok Arum, Blok J No. 26, Kel. Pabuaran Tumpeng, Kec. Karawaci, Tangerang",
@@ -89,7 +100,7 @@ export const wedding = {
     {
       name: "Resepsi & Adat",
       dateLabel: "Sabtu\n25 . 04 . 2026",
-      time: "Pukul 11.00 WIB",
+      time: "11.00 WIB",
       venue: "UFIT HALL GK",
       address:
         "Jl. Palem Raja Raya No.31, Panunggangan Bar., Kec. Cibodas, Kab. Tangerang",
@@ -100,7 +111,7 @@ export const wedding = {
   ] satisfies WeddingEvent[],
 
   story: {
-    enabled: true,
+    enabled: false,
     title: "Our Story",
     subtitle: "Constantly, consistently, continually, You.",
     paragraphs: [
@@ -122,32 +133,31 @@ export const wedding = {
   },
 
   gallery: {
-    title: "Our Gallery",
+    title: "Galeri",
     subtitle: "Constantly, consistently,\ncontinually, You.",
     images: [
-      { src: "/assets/images/gallery-placeholder.svg", alt: "Foto prewedding 1" },
-      { src: "/assets/images/gallery-placeholder.svg", alt: "Foto prewedding 2" },
-      { src: "/assets/images/gallery-placeholder.svg", alt: "Foto prewedding 3" },
-      { src: "/assets/images/gallery-placeholder.svg", alt: "Foto prewedding 4" },
-      { src: "/assets/images/gallery-placeholder.svg", alt: "Foto prewedding 5" },
-      { src: "/assets/images/gallery-placeholder.svg", alt: "Foto prewedding 6" },
-      { src: "/assets/images/gallery-placeholder.svg", alt: "Foto prewedding 7" },
-      { src: "/assets/images/gallery-placeholder.svg", alt: "Foto prewedding 8" },
+      { src: "/assets/ballroom/couple/groom.jpg", alt: "Mempelai Pria" },
+      { src: "/assets/ballroom/couple/bride.jpg", alt: "Mempelai Wanita" },
+      { src: "/assets/ballroom/couple/bg.jpg", alt: "Bersama" },
+      { src: "/assets/ballroom/cover-frame.jpg", alt: "Pandangan Pertama" },
+      { src: "/assets/ballroom/couple/bg.jpg", alt: "Janji" },
+      { src: "/assets/ballroom/hero-poster.jpg", alt: "Selamanya" },
     ],
   },
 
   gift: {
-    title: "Wedding Gift",
+    title: "Kirim Tanda Kasih",
     description:
-      "Doa dan kehadiran Anda adalah berkat yang sangat berarti bagi kami. Jika memberi adalah ungkapan kasih Anda, Anda dapat memberikan kado secara cashless.",
+      "Doa restu Anda sudah lebih dari cukup. Bila ingin berbagi kebahagiaan, kami sediakan cara mudah di bawah ini.",
     physicalAddress:
       "Perum. Taman Danau Indah Blok J No. 26, Kel. Pabuaran Tumpeng, Kec. Karawaci, Tangerang",
+    qris: "",
     accounts: [
       {
         bank: "BCA",
         number: "6705188657",
         holder: "Christin Samosir, S.M.",
-        logo: "/assets/images/bca-logo.png",
+        logo: "/assets/ballroom/bca-logo.png",
       },
     ] satisfies GiftAccount[],
   },
@@ -155,53 +165,45 @@ export const wedding = {
   hashtag: {
     title: "Share Your Moments",
     tag: "#GeraldoChristin2026",
-    photo: "/assets/images/hashtag-placeholder.svg",
+    photo: "/assets/ballroom/cover-frame.jpg",
   },
 
   closing: {
-    paragraphs: [
-      "Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Anda berkenan hadir dan mendoakan pernikahan kami.",
-      "Atas doa dan kehadiran Anda, kami mengucapkan terima kasih. Tuhan memberkati.",
-    ],
+    paragraphs: ["Terima kasih atas doa dan kehadiran Anda."],
   },
 
   media: {
-    coverBg: "/assets/images/batak-sampul.jpg",
-    desktopBg: "/assets/images/DESIGN-BG-HOME-BATAK.jpg",
-    paperBg: "/assets/images/paper-plos-p-1.jpg",
-    rumahBolon: "/assets/images/rumah-olon.png",
-    bunga: "/assets/images/2088186-bunga.png",
-    divider: "/assets/images/divider-tema-maroon.png",
-    closing: "/assets/images/closing-tema-batak.jpg",
-    ulos: "/assets/images/ulos.jpg",
-    heroPhoto: "/assets/images/hero-couple.png",
-    portrait: "/assets/images/hero-couple.png",
-    audio: "/assets/audio/toba-dream.mp3",
-    video: "/assets/video/3D-motion-batak-compressed.mp4",
-    ogImage: "/assets/images/batak-sampul.jpg",
+    coverBg: "/assets/ballroom/cover-frame.jpg",
+    audio: "",
+    ogImage: "/assets/ballroom/cover-frame.jpg",
+    logo: "/assets/ballroom/logo.png",
+    openingVideo: "/assets/ballroom/opening.mp4",
+    heroFramesBase: "/assets/ballroom/hero-frames",
+    heroFrameCount: 24,
+    heroPoster: "/assets/ballroom/hero-poster.jpg",
   },
 
   rsvp: {
-    title: "Rsvp",
+    title: "RSVP",
     subtitle: "Konfirmasi kehadiran Anda dengan mengisi form berikut",
     note: "*Mohon maaf! Khusus untuk tamu undangan",
-    deadline: "2026-12-31T23:59:59+07:00",
-    deadlineLabel: "Mohon konfirmasi kehadiran sebelum {date}",
+    deadline: "2026-04-18T23:59:59+07:00",
+    deadlineLabel: "Mohon konfirmasi sebelum {date}",
     deadlineClosedMessage:
       "Batas konfirmasi kehadiran telah berakhir. Terima kasih atas perhatiannya.",
-    nameLabel: "Nama*",
-    namePlaceholder: "Nama Anda",
-    attendanceLabel: "Konfirmasi Kehadiran*",
+    nameLabel: "Nama",
+    namePlaceholder: "Nama lengkap",
+    attendanceLabel: "Kehadiran",
     attendanceAriaLabel: "Pilihan kehadiran",
-    guestCountLabel: "Jumlah Kehadiran*",
+    guestCountLabel: "Jumlah tamu",
     guestCountAriaLabel: "Jumlah kehadiran",
     guestCountPlaceholder: "Pilih",
     guestCountOptions: ["1", "2", "3"],
-    submit: "Submit",
+    submit: "Kirim Konfirmasi",
     submitting: "Mengirim...",
     defaultAttendance: "hadir",
     errorMessage: "Gagal mengirim RSVP. Silakan coba lagi.",
-    successMessage: "Terima kasih! Konfirmasi kehadiran Anda telah kami terima.",
+    successMessage: "Konfirmasi Anda sudah kami terima.",
     alreadySubmittedMessage: "Anda sudah mengirim konfirmasi kehadiran. Terima kasih!",
     tooFastMessage: "Mohon tunggu sebentar sebelum mengirim form.",
     spamNameMessage: "Nama tidak valid. Mohon isi nama asli Anda.",
@@ -230,7 +232,7 @@ export const wedding = {
     colGuest: "Tamu Undangan",
     colActions: "Aksi",
     attendanceHadir: "Hadir",
-    attendanceTidak: "Tidak Hadir",
+    attendanceTidak: "Berhalangan",
     attendanceRagu: "Ragu",
     statTotal: "Konfirmasi",
     statPeople: "Total Orang",
@@ -240,14 +242,18 @@ export const wedding = {
   },
 
   guestbook: {
-    title: "Best Wishes",
-    subtitle: "Sampaikan doa dan ucapan terbaik Anda",
+    enabled: true,
+    title: "Ucapan & Doa",
+    subtitle: "Kirim doa dan ucapan untuk kedua mempelai",
     namePlaceholder: "Nama",
-    messagePlaceholder: "Ucapan",
-    submit: "Kirim",
+    messagePlaceholder: "Tulis doa atau ucapan…",
+    submit: "Kirim Ucapan",
     submitting: "Mengirim...",
     emptyMessage: "Belum ada ucapan. Jadilah yang pertama!",
     emptyNoSupabase: "Hubungkan Supabase untuk menampilkan buku tamu.",
+    lockedMessage: "Buka undangan dari link pribadi Anda untuk mengirim ucapan.",
+    limitReachedMessage: "Batas 3 ucapan per undangan sudah tercapai.",
+    remainingLabel: "Sisa {n} ucapan",
     pagerPrev: "Sebelumnya",
     pagerNext: "Selanjutnya",
     errorMessage: "Gagal mengirim ucapan. Silakan coba lagi.",
@@ -262,7 +268,6 @@ export const wedding = {
     salutation: "Kepada Yth.",
     openButton: "Buka Undangan",
     openButtonAriaLabel: "Buka undangan pernikahan",
-    rumahBolonAlt: "Rumah Bolon — simbol adat Batak",
   },
 
   coupleSection: {
@@ -275,40 +280,42 @@ export const wedding = {
     title: "Counting The Days",
     heading: "Hitung mundur menuju hari pernikahan",
     labels: {
-      days: "Days",
-      hours: "Hours",
-      minutes: "Minutes",
-      seconds: "Seconds",
+      days: "hari",
+      hours: "jam",
+      minutes: "menit",
+      seconds: "detik",
     },
   },
 
   eventsSection: {
     title: "Wedding\nEvent",
-    titleEmbedded: "Wedding Event",
+    titleEmbedded: "Detail Acara",
     subtitle: "Acara akan dilaksanakan pada:",
     venueLabel: "Bertempat di",
     venueLabelColon: "Bertempat di:",
-    mapsButton: "Open Maps",
-    calendarGoogleButton: "Google Calendar",
+    mapsButton: "Petunjuk Arah",
+    calendarGoogleButton: "Simpan Kalender",
+    sheetMapsButton: "Buka Maps",
+    sheetCalendarButton: "Kalender",
     calendarIcsButton: "Unduh .ics",
     calendarFabLabel: "Tambah ke Kalender",
   },
 
   giftUi: {
-    openButton: "Klik di sini",
+    openButton: "Kirim Hadiah",
     bankLabel: "Bank",
     accountNumberLabel: "No. Rekening —",
     accountHolderPrefix: "a.n",
     copyAccountButton: "Salin Nomor Rekening",
     physicalGiftTitle: "Kirim Kado",
     copyAddressButton: "Salin Alamat",
-    copyAccountSuccess: "Nomor rekening berhasil disalin",
+    copyAccountSuccess: "Nomor rekening tersalin",
     copyAddressSuccess: "Alamat berhasil disalin",
     copyError: "Gagal menyalin",
   },
 
   footer: {
-    creditPrefix: "Dibuat oleh",
+    creditPrefix: "© 2026 · Undangan Digital",
     portfolioPrompt: "Kunjungi portfolio di bawah ini:",
     websiteAriaLabel: "Kunjungi website",
     instagramAriaLabel: "Kunjungi Instagram",

@@ -22,12 +22,10 @@ export function formatRsvpDeadlineLabel(
 ): string {
   const date = parseRsvpDeadline(deadline);
   if (!date) return "";
-  const formatted = date.toLocaleString(locale, {
+  const formatted = date.toLocaleDateString(locale, {
     day: "numeric",
     month: "long",
     year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
   });
   return template.replace(/\{date\}/g, formatted);
 }

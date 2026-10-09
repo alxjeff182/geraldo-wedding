@@ -59,6 +59,7 @@ export type RsvpContent = {
 };
 
 export type GuestbookContent = {
+  enabled?: boolean;
   title?: string;
   subtitle?: string;
   namePlaceholder?: string;
@@ -67,6 +68,9 @@ export type GuestbookContent = {
   submitting?: string;
   emptyMessage?: string;
   emptyNoSupabase?: string;
+  lockedMessage?: string;
+  limitReachedMessage?: string;
+  remainingLabel?: string;
   pagerPrev?: string;
   pagerNext?: string;
   errorMessage?: string;
@@ -93,6 +97,7 @@ export type SiteContentOverrides = {
     groom?: {
       shortName?: string;
       fullName?: string;
+      parents?: string;
       instagram?: string;
       instagramHandle?: string;
       photo?: string;
@@ -100,10 +105,17 @@ export type SiteContentOverrides = {
     bride?: {
       shortName?: string;
       fullName?: string;
+      parents?: string;
       instagram?: string;
       instagramHandle?: string;
       photo?: string;
     };
+  };
+  contact?: {
+    whatsappNumber?: string;
+    rsvpWhatsappEnabled?: boolean;
+    rsvpWhatsappTemplate?: string;
+    giftWhatsappTemplate?: string;
   };
   coupleSection?: {
     prefix?: string;
@@ -132,6 +144,8 @@ export type SiteContentOverrides = {
     venueLabelColon?: string;
     mapsButton?: string;
     calendarGoogleButton?: string;
+    sheetMapsButton?: string;
+    sheetCalendarButton?: string;
     calendarIcsButton?: string;
     calendarFabLabel?: string;
   };
@@ -159,6 +173,7 @@ export type SiteContentOverrides = {
     title?: string;
     description?: string;
     physicalAddress?: string;
+    qris?: string;
     accounts?: GiftAccount[];
   };
   giftUi?: {
@@ -186,7 +201,6 @@ export type SiteContentOverrides = {
     salutation?: string;
     openButton?: string;
     openButtonAriaLabel?: string;
-    rumahBolonAlt?: string;
   };
   countdown?: {
     title?: string;
@@ -214,18 +228,13 @@ export type SiteContentOverrides = {
   };
   media?: {
     coverBg?: string;
-    desktopBg?: string;
-    paperBg?: string;
-    rumahBolon?: string;
-    bunga?: string;
-    divider?: string;
-    closing?: string;
-    ulos?: string;
-    heroPhoto?: string;
-    portrait?: string;
     audio?: string;
-    video?: string;
     ogImage?: string;
+    logo?: string;
+    openingVideo?: string;
+    heroFramesBase?: string;
+    heroFrameCount?: number;
+    heroPoster?: string;
   };
   rsvp?: RsvpContent;
   guestbook?: GuestbookContent;

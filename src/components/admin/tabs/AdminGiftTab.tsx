@@ -27,6 +27,13 @@ export function AdminGiftTab({ merged, updateDraft }: AdminTabProps) {
           onChange={(e) => updateDraft(["gift", "physicalAddress"], e.target.value)}
         />
       </label>
+      <ImageUploader
+        label="QRIS (kosong = tamu hanya lihat transfer bank)"
+        folder="gift"
+        spec={MEDIA_SPECS.qris}
+        value={merged.gift.qris}
+        onChange={(url) => updateDraft(["gift", "qris"], url)}
+      />
       {merged.gift.accounts[0] && (
         <fieldset className="admin-fieldset">
           <legend>Rekening Bank</legend>

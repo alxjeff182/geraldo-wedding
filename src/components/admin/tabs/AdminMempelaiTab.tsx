@@ -46,6 +46,15 @@ export function AdminMempelaiTab({ merged, updateDraft }: AdminTabProps) {
                 onChange={(e) => updateDraft(["couple", role, "fullName"], e.target.value)}
               />
             </label>
+            <label className="admin-field admin-field--wide">
+              <span className="admin-label">Orang Tua</span>
+              <input
+                className="admin-input"
+                value={merged.couple[role].parents}
+                onChange={(e) => updateDraft(["couple", role, "parents"], e.target.value)}
+                placeholder="Putra/Putri dari …"
+              />
+            </label>
             <label className="admin-field">
               <span className="admin-label">Instagram URL</span>
               <input

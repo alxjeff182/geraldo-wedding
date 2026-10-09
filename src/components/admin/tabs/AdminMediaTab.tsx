@@ -8,8 +8,8 @@ export function AdminMediaTab({ merged, updateDraft }: AdminTabProps) {
       <div className="admin-fieldset admin-field--wide admin-media-guide">
         <legend>Panduan Upload Media</legend>
         <p className="admin-media-guide__intro">
-          Gunakan dimensi dan rasio yang sama dengan aset saat ini agar tampilan tidak terpotong atau blur.
-          Semua ukuran di bawah mengacu pada file di <code>public/assets/</code>.
+          Gunakan dimensi dan rasio yang sama dengan aset ballroom agar tampilan tidak terpotong atau blur.
+          Semua ukuran di bawah mengacu pada file di <code>public/assets/ballroom/</code>.
         </p>
       </div>
       <ImageUploader
@@ -20,22 +20,39 @@ export function AdminMediaTab({ merged, updateDraft }: AdminTabProps) {
         onChange={(url) => updateDraft(["media", "coverBg"], url)}
       />
       <ImageUploader
-        label="Hero Photo"
+        label="Logo Monogram"
         folder="media"
-        spec={MEDIA_SPECS.heroPhoto}
-        value={merged.media.heroPhoto}
-        locked
-        lockedNote="Foto section pertama dikunci dan tidak bisa diganti."
-        onChange={() => undefined}
+        spec={MEDIA_SPECS.logo}
+        value={merged.media.logo}
+        onChange={(url) => updateDraft(["media", "logo"], url)}
       />
       <ImageUploader
-        label="Video Hero"
+        label="Video Opening (pintu)"
         folder="media"
         accept="video/mp4,video/webm"
-        spec={MEDIA_SPECS.video}
-        value={merged.media.video}
-        onChange={(url) => updateDraft(["media", "video"], url)}
+        spec={MEDIA_SPECS.openingVideo}
+        value={merged.media.openingVideo}
+        onChange={(url) => updateDraft(["media", "openingVideo"], url)}
       />
+      <label className="admin-field">
+        <span className="admin-label">Hero Frames Base Path</span>
+        <input
+          className="admin-input"
+          value={merged.media.heroFramesBase}
+          onChange={(e) => updateDraft(["media", "heroFramesBase"], e.target.value)}
+        />
+      </label>
+      <label className="admin-field">
+        <span className="admin-label">Jumlah Hero Frames</span>
+        <input
+          className="admin-input"
+          type="number"
+          min={1}
+          max={60}
+          value={merged.media.heroFrameCount}
+          onChange={(e) => updateDraft(["media", "heroFrameCount"], Number(e.target.value) || 24)}
+        />
+      </label>
       <ImageUploader
         label="Audio"
         folder="media"
@@ -43,48 +60,6 @@ export function AdminMediaTab({ merged, updateDraft }: AdminTabProps) {
         spec={MEDIA_SPECS.audio}
         value={merged.media.audio}
         onChange={(url) => updateDraft(["media", "audio"], url)}
-      />
-      <ImageUploader
-        label="Background Desktop"
-        folder="media"
-        spec={MEDIA_SPECS.desktopBg}
-        value={merged.media.desktopBg}
-        onChange={(url) => updateDraft(["media", "desktopBg"], url)}
-      />
-      <ImageUploader
-        label="Divider"
-        folder="media"
-        spec={MEDIA_SPECS.divider}
-        value={merged.media.divider}
-        onChange={(url) => updateDraft(["media", "divider"], url)}
-      />
-      <ImageUploader
-        label="Rumah Bolon"
-        folder="media"
-        spec={MEDIA_SPECS.rumahBolon}
-        value={merged.media.rumahBolon}
-        onChange={(url) => updateDraft(["media", "rumahBolon"], url)}
-      />
-      <ImageUploader
-        label="Bunga Dekorasi"
-        folder="media"
-        spec={MEDIA_SPECS.bunga}
-        value={merged.media.bunga}
-        onChange={(url) => updateDraft(["media", "bunga"], url)}
-      />
-      <ImageUploader
-        label="Background Penutup"
-        folder="media"
-        spec={MEDIA_SPECS.closing}
-        value={merged.media.closing}
-        onChange={(url) => updateDraft(["media", "closing"], url)}
-      />
-      <ImageUploader
-        label="Tekstur Ulos"
-        folder="media"
-        spec={MEDIA_SPECS.ulos}
-        value={merged.media.ulos}
-        onChange={(url) => updateDraft(["media", "ulos"], url)}
       />
       <ImageUploader
         label="OG Image"

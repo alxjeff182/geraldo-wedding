@@ -4,13 +4,13 @@
   "description": "Undangan pernikahan Geraldo & Christin",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#5c1a1a",
-  "theme_color": "#5c1a1a",
+  "background_color": "#1a0f0c",
+  "theme_color": "#1a0f0c",
   "icons": [
     {
-      "src": "/assets/images/batak-sampul.jpg",
+      "src": "/assets/ballroom/logo.png",
       "sizes": "512x512",
-      "type": "image/jpeg"
+      "type": "image/png"
     }
   ]
 }
