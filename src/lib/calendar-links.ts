@@ -128,7 +128,8 @@ function toBase64Url(text: string): string {
  * Open ICS in Calendar.app / iOS Calendar with event titles prefilled.
  * Mac desktop must use webcal:// — https:// makes Chrome/Safari download the .ics.
  */
-export function openAppleCalendarIcs(content: string, _filename = "wedding.ics") {
+export function openAppleCalendarIcs(content: string, filename = "wedding.ics") {
+  void filename;
   const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
   const iOS =
     /iPad|iPhone|iPod/i.test(ua) ||

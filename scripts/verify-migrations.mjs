@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Verify production Supabase migrations 004–007.
+ * Verify production Supabase migrations 004–011.
  * Requires: SUPABASE_URL (or VITE_SUPABASE_URL), SUPABASE_SERVICE_ROLE_KEY
  */
 import { readFileSync, existsSync } from "node:fs";
@@ -63,7 +63,7 @@ const checks = [
     },
   },
   {
-    name: "007 rsvp one-per-guest index",
+    name: "007 rsvp one-per-guest readable",
     run: async () => {
       const { data, error } = await supabase
         .from("rsvp_submissions")
@@ -71,6 +71,32 @@ const checks = [
         .not("guest_id", "is", null)
         .limit(1);
       return !error && Array.isArray(data);
+    },
+  },
+  {
+    name: "008 guests.invite_sent_at column",
+    run: async () => {
+      const { error } = await supabase.from("guests").select("invite_sent_at").limit(1);
+      return !error;
+    },
+  },
+  {
+    name: "010 wishes.hidden column",
+    run: async () => {
+      const { error } = await supabase.from("wishes").select("hidden").limit(1);
+      return !error;
+    },
+  },
+  {
+    name: "011 ensure_guest_by_slug() RPC",
+    run: async () => {
+      const { error } = await supabase.rpc("ensure_guest_by_slug", {
+        guest_slug: "__verify_probe__",
+        guest_name: "Verify Probe",
+      });
+      if (error) return false;
+      await supabase.from("guests").delete().eq("slug", "__verify_probe__");
+      return true;
     },
   },
 ];
@@ -87,7 +113,7 @@ for (const check of checks) {
 
 if (failed > 0) {
   console.error(`\n${failed} check(s) failed. Run: npm run db:apply > pending-migrations.sql`);
-  console.error("Then paste into Supabase SQL Editor for project geraldo-wedding.");
+  console.error("Then paste into Supabase SQL Editor, and redeploy: npx supabase functions deploy submit");
   process.exit(1);
 }
 

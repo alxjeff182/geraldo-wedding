@@ -19,6 +19,11 @@ function deepMerge<T>(base: T, overrides: unknown): T {
       const baseVal = (base as Record<string, unknown>)[key];
       const overrideVal = overrides[key];
       if (overrideVal === undefined) continue;
+      // Ignore unknown / removed Batak media keys from old CMS rows
+      if (baseVal === undefined && isPlainObject(base) && "coverBg" in (base as object)) {
+        const allowed = new Set(Object.keys(base as object));
+        if (!allowed.has(key)) continue;
+      }
       result[key] = deepMerge(baseVal, overrideVal);
     }
     return result as T;
@@ -27,13 +32,25 @@ function deepMerge<T>(base: T, overrides: unknown): T {
   return overrides as T;
 }
 
-/** Drop CMS overrides for the locked first-section couple photo. */
+/** Strip obsolete Batak media keys from CMS overrides before save. */
 export function stripLockedMedia(overrides: SiteContentOverrides): SiteContentOverrides {
   if (!overrides.media) return overrides;
-  const media = { ...overrides.media };
-  delete media.heroPhoto;
-  delete media.portrait;
-  return { ...overrides, media };
+  const media = { ...overrides.media } as Record<string, unknown>;
+  for (const key of [
+    "desktopBg",
+    "paperBg",
+    "rumahBolon",
+    "bunga",
+    "divider",
+    "closing",
+    "ulos",
+    "heroPhoto",
+    "portrait",
+    "video",
+  ]) {
+    delete media[key];
+  }
+  return { ...overrides, media: media as SiteContentOverrides["media"] };
 }
 
 export function mergeWeddingContent(overrides: SiteContentOverrides = {}): WeddingConfig {
@@ -45,6 +62,15 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
       invite.whatsappTemplates = resolveInviteTemplates(undefined, invite.whatsappTemplate);
       delete invite.whatsappTemplate;
     }
+  }
+
+  // Drop removed fields from old CMS payloads
+  if (normalized.site && "theme" in normalized.site) {
+    delete (normalized.site as { theme?: unknown }).theme;
+  }
+  if (normalized.media) {
+    const cleaned = stripLockedMedia({ media: normalized.media }).media;
+    normalized.media = cleaned;
   }
 
   const merged = deepMerge(structuredClone(wedding) as WeddingConfig, normalized) as WeddingConfig;
@@ -65,12 +91,6 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
       ...merged.invite,
       whatsappTemplates,
       defaultTemplateId,
-    },
-    media: {
-      ...merged.media,
-      // First-section couple photo is locked to the bundled asset.
-      heroPhoto: wedding.media.heroPhoto,
-      portrait: wedding.media.portrait,
     },
   };
 }

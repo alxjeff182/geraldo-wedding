@@ -28,6 +28,7 @@ export type Wish = {
   name: string;
   message: string;
   attendance: "hadir" | "tidak_hadir" | "ragu" | null;
+  hidden?: boolean;
   created_at: string;
 };
 
@@ -42,6 +43,7 @@ export type RsvpInsert = {
 
 export type WishInsert = {
   guest_id?: string | null;
+  guest_slug?: string | null;
   name: string;
   message: string;
   attendance?: "hadir" | "tidak_hadir" | "ragu" | null;
@@ -100,6 +102,10 @@ export type WeddingDatabase = {
       };
       get_guest_by_slug: {
         Args: { guest_slug: string };
+        Returns: { id: string; display_name: string }[];
+      };
+      ensure_guest_by_slug: {
+        Args: { guest_slug: string; guest_name?: string | null };
         Returns: { id: string; display_name: string }[];
       };
     };

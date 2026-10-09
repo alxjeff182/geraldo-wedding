@@ -6,6 +6,8 @@ export type InviteTemplateVars = {
   pasangan: string;
   salam: string;
   slug: string;
+  acara?: string;
+  venue?: string;
 };
 
 export const INVITE_TEMPLATE_VARIABLES = [
@@ -16,6 +18,8 @@ export const INVITE_TEMPLATE_VARIABLES = [
   { key: "pasangan", label: "Nama mempelai" },
   { key: "salam", label: "Salam pembuka" },
   { key: "slug", label: "Slug tamu" },
+  { key: "acara", label: "Ringkasan acara & jam" },
+  { key: "venue", label: "Nama venue" },
 ] as const;
 
 export function slugifyGuestName(name: string): string {
@@ -50,6 +54,39 @@ export function formatPhoneDisplay(phone: string): string {
 export function buildGuestInviteUrl(siteUrl: string, slug: string): string {
   const base = siteUrl.replace(/\/$/, "");
   return `${base}/?guest=${encodeURIComponent(slug)}`;
+}
+
+/**
+ * Canonical invite param is `guest=<slug>`.
+ * Legacy `to=<name>` is accepted and normalized to the same slug lookup.
+ */
+export function resolveInviteSlug(search: URLSearchParams): {
+  slug: string | null;
+  displayFallback: string | null;
+  fromLegacyTo: boolean;
+} {
+  const guest = search.get("guest")?.trim();
+  if (guest) {
+    return { slug: guest, displayFallback: guest.replace(/-/g, " "), fromLegacyTo: false };
+  }
+
+  const to = search.get("to")?.trim();
+  if (!to) {
+    return { slug: null, displayFallback: null, fromLegacyTo: false };
+  }
+
+  let decoded = to;
+  try {
+    decoded = decodeURIComponent(to.replace(/\+/g, " "));
+  } catch {
+    decoded = to;
+  }
+
+  return {
+    slug: slugifyGuestName(decoded),
+    displayFallback: decoded,
+    fromLegacyTo: true,
+  };
 }
 
 export function formatInviteMessage(template: string, vars: InviteTemplateVars): string {

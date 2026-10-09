@@ -1,58 +1,80 @@
 import { useEffect, useState } from "react";
-import { decodeGuestName } from "../lib/guest-name";
+import { resolveInviteSlug } from "../lib/invite-links";
+
+function firstRow<T>(data: T | T[] | null | undefined): T | null {
+  if (!data) return null;
+  return Array.isArray(data) ? (data[0] ?? null) : data;
+}
 
 export function useGuestName() {
   const [guestName, setGuestName] = useState("Tamu Undangan");
   const [guestId, setGuestId] = useState<string | null>(null);
+  const [inviteSlug, setInviteSlug] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const toParam = params.get("to");
-    const guestSlug = params.get("guest");
+    const { slug, displayFallback, fromLegacyTo } = resolveInviteSlug(params);
 
-    if (toParam) {
-      setGuestName(decodeGuestName(toParam));
+    if (!slug) {
       setLoading(false);
       return;
     }
 
-    if (!guestSlug) {
-      setLoading(false);
-      return;
-    }
+    setInviteSlug(slug);
 
     void (async () => {
       const { getSupabase, isSupabaseConfigured } = await import("../lib/supabase");
+      const fallbackName = displayFallback ?? slug.replace(/-/g, " ");
 
       if (!isSupabaseConfigured) {
-        setGuestName(guestSlug.replace(/-/g, " "));
+        setGuestName(fallbackName);
         setLoading(false);
         return;
       }
 
       const supabase = getSupabase();
       if (!supabase) {
-        setGuestName(guestSlug.replace(/-/g, " "));
+        setGuestName(fallbackName);
         setLoading(false);
         return;
       }
 
-      const { data, error } = await supabase.rpc("get_guest_by_slug", {
-        guest_slug: guestSlug,
+      const { data: found } = await supabase.rpc("get_guest_by_slug", {
+        guest_slug: slug,
       });
+      let row = firstRow(found);
 
-      const row = Array.isArray(data) ? data[0] : null;
+      if (!row?.id) {
+        const { data: ensured } = await supabase.rpc("ensure_guest_by_slug", {
+          guest_slug: slug,
+          guest_name: fallbackName,
+        });
+        row = firstRow(ensured);
+      }
 
-      if (!error && row) {
-        setGuestName(row.display_name);
+      if (row?.id) {
+        setGuestName(row.display_name || fallbackName);
         setGuestId(row.id);
+
+        if (fromLegacyTo || params.get("guest") !== slug) {
+          const next = new URLSearchParams(params);
+          next.delete("to");
+          next.set("guest", slug);
+          const qs = next.toString();
+          window.history.replaceState(
+            null,
+            "",
+            `${window.location.pathname}${qs ? `?${qs}` : ""}${window.location.hash}`,
+          );
+        }
       } else {
-        setGuestName(guestSlug.replace(/-/g, " "));
+        // RPC belum di-deploy: tetap tampilkan form lewat inviteSlug
+        setGuestName(fallbackName);
       }
       setLoading(false);
     })();
   }, []);
 
-  return { guestName, guestId, loading };
+  return { guestName, guestId, inviteSlug, loading };
 }

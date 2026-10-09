@@ -27,7 +27,9 @@ export function AdminTabContent({ tab, merged, updateDraft, setMessage }: AdminT
     case "rsvp":
       return <AdminRsvpTab merged={merged} updateDraft={updateDraft} setMessage={setMessage} />;
     case "guestbook":
-      return <AdminGuestbookTab merged={merged} updateDraft={updateDraft} />;
+      return (
+        <AdminGuestbookTab merged={merged} updateDraft={updateDraft} setMessage={setMessage} />
+      );
     case "penutup":
       return <AdminPenutupTab merged={merged} updateDraft={updateDraft} />;
     case "media":

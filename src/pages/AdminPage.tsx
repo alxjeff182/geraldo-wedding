@@ -17,6 +17,7 @@ import { AlertDialog } from "../components/ui/AlertDialog";
 import { TABS } from "../components/admin/admin-tabs";
 import type { AdminTab } from "../components/admin/types";
 import { useAlertDialog } from "../hooks/useAlertDialog";
+import "../styles/admin.css";
 
 const LOAD_STUCK_MS = 15000;
 

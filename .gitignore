@@ -7,3 +7,4 @@ dist
 legacy/
 asset/
 .vercel
+supabase/.temp/

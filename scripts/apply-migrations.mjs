@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Print combined SQL for migrations 004–007 to run in Supabase SQL Editor.
+ * Print combined SQL for migrations 004–011 to run in Supabase SQL Editor.
  * Usage: node scripts/apply-migrations.mjs > pending-migrations.sql
  */
 import { readFileSync } from "node:fs";
@@ -13,9 +13,14 @@ const files = [
   "005_rsvp_admin.sql",
   "006_admin_hardening.sql",
   "007_rsvp_antispam.sql",
+  "008_guest_invite_sent.sql",
+  "009_reset_gw5_copy.sql",
+  "010_wishes_moderation.sql",
+  "011_ensure_guest.sql",
 ];
 
 console.log("-- Run this file in Supabase SQL Editor (safe to re-run idempotent parts)\n");
+console.log("-- Note: 009 resets some CMS copy defaults — review before prod if you customized content.\n");
 
 for (const file of files) {
   const sql = readFileSync(resolve(root, "supabase/migrations", file), "utf8");
