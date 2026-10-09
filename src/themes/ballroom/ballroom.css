@@ -2363,13 +2363,12 @@ body:has(.theme-ballroom) {
   color: var(--gold);
 }
 
-.theme-ballroom .gift-qris-note {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
+.theme-ballroom .qris-dummy-note {
   margin: 0;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
   color: rgba(212, 196, 176, 0.55);
+  text-align: center;
 }
 
 .theme-ballroom .wishes-locked {

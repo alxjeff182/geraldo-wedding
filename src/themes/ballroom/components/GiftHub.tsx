@@ -4,7 +4,7 @@ import {
   buildGiftWhatsappMessage,
   buildGuestWhatsAppUrl,
 } from "../../../lib/guest-whatsapp";
-import { IconCopy, IconQris, IconWhatsApp } from "../icons";
+import { IconCopy, IconWhatsApp } from "../icons";
 
 type Props = {
   title: string;
@@ -24,6 +24,8 @@ type Props = {
   onTabChange?: (tab: "qris" | "bank") => void;
 };
 
+const QRIS_FALLBACK = "/assets/ballroom/qris-dummy.svg";
+
 export function GiftHub({
   title,
   description,
@@ -40,8 +42,9 @@ export function GiftHub({
   embedded = false,
   onTabChange,
 }: Props) {
-  const hasQris = Boolean(qris);
-  const [tab, setTab] = useState<"qris" | "bank">(hasQris ? "qris" : "bank");
+  const qrisSrc = qris?.trim() || QRIS_FALLBACK;
+  const isDummy = !qris?.trim() || /qris-dummy/i.test(qris);
+  const [tab, setTab] = useState<"qris" | "bank">("qris");
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const timerRef = useRef(0);
 
@@ -74,17 +77,15 @@ export function GiftHub({
   const panels: ReactNode = (
     <>
       <div className="seg" role="tablist" aria-label="Metode hadiah">
-        {hasQris ? (
-          <button
-            type="button"
-            className={`seg__btn${tab === "qris" ? " is-active" : ""}`}
-            role="tab"
-            aria-selected={tab === "qris"}
-            onClick={() => selectTab("qris")}
-          >
-            QRIS
-          </button>
-        ) : null}
+        <button
+          type="button"
+          className={`seg__btn${tab === "qris" ? " is-active" : ""}`}
+          role="tab"
+          aria-selected={tab === "qris"}
+          onClick={() => selectTab("qris")}
+        >
+          QRIS
+        </button>
         <button
           type="button"
           className={`seg__btn${tab === "bank" ? " is-active" : ""}`}
@@ -96,15 +97,19 @@ export function GiftHub({
         </button>
       </div>
 
-      {hasQris && tab === "qris" ? (
+      {tab === "qris" ? (
         <div className="gift-panel is-active" role="tabpanel">
           <div className="qris-frame">
-            <img src={qris} alt="Kode QRIS" width={280} height={280} />
+            <img src={qrisSrc} alt="Kode QRIS" width={280} height={280} />
           </div>
           <p className="qris-name">a.n. {coupleTitle}</p>
-          <a className="gift-link" href={qris} download>
-            Simpan QRIS
-          </a>
+          {isDummy ? (
+            <p className="qris-dummy-note">QRIS sementara — ganti lewat CMS (tab Gift)</p>
+          ) : (
+            <a className="gift-link" href={qrisSrc} download>
+              Simpan QRIS
+            </a>
+          )}
         </div>
       ) : (
         <div className="gift-panel is-active" role="tabpanel">
@@ -133,12 +138,6 @@ export function GiftHub({
             <p className="gift-address">
               <span className="gift-address__label">Alamat kirim</span>
               {physicalAddress}
-            </p>
-          ) : null}
-          {!hasQris ? (
-            <p className="gift-qris-note">
-              <IconQris size={16} />
-              <span>QRIS dapat diunggah lewat CMS (tab Gift).</span>
             </p>
           ) : null}
         </div>

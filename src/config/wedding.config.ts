@@ -151,7 +151,7 @@ export const wedding = {
       "Doa restu Anda sudah lebih dari cukup. Bila ingin berbagi kebahagiaan, kami sediakan cara mudah di bawah ini.",
     physicalAddress:
       "Perum. Taman Danau Indah Blok J No. 26, Kel. Pabuaran Tumpeng, Kec. Karawaci, Tangerang",
-    qris: "",
+    qris: "/assets/ballroom/qris-dummy.svg",
     accounts: [
       {
         bank: "BCA",

@@ -17,9 +17,7 @@ type Props = {
 
 export function GiftSheet({ open, guestName, onClose, setSheetRef, onToast }: Props) {
   const { content } = useWeddingContent();
-  const [metode, setMetode] = useState(
-    content.gift.qris ? "QRIS" : "Transfer Bank",
-  );
+  const [metode, setMetode] = useState("QRIS");
 
   const waHref = buildGuestWhatsAppUrl(
     content.contact.whatsappNumber,
