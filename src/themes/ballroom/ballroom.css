@@ -168,7 +168,7 @@ body:has(.theme-ballroom) {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 28%;
+  object-position: center 45%;
 }.theme-ballroom .cover__shade{
   position: absolute;
   inset: 0;
@@ -641,10 +641,6 @@ body:has(.theme-ballroom) {
   height: 100%;
   object-fit: cover;
   object-position: center 18%;
-}.theme-ballroom .couple-card[data-chapter="0"] .couple-card__face--front img{
-  object-position: 28% 18%;
-}.theme-ballroom .couple-card[data-chapter="1"] .couple-card__face--front img{
-  object-position: 72% 18%;
 }.theme-ballroom .couple-card__caption{
   position: absolute;
   left: 0;

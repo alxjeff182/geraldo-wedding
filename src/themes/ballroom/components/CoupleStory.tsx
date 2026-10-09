@@ -151,7 +151,7 @@ export function CoupleStory({
     >
       <div className="couple-story__pin">
         <div className="couple-story__bg" aria-hidden="true">
-          <img src="/assets/ballroom/couple/bg.jpg" alt="" width={720} height={1280} />
+          <img src="/assets/ballroom/couple/bg.jpg" alt="" width={1080} height={1350} />
         </div>
         <div className="couple-story__veil" aria-hidden="true" />
         <div className="couple-story__head">

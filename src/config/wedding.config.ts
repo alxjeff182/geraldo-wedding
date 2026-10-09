@@ -136,12 +136,14 @@ export const wedding = {
     title: "Galeri",
     subtitle: "Constantly, consistently,\ncontinually, You.",
     images: [
-      { src: "/assets/ballroom/couple/groom.jpg", alt: "Mempelai Pria" },
-      { src: "/assets/ballroom/couple/bride.jpg", alt: "Mempelai Wanita" },
-      { src: "/assets/ballroom/couple/bg.jpg", alt: "Bersama" },
-      { src: "/assets/ballroom/cover-frame.jpg", alt: "Pandangan Pertama" },
-      { src: "/assets/ballroom/couple/bg.jpg", alt: "Janji" },
-      { src: "/assets/ballroom/hero-poster.jpg", alt: "Selamanya" },
+      { src: "/assets/ballroom/gallery/01.jpg", alt: "Studio — berdua" },
+      { src: "/assets/ballroom/gallery/02.jpg", alt: "Adat — saling menatap" },
+      { src: "/assets/ballroom/gallery/03.jpg", alt: "Sawah — bergandengan" },
+      { src: "/assets/ballroom/gallery/04.jpg", alt: "Adat — berpelukan" },
+      { src: "/assets/ballroom/gallery/05.jpg", alt: "Studio — full body" },
+      { src: "/assets/ballroom/gallery/06.jpg", alt: "Adat — berdua" },
+      { src: "/assets/ballroom/gallery/07.jpg", alt: "Sawah — menoleh" },
+      { src: "/assets/ballroom/gallery/08.jpg", alt: "Christin dengan payung" },
     ],
   },
 
@@ -165,7 +167,7 @@ export const wedding = {
   hashtag: {
     title: "Share Your Moments",
     tag: "#GeraldoChristin2026",
-    photo: "/assets/ballroom/cover-frame.jpg",
+    photo: "/assets/ballroom/og-image.jpg",
   },
 
   closing: {
@@ -175,7 +177,7 @@ export const wedding = {
   media: {
     coverBg: "/assets/ballroom/cover-frame.jpg",
     audio: "",
-    ogImage: "/assets/ballroom/cover-frame.jpg",
+    ogImage: "/assets/ballroom/og-image.jpg",
     logo: "/assets/ballroom/logo.png",
     openingVideo: "/assets/ballroom/opening.mp4",
     heroFramesBase: "/assets/ballroom/hero-frames",
