@@ -1,0 +1,16 @@
+---
+description: Setiap perubahan lokal harus langsung di-deploy ke production
+alwaysApply: true
+---
+
+# Deploy on every local change
+
+Setelah selesai mengubah kode di repo ini, **langsung naikkan ke production** tanpa menunggu diminta lagi:
+
+1. **Commit** perubahan relevan (pesan singkat, fokus "why").
+2. **Push** ke GitHub (`main` atau branch yang sedang dipakai; jika di `theme/ballroom` / feature branch, push branch itu lalu merge/PR ke `main` bila production mengikuti `main`).
+3. **Vercel production**: `npx vercel deploy --prod --yes` dan pastikan alias `geraldo-christin.vercel.app` mengarah ke deployment baru (atau biarkan Git integration Vercel deploy dari push ke `main`).
+4. Jika menyentuh **Supabase** (migrations / `supabase/functions/submit`): apply SQL + `npx supabase functions deploy submit --project-ref zuuwxxrpkbfmelyoibst` (butuh `SUPABASE_ACCESS_TOKEN` jika CLI belum login).
+5. Laporkan URL production setelah deploy.
+
+Jangan tinggalkan perubahan penting hanya di local. Kecuali user eksplisit bilang "jangan deploy" / "local only".
