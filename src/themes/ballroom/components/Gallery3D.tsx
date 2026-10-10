@@ -28,6 +28,7 @@ export function Gallery3D({
     stageRef,
     ringRef,
     activeIndex,
+    hasInteracted,
     lightbox,
     closeLightbox,
     stepBy,
@@ -39,6 +40,7 @@ export function Gallery3D({
   });
 
   const current = images[activeIndex] ?? images[0];
+  const countLabel = `${String(activeIndex + 1).padStart(2, "0")} / ${String(n).padStart(2, "0")}`;
 
   useEffect(() => {
     if (!lightbox) return;
@@ -225,15 +227,10 @@ export function Gallery3D({
       </div>
 
       <footer className="gallery-canvas__ui">
-        <p className="gallery-canvas__caption">
-          <span className="gallery-canvas__count">
-            {String(activeIndex + 1).padStart(2, "0")}
-          </span>
-          <span className="gallery-canvas__sep" aria-hidden="true">
-            ·
-          </span>
-          <span>{current?.alt}</span>
-        </p>
+        <div className="gallery-canvas__caption" key={activeIndex}>
+          <span className="gallery-canvas__count">{countLabel}</span>
+          <span className="gallery-canvas__title">{current?.alt}</span>
+        </div>
         <div className="gallery-canvas__dots" role="tablist" aria-label="Navigasi galeri">
           {images.map((_, i) => (
             <button
@@ -245,8 +242,8 @@ export function Gallery3D({
             />
           ))}
         </div>
-        <p className="gallery-canvas__hint">
-          Geser · ketuk samping untuk putar · ketuk depan untuk perbesar
+        <p className={`gallery-canvas__hint${hasInteracted ? " is-gone" : ""}`}>
+          Geser atau ketuk foto
         </p>
       </footer>
 

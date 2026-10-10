@@ -17,6 +17,7 @@ export function useGalleryRing({ count, scrollRootRef, enabled = true }: Options
   const ringRef = useRef<HTMLDivElement | null>(null);
   const lightboxOpenRef = useRef(false);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [hasInteracted, setHasInteracted] = useState(false);
   const [lightbox, setLightbox] = useState<{ src: string; alt: string; caption: string } | null>(
     null,
   );
@@ -73,11 +74,21 @@ export function useGalleryRing({ count, scrollRootRef, enabled = true }: Options
       return from + d;
     };
 
+    const markInteracted = () => setHasInteracted(true);
+
     const layout = () => {
       if (reduceMotion) return;
-      const planeW = planeEls[0].offsetWidth || stage.clientWidth * 0.62;
-      const radius = planeW / (2 * Math.tan(Math.PI / n)) + planeW * 0.12;
+      // Fit front plane inside the stage after perspective foreshortening.
+      const P = 1200;
+      const k = 1 / (2 * Math.tan(Math.PI / n)) + 0.12;
+      const H = stage.clientHeight * 0.8;
+      const W = stage.clientWidth * 0.66;
+      const byH = (H * P) / ((4 / 3) * P + H * k);
+      const byW = (W * P) / (P + W * k);
+      const planeW = Math.max(140, Math.min(248, byH, byW));
+      const radius = k * planeW;
       planeEls.forEach((el, i) => {
+        el.style.setProperty("--plane-w", `${planeW.toFixed(1)}px`);
         el.style.setProperty("--slot", `${i * step}deg`);
         el.style.setProperty("--radius", `${radius.toFixed(1)}px`);
       });
@@ -137,7 +148,8 @@ export function useGalleryRing({ count, scrollRootRef, enabled = true }: Options
 
     lightboxOpenRef.current = false;
 
-    const snapTo = (index: number, animate = true) => {
+    const snapTo = (index: number, animate = true, fromUser = true) => {
+      if (fromUser) markInteracted();
       const desired = -index * step;
       endDrag();
       autoSpin = false;
@@ -155,7 +167,7 @@ export function useGalleryRing({ count, scrollRootRef, enabled = true }: Options
       resetIdle();
     };
 
-    const stepBy = (dir: number) => snapTo((active + dir + n) % n);
+    const stepBy = (dir: number) => snapTo((active + dir + n) % n, true, true);
 
     const openLightboxFor = (index: number) => {
       const el = planeEls[index];
@@ -167,6 +179,7 @@ export function useGalleryRing({ count, scrollRootRef, enabled = true }: Options
         el.querySelector(".gallery-plane__num")?.textContent?.trim() ||
         String(index + 1).padStart(2, "0");
       if (!img) return;
+      markInteracted();
       lightboxOpenRef.current = true;
       autoSpin = false;
       window.clearTimeout(idleTimer);
@@ -283,6 +296,7 @@ export function useGalleryRing({ count, scrollRootRef, enabled = true }: Options
       const dx = e.clientX - lastX;
       const dt = Math.max(16, now - lastT);
       if (Math.abs(e.clientX - startX) > 6 || Math.abs(e.clientY - startY) > 6) {
+        if (!moved) markInteracted();
         moved = true;
       }
       angle += dx * 0.35;
@@ -377,6 +391,7 @@ export function useGalleryRing({ count, scrollRootRef, enabled = true }: Options
     stageRef,
     ringRef,
     activeIndex,
+    hasInteracted,
     lightbox,
     closeLightbox,
     stepBy: (dir: number) => apiRef.current?.stepBy(dir),
