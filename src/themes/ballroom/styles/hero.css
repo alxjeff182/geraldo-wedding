@@ -49,8 +49,8 @@
 } /* Hero — scroll-scrubbed video parallax */
 .theme-ballroom .hero {
   position: relative;
-  /* Longer scrub track so all 24 frames advance gradually (≈10vh per step) */
-  height: 340vh;
+  /* Longer scrub track + crossfade = smoother manual scroll after intro */
+  height: 380vh;
   text-align: center;
 }
 .theme-ballroom .hero__pin {
@@ -72,6 +72,7 @@
   background: #8a847c;
   display: block;
   filter: sepia(0.18) saturate(1.05) contrast(1.04);
+  will-change: contents;
 }
 .theme-ballroom .hero__veil {
   position: absolute;

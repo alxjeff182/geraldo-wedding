@@ -17,6 +17,10 @@ function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n));
 }
 
+function easeInOutCubic(t: number) {
+  return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+}
+
 export function useHeroFrames({
   basePath,
   frameCount,
@@ -25,7 +29,7 @@ export function useHeroFrames({
   scrollRootRef,
   heroRef,
   enabled = true,
-  introDurationMs = 3600,
+  introDurationMs = 5200,
   onProgress,
 }: Options) {
   const onProgressRef = useRef(onProgress);
@@ -39,6 +43,7 @@ export function useHeroFrames({
     let rafWait = 0;
     let rafIntro = 0;
     let drawnFallback = false;
+    let readyTimer = 0;
 
     const start = () => {
       const canvas = canvasRef.current;
@@ -49,57 +54,72 @@ export function useHeroFrames({
         return;
       }
 
-      const ctx = canvas.getContext("2d", { alpha: false });
+      const ctx = canvas.getContext("2d", { alpha: false, desynchronized: true });
       if (!ctx) return;
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
 
       const frames: (HTMLImageElement | null)[] = new Array(frameCount).fill(null);
-      let lastDrawn = -1;
       let loadedCount = 0;
       let ticking = false;
       let introActive = false;
       let userTookOver = false;
+      let lastExact = -1;
 
       const drawFallback = () => {
         if (drawnFallback || !posterSrc) return;
         const poster = new Image();
         poster.src = posterSrc;
         poster.onload = () => {
-          if (cancelled || lastDrawn !== -1) return;
+          if (cancelled || lastExact >= 0) return;
+          ctx.globalAlpha = 1;
           ctx.drawImage(poster, 0, 0, canvas.width, canvas.height);
           drawnFallback = true;
         };
       };
 
-      const paint = (index: number) => {
-        const safe = clamp(index, 0, frameCount - 1);
-        const img = frames[safe];
-        if (!img || !img.complete || !img.naturalWidth) {
-          // Prefer nearest loaded neighbor so motion never blanks.
-          for (let d = 1; d < frameCount; d += 1) {
-            const left = frames[safe - d];
-            if (left?.complete && left.naturalWidth) {
-              if (safe - d !== lastDrawn) {
-                lastDrawn = safe - d;
-                ctx.drawImage(left, 0, 0, canvas.width, canvas.height);
-              }
-              return true;
-            }
-            const right = frames[safe + d];
-            if (right?.complete && right.naturalWidth) {
-              if (safe + d !== lastDrawn) {
-                lastDrawn = safe + d;
-                ctx.drawImage(right, 0, 0, canvas.width, canvas.height);
-              }
-              return true;
-            }
-          }
-          drawFallback();
-          return false;
+      const readyImage = (index: number) => {
+        const img = frames[clamp(index, 0, frameCount - 1)];
+        return img?.complete && img.naturalWidth ? img : null;
+      };
+
+      const nearestReady = (index: number) => {
+        const direct = readyImage(index);
+        if (direct) return direct;
+        for (let d = 1; d < frameCount; d += 1) {
+          const left = readyImage(index - d);
+          if (left) return left;
+          const right = readyImage(index + d);
+          if (right) return right;
         }
-        if (safe === lastDrawn) return true;
-        lastDrawn = safe;
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        return true;
+        return null;
+      };
+
+      /** Crossfade between adjacent frames for butter-smooth scrubbing. */
+      const paintExact = (exact: number) => {
+        const maxIdx = frameCount - 1;
+        const e = clamp(exact, 0, maxIdx);
+        if (Math.abs(e - lastExact) < 0.001) return;
+        lastExact = e;
+
+        const i0 = Math.floor(e);
+        const i1 = Math.min(maxIdx, i0 + 1);
+        const blend = e - i0;
+        const a = nearestReady(i0);
+        const b = i1 === i0 ? a : nearestReady(i1);
+
+        if (!a) {
+          drawFallback();
+          return;
+        }
+
+        ctx.globalAlpha = 1;
+        ctx.drawImage(a, 0, 0, canvas.width, canvas.height);
+        if (b && b !== a && blend > 0.02) {
+          ctx.globalAlpha = blend;
+          ctx.drawImage(b, 0, 0, canvas.width, canvas.height);
+          ctx.globalAlpha = 1;
+        }
       };
 
       const heroInner = heroEl.querySelector(".hero__inner") as HTMLElement | null;
@@ -113,7 +133,6 @@ export function useHeroFrames({
         });
 
         if (heroInner) {
-          // Keep motion subtle — large negative Y clips the eyebrow under overflow:hidden.
           const textProgress = Math.max(0, (progress - 0.12) / 0.88);
           heroInner.style.transform = `translate3d(0, ${textProgress * -8}px, 0)`;
         }
@@ -127,12 +146,12 @@ export function useHeroFrames({
         return Math.max(1, heroEl.offsetHeight - viewH);
       };
 
-      const applyProgress = (progress: number, { syncScroll }: { syncScroll?: boolean } = {}) => {
+      const applyProgress = (
+        progress: number,
+        { syncScroll = false }: { syncScroll?: boolean } = {},
+      ) => {
         const p = clamp(progress, 0, 1);
-        // Map continuously across every frame (no rounding gaps during intro).
-        const exact = p * (frameCount - 1);
-        const index = clamp(Math.round(exact), 0, frameCount - 1);
-        paint(index);
+        paintExact(p * (frameCount - 1));
         if (syncScroll) {
           scrollRoot.scrollTop = maxScrollForHero() * p;
         }
@@ -143,14 +162,14 @@ export function useHeroFrames({
         if (frames[i]) return;
         const img = new Image();
         img.decoding = "async";
-        if (i < 6) img.fetchPriority = "high";
+        img.fetchPriority = i < 8 ? "high" : "low";
         const n = String(i + 1).padStart(3, "0");
         img.src = `${basePath.replace(/\/$/, "")}/${n}.jpg`;
         img.onload = () => {
           if (cancelled) return;
           loadedCount += 1;
           void img.decode?.().catch(() => undefined);
-          if (lastDrawn === -1 && i === 0) paint(0);
+          if (lastExact < 0 && i === 0) paintExact(0);
         };
         frames[i] = img;
       };
@@ -167,6 +186,11 @@ export function useHeroFrames({
         if (userTookOver) return;
         userTookOver = true;
         stopIntro();
+        // Keep scrub position aligned with the frame currently on screen.
+        if (lastExact >= 0) {
+          const p = lastExact / Math.max(1, frameCount - 1);
+          scrollRoot.scrollTop = maxScrollForHero() * p;
+        }
       };
 
       const onScroll = () => {
@@ -209,8 +233,7 @@ export function useHeroFrames({
 
         introActive = true;
         const startedAt = performance.now();
-        // Hold first + last frame briefly so the sequence reads complete.
-        const holdRatio = 0.06;
+        const holdRatio = 0.04;
         const playSpan = 1 - holdRatio * 2;
 
         const tick = (now: number) => {
@@ -220,16 +243,17 @@ export function useHeroFrames({
             return;
           }
 
-          const t = clamp((now - startedAt) / introDurationMs, 0, 1);
-          let progress: number;
-          if (t <= holdRatio) progress = 0;
-          else if (t >= 1 - holdRatio) progress = 1;
-          else progress = (t - holdRatio) / playSpan;
+          const raw = clamp((now - startedAt) / introDurationMs, 0, 1);
+          let linear: number;
+          if (raw <= holdRatio) linear = 0;
+          else if (raw >= 1 - holdRatio) linear = 1;
+          else linear = (raw - holdRatio) / playSpan;
 
-          // Linear time → linear frame index (every frame gets equal time).
-          applyProgress(progress, { syncScroll: true });
+          const progress = easeInOutCubic(linear);
+          // Animate frames only during intro — avoid scrollTop thrash every frame.
+          applyProgress(progress, { syncScroll: false });
 
-          if (t < 1) {
+          if (raw < 1) {
             rafIntro = requestAnimationFrame(tick);
           } else {
             introActive = false;
@@ -242,22 +266,23 @@ export function useHeroFrames({
 
       const beginWhenReady = () => {
         if (cancelled) return;
-        const firstReady = Boolean(frames[0]?.complete && frames[0]?.naturalWidth);
-        const enoughReady = loadedCount >= Math.min(frameCount, 8);
-        if (firstReady && (enoughReady || loadedCount >= 1)) {
-          // Small delay lets more frames decode before the sweep starts.
-          window.setTimeout(() => {
+        const allReady = loadedCount >= frameCount;
+        const mostlyReady = loadedCount >= Math.max(12, Math.ceil(frameCount * 0.75));
+        if (allReady || mostlyReady) {
+          readyTimer = window.setTimeout(() => {
             if (!cancelled) runIntro();
-          }, enoughReady ? 80 : 280);
+          }, allReady ? 40 : 120);
           return;
         }
+
         const started = performance.now();
         const wait = () => {
           if (cancelled) return;
-          if (
-            (frames[0]?.complete && frames[0]?.naturalWidth && loadedCount >= 4) ||
-            performance.now() - started > 1200
-          ) {
+          if (loadedCount >= frameCount || performance.now() - started > 2500) {
+            runIntro();
+            return;
+          }
+          if (loadedCount >= Math.ceil(frameCount * 0.8) && performance.now() - started > 600) {
             runIntro();
             return;
           }
@@ -275,6 +300,7 @@ export function useHeroFrames({
       cancelled = true;
       cancelAnimationFrame(rafWait);
       cancelAnimationFrame(rafIntro);
+      window.clearTimeout(readyTimer);
       cleanupScroll?.();
     };
   }, [basePath, frameCount, posterSrc, canvasRef, scrollRootRef, heroRef, enabled, introDurationMs]);
