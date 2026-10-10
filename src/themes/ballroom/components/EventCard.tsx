@@ -1,5 +1,10 @@
 import type { WeddingEvent } from "../../../config/wedding.config";
-import { buildGoogleCalendarUrl } from "../../../lib/calendar-links";
+import {
+  buildIcsCalendar,
+  downloadIcsFile,
+  openCalendarForEvents,
+  type CalendarEventInput,
+} from "../../../lib/calendar-links";
 import { IconPinSm } from "../icons";
 
 type Props = {
@@ -8,7 +13,18 @@ type Props = {
   events: WeddingEvent[];
   mapsLabel: string;
   calendarLabel: string;
+  calendarIcsLabel?: string;
 };
+
+function toCalendarInput(event: WeddingEvent, siteTitle: string): CalendarEventInput {
+  return {
+    title: `${siteTitle} — ${event.name}`,
+    details: `${event.name}\n${event.time}\n${event.venue}`,
+    location: event.address,
+    startsAt: event.startsAt,
+    endsAt: event.endsAt,
+  };
+}
 
 export function EventCard({
   eyebrow,
@@ -16,18 +32,9 @@ export function EventCard({
   events,
   mapsLabel,
   calendarLabel,
+  calendarIcsLabel = "Unduh .ics",
 }: Props) {
   const first = events[0];
-  const calUrl = first
-    ? buildGoogleCalendarUrl({
-        title: `${title} — ${first.name}`,
-        details: events.map((e) => `${e.name}: ${e.time}`).join("\n"),
-        location: first.address,
-        startsAt: first.startsAt,
-        endsAt: events[events.length - 1]?.endsAt ?? first.endsAt,
-      })
-    : null;
-
   const day = first ? new Date(first.startsAt).getDate() : "";
   const month = first
     ? new Date(first.startsAt).toLocaleDateString("id-ID", { month: "long" })
@@ -36,6 +43,17 @@ export function EventCard({
   const weekday = first
     ? new Date(first.startsAt).toLocaleDateString("id-ID", { weekday: "long" })
     : "";
+
+  const calendarEvents = events.map((event) => toCalendarInput(event, title));
+
+  const saveAll = () => {
+    openCalendarForEvents(calendarEvents, title, "wedding-events.ics");
+  };
+
+  const downloadIcs = () => {
+    const ics = buildIcsCalendar(calendarEvents, title);
+    if (ics) downloadIcsFile("wedding-events.ics", ics);
+  };
 
   return (
     <section id="event" className="event-mod" aria-label={title}>
@@ -62,40 +80,55 @@ export function EventCard({
               <p className="event-timeline__time">{event.time}</p>
               <p className="event-timeline__name">{event.name}</p>
               <p className="event-timeline__note">{event.venue}</p>
+              <div className="event-card__venue event-card__venue--inline">
+                <span className="event-card__icon" aria-hidden="true">
+                  <IconPinSm />
+                </span>
+                <div>
+                  <strong>{event.venue}</strong>
+                  <small>{event.address}</small>
+                </div>
+              </div>
+              <div className="event-card__actions event-card__actions--inline">
+                {event.mapsUrl ? (
+                  <a
+                    className="event-card__btn"
+                    href={event.mapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {mapsLabel}
+                  </a>
+                ) : null}
+                <button
+                  type="button"
+                  className="event-card__btn event-card__btn--ghost"
+                  onClick={() =>
+                    openCalendarForEvents(
+                      [toCalendarInput(event, title)],
+                      `${title} — ${event.name}`,
+                      `${event.name.toLowerCase().replace(/\s+/g, "-")}.ics`,
+                    )
+                  }
+                >
+                  {calendarLabel}
+                </button>
+              </div>
             </li>
           ))}
         </ol>
         <div className="event-card__divider" aria-hidden="true" />
-        <div className="event-card__venue">
-          <span className="event-card__icon" aria-hidden="true">
-            <IconPinSm />
-          </span>
-          <div>
-            <strong>{first?.venue}</strong>
-            <small>{first?.address}</small>
-          </div>
-        </div>
         <div className="event-card__actions">
-          {first?.mapsUrl ? (
-            <a
-              className="event-card__btn"
-              href={first.mapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {mapsLabel}
-            </a>
-          ) : null}
-          {calUrl ? (
-            <a
-              className="event-card__btn event-card__btn--ghost"
-              href={calUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {calendarLabel}
-            </a>
-          ) : null}
+          <button type="button" className="event-card__btn" onClick={saveAll}>
+            Simpan ke Kalender
+          </button>
+          <button
+            type="button"
+            className="event-card__btn event-card__btn--ghost"
+            onClick={downloadIcs}
+          >
+            {calendarIcsLabel}
+          </button>
         </div>
       </article>
     </section>

@@ -2565,3 +2565,102 @@ body:has(.theme-ballroom) {
 .theme-ballroom .wishes-pager .btn--small {
   margin-top: 0;
 }
+
+.theme-ballroom .event-card__venue--inline {
+  margin-top: 0.65rem;
+  text-align: left;
+}
+
+.theme-ballroom .event-card__actions--inline {
+  margin-top: 0.55rem;
+  grid-template-columns: 1fr 1fr;
+}
+
+.theme-ballroom .event-timeline__item + .event-timeline__item {
+  margin-top: 1.15rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.theme-ballroom .couple-card__ig {
+  display: inline-block;
+  margin: 0.65rem 0 0;
+  color: var(--gold-soft);
+  font-size: 0.85rem;
+  text-decoration: none;
+  border-bottom: 1px solid var(--gold-a40);
+}
+
+.theme-ballroom .hashtag-mod__tag--btn {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
+
+.theme-ballroom .hashtag-mod__ig {
+  display: flex;
+  margin: 1rem auto 0;
+  width: fit-content;
+}
+
+.theme-ballroom .gift-address__text {
+  margin: 0 0 0.65rem;
+  white-space: pre-wrap;
+}
+
+.theme-ballroom .footer__quote {
+  margin: 0.35rem 0 0;
+  font-style: italic;
+  font-size: 0.85rem;
+  color: rgba(212, 196, 176, 0.7);
+  letter-spacing: 0.02em;
+}
+
+.theme-ballroom .footer__credits {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.theme-ballroom .footer__prompt {
+  margin: 0.35rem 0 0;
+  font-size: 0.72rem;
+  color: rgba(212, 196, 176, 0.55);
+}
+
+.theme-ballroom .footer__links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.65rem;
+}
+
+.theme-ballroom .footer__links a {
+  color: var(--gold-soft);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-bottom: 1px solid var(--gold-a40);
+}
+
+.theme-ballroom .audio-fab {
+  position: absolute;
+  top: max(0.85rem, env(safe-area-inset-top));
+  right: max(0.85rem, env(safe-area-inset-right));
+  z-index: 40;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--gold-a40);
+  background: rgba(20, 12, 12, 0.72);
+  color: var(--gold-soft);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}

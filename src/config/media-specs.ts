@@ -95,6 +95,16 @@ export const MEDIA_SPECS = {
     formats: "MP4 (H.264)",
     notes: "Video pembuka pintu.",
   },
+  heroPoster: {
+    dimensions: "720 × 1280 px",
+    width: 720,
+    height: 1280,
+    ratio: "9:16 (portrait)",
+    maxSize: "300 KB",
+    maxBytes: 320 * 1024,
+    formats: "JPG / WebP",
+    notes: "Poster hero sebelum frame sequence dimuat.",
+  },
   qris: {
     dimensions: "800 × 800 px",
     width: 800,

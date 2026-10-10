@@ -15,6 +15,29 @@ export function AdminUndanganTab({ merged, updateDraft, setMessage }: AdminUndan
   return (
     <div className="admin-stack">
       <fieldset className="admin-fieldset">
+        <legend>Situs & SEO</legend>
+        <div className="admin-form-grid">
+          <AdminTextField
+            label="URL undangan (untuk link share)"
+            wide
+            value={merged.site.url}
+            onChange={(value) => updateDraft(["site", "url"], value)}
+          />
+          <label className="admin-field">
+            <span className="admin-label">Sembunyikan dari mesin pencari (noindex)</span>
+            <select
+              className="admin-input"
+              value={merged.site.noIndex ? "1" : "0"}
+              onChange={(e) => updateDraft(["site", "noIndex"], e.target.value === "1")}
+            >
+              <option value="0">Indeks (live)</option>
+              <option value="1">Noindex (staging / preview)</option>
+            </select>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset className="admin-fieldset">
         <legend>WhatsApp Tamu (RSVP & Gift)</legend>
         <div className="admin-form-grid">
           <AdminTextField

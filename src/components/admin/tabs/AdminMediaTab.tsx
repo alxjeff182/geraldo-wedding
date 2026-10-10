@@ -34,6 +34,13 @@ export function AdminMediaTab({ merged, updateDraft }: AdminTabProps) {
         value={merged.media.openingVideo}
         onChange={(url) => updateDraft(["media", "openingVideo"], url)}
       />
+      <ImageUploader
+        label="Hero Poster"
+        folder="media"
+        spec={MEDIA_SPECS.heroPoster}
+        value={merged.media.heroPoster ?? ""}
+        onChange={(url) => updateDraft(["media", "heroPoster"], url)}
+      />
       <label className="admin-field">
         <span className="admin-label">Hero Frames Base Path</span>
         <input

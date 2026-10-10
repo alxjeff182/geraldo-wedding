@@ -14,7 +14,7 @@ export function useGuestName() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const { slug, displayFallback, fromLegacyTo } = resolveInviteSlug(params);
+    const { slug, fromLegacyTo } = resolveInviteSlug(params);
 
     if (!slug) {
       setLoading(false);
@@ -25,17 +25,14 @@ export function useGuestName() {
 
     void (async () => {
       const { getSupabase, isSupabaseConfigured } = await import("../lib/supabase");
-      const fallbackName = displayFallback ?? slug.replace(/-/g, " ");
 
       if (!isSupabaseConfigured) {
-        setGuestName(fallbackName);
         setLoading(false);
         return;
       }
 
       const supabase = getSupabase();
       if (!supabase) {
-        setGuestName(fallbackName);
         setLoading(false);
         return;
       }
@@ -43,18 +40,10 @@ export function useGuestName() {
       const { data: found } = await supabase.rpc("get_guest_by_slug", {
         guest_slug: slug,
       });
-      let row = firstRow(found);
-
-      if (!row?.id) {
-        const { data: ensured } = await supabase.rpc("ensure_guest_by_slug", {
-          guest_slug: slug,
-          guest_name: fallbackName,
-        });
-        row = firstRow(ensured);
-      }
+      const row = firstRow(found);
 
       if (row?.id) {
-        setGuestName(row.display_name || fallbackName);
+        setGuestName(row.display_name || "Tamu Undangan");
         setGuestId(row.id);
 
         if (fromLegacyTo || params.get("guest") !== slug) {
@@ -68,10 +57,8 @@ export function useGuestName() {
             `${window.location.pathname}${qs ? `?${qs}` : ""}${window.location.hash}`,
           );
         }
-      } else {
-        // RPC belum di-deploy: tetap tampilkan form lewat inviteSlug
-        setGuestName(fallbackName);
       }
+      // Unknown slug → treat as public invite (no guestId).
       setLoading(false);
     })();
   }, []);

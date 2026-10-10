@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Print combined SQL for migrations 004–011 to run in Supabase SQL Editor.
+ * Print combined SQL for migrations 004–012 to run in Supabase SQL Editor.
  * Usage: node scripts/apply-migrations.mjs > pending-migrations.sql
  */
 import { readFileSync } from "node:fs";
@@ -17,6 +17,7 @@ const files = [
   "009_reset_gw5_copy.sql",
   "010_wishes_moderation.sql",
   "011_ensure_guest.sql",
+  "012_strict_guests.sql",
 ];
 
 console.log("-- Run this file in Supabase SQL Editor (safe to re-run idempotent parts)\n");

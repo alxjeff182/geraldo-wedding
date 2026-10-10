@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Verify production Supabase migrations 004–011.
+ * Verify production Supabase migrations 004–012.
  * Requires: SUPABASE_URL (or VITE_SUPABASE_URL), SUPABASE_SERVICE_ROLE_KEY
  */
 import { readFileSync, existsSync } from "node:fs";
@@ -96,6 +96,19 @@ const checks = [
       });
       if (error) return false;
       await supabase.from("guests").delete().eq("slug", "__verify_probe__");
+      return true;
+    },
+  },
+  {
+    name: "012 ensure_guest_by_slug still exists (revoke anon/auth applied in SQL Editor)",
+    run: async () => {
+      // Service role can still execute; this only verifies the function remains after 012.
+      const { error } = await supabase.rpc("ensure_guest_by_slug", {
+        guest_slug: "__verify_probe_012__",
+        guest_name: "Verify Probe 012",
+      });
+      if (error) return false;
+      await supabase.from("guests").delete().eq("slug", "__verify_probe_012__");
       return true;
     },
   },

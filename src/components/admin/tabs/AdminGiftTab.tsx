@@ -1,9 +1,23 @@
 import { AdminTextField } from "../AdminFields";
 import { ImageUploader } from "../ImageUploader";
 import { MEDIA_SPECS } from "../../../config/media-specs";
+import type { GiftAccount } from "../../../config/wedding.config";
 import type { AdminTabProps } from "../types";
 
+const emptyAccount = (): GiftAccount => ({
+  bank: "",
+  number: "",
+  holder: "",
+  logo: "",
+});
+
 export function AdminGiftTab({ merged, updateDraft }: AdminTabProps) {
+  const accounts = merged.gift.accounts;
+
+  const setAccounts = (next: GiftAccount[]) => {
+    updateDraft(["gift", "accounts"], next);
+  };
+
   return (
     <div className="admin-stack">
       <AdminTextField
@@ -34,19 +48,19 @@ export function AdminGiftTab({ merged, updateDraft }: AdminTabProps) {
         value={merged.gift.qris}
         onChange={(url) => updateDraft(["gift", "qris"], url)}
       />
-      {merged.gift.accounts[0] && (
-        <fieldset className="admin-fieldset">
-          <legend>Rekening Bank</legend>
+      {accounts.map((account, index) => (
+        <fieldset key={index} className="admin-fieldset">
+          <legend>Rekening Bank {index + 1}</legend>
           <div className="admin-form-grid">
             <label className="admin-field">
               <span className="admin-label">Bank</span>
               <input
                 className="admin-input"
-                value={merged.gift.accounts[0].bank}
+                value={account.bank}
                 onChange={(e) => {
-                  const accounts = [...merged.gift.accounts];
-                  accounts[0] = { ...accounts[0], bank: e.target.value };
-                  updateDraft(["gift", "accounts"], accounts);
+                  const next = [...accounts];
+                  next[index] = { ...next[index], bank: e.target.value };
+                  setAccounts(next);
                 }}
               />
             </label>
@@ -54,11 +68,11 @@ export function AdminGiftTab({ merged, updateDraft }: AdminTabProps) {
               <span className="admin-label">Nomor</span>
               <input
                 className="admin-input"
-                value={merged.gift.accounts[0].number}
+                value={account.number}
                 onChange={(e) => {
-                  const accounts = [...merged.gift.accounts];
-                  accounts[0] = { ...accounts[0], number: e.target.value };
-                  updateDraft(["gift", "accounts"], accounts);
+                  const next = [...accounts];
+                  next[index] = { ...next[index], number: e.target.value };
+                  setAccounts(next);
                 }}
               />
             </label>
@@ -66,11 +80,11 @@ export function AdminGiftTab({ merged, updateDraft }: AdminTabProps) {
               <span className="admin-label">Pemilik Rekening</span>
               <input
                 className="admin-input"
-                value={merged.gift.accounts[0].holder}
+                value={account.holder}
                 onChange={(e) => {
-                  const accounts = [...merged.gift.accounts];
-                  accounts[0] = { ...accounts[0], holder: e.target.value };
-                  updateDraft(["gift", "accounts"], accounts);
+                  const next = [...accounts];
+                  next[index] = { ...next[index], holder: e.target.value };
+                  setAccounts(next);
                 }}
               />
             </label>
@@ -79,15 +93,31 @@ export function AdminGiftTab({ merged, updateDraft }: AdminTabProps) {
             label="Logo Bank"
             folder="gift"
             spec={MEDIA_SPECS.giftLogo}
-            value={merged.gift.accounts[0].logo}
+            value={account.logo}
             onChange={(url) => {
-              const accounts = [...merged.gift.accounts];
-              accounts[0] = { ...accounts[0], logo: url };
-              updateDraft(["gift", "accounts"], accounts);
+              const next = [...accounts];
+              next[index] = { ...next[index], logo: url };
+              setAccounts(next);
             }}
           />
+          {accounts.length > 1 ? (
+            <button
+              type="button"
+              className="admin-btn admin-btn--ghost admin-btn--danger admin-btn--sm"
+              onClick={() => setAccounts(accounts.filter((_, i) => i !== index))}
+            >
+              Hapus rekening
+            </button>
+          ) : null}
         </fieldset>
-      )}
+      ))}
+      <button
+        type="button"
+        className="admin-btn admin-btn--ghost admin-btn--sm"
+        onClick={() => setAccounts([...accounts, emptyAccount()])}
+      >
+        Tambah rekening
+      </button>
       <fieldset className="admin-fieldset">
         <legend>Caption & Tombol</legend>
         <div className="admin-form-grid">

@@ -24,12 +24,11 @@ import { useSheet } from "./hooks/useSheet";
 import { useInvitationFx } from "./hooks/useInvitationFx";
 import "./ballroom.css";
 
-const DOCK_AT = 0.58;
+const DOCK_AT = 0.3;
 
 type Props = {
   guestName: string;
   guestId: string | null;
-  inviteSlug?: string | null;
 };
 
 function QuoteWithEm({ text }: { text: string }) {
@@ -43,7 +42,7 @@ function QuoteWithEm({ text }: { text: string }) {
   );
 }
 
-export function BallroomApp({ guestName, guestId, inviteSlug = null }: Props) {
+export function BallroomApp({ guestName, guestId }: Props) {
   const { content } = useWeddingContent();
   usePageMeta(content);
 
@@ -54,8 +53,9 @@ export function BallroomApp({ guestName, guestId, inviteSlug = null }: Props) {
   const [revealed, setRevealed] = useState(false);
   const [heroProgress, setHeroProgress] = useState(0);
   const [inFirstSection, setInFirstSection] = useState(true);
-  const { audioRef, play } = useAudio();
+  const { audioRef, play, toggle, playing } = useAudio();
   const { message, show, hide } = useToast();
+  const hasAudio = Boolean(content.media.audio?.trim());
 
   const inertTargets = useMemo(
     () => [inviteRef.current, document.getElementById("ballroom-dock")],
@@ -89,7 +89,7 @@ export function BallroomApp({ guestName, guestId, inviteSlug = null }: Props) {
     if (opening || revealed) return;
     setLeaving(true);
     setOpening(true);
-    play();
+    if (hasAudio) play();
   };
 
   const onReveal = useCallback(() => {
@@ -113,7 +113,20 @@ export function BallroomApp({ guestName, guestId, inviteSlug = null }: Props) {
         className={`stage${sheet.isOpen ? " is-sheet-open" : ""}`}
         id="stage"
       >
-        <audio ref={audioRef} src={content.media.audio} loop preload="none" />
+        {hasAudio ? (
+          <audio ref={audioRef} src={content.media.audio} loop preload="none" />
+        ) : null}
+
+        {hasAudio && revealed ? (
+          <button
+            type="button"
+            className={`audio-fab${playing ? " is-playing" : ""}`}
+            aria-label={playing ? "Matikan musik" : "Putar musik"}
+            onClick={toggle}
+          >
+            {playing ? "♪" : "🔇"}
+          </button>
+        ) : null}
 
         {!revealed ? (
           <Cover
@@ -145,8 +158,8 @@ export function BallroomApp({ guestName, guestId, inviteSlug = null }: Props) {
           <Hero
             scrollRootRef={inviteRef}
             eyebrow={content.hero.eyebrow}
-            groomName={content.couple.groom.shortName}
-            brideName={content.couple.bride.shortName}
+            groomName={content.hero.groomName?.trim() || content.couple.groom.shortName}
+            brideName={content.hero.brideName?.trim() || content.couple.bride.shortName}
             weddingDate={content.date}
             dateLabel={content.dateLabel}
             labels={content.countdown.labels}
@@ -163,14 +176,18 @@ export function BallroomApp({ guestName, guestId, inviteSlug = null }: Props) {
             groom={{
               role: "Mempelai Pria",
               name: content.couple.groom.shortName,
+              fullName: content.couple.groom.fullName,
               parents: content.couple.groom.parents,
               photo: content.couple.groom.photo,
+              instagramHandle: content.couple.groom.instagramHandle,
             }}
             bride={{
               role: "Mempelai Wanita",
               name: content.couple.bride.shortName,
+              fullName: content.couple.bride.fullName,
               parents: content.couple.bride.parents,
               photo: content.couple.bride.photo,
+              instagramHandle: content.couple.bride.instagramHandle,
             }}
             enabled={revealed}
           />
@@ -195,6 +212,7 @@ export function BallroomApp({ guestName, guestId, inviteSlug = null }: Props) {
             events={[...content.events]}
             mapsLabel={content.eventsSection.mapsButton}
             calendarLabel={content.eventsSection.calendarGoogleButton}
+            calendarIcsLabel={content.eventsSection.calendarIcsButton}
           />
           <Gallery3D
             eyebrow="Moments"
@@ -209,6 +227,9 @@ export function BallroomApp({ guestName, guestId, inviteSlug = null }: Props) {
             accounts={[...content.gift.accounts]}
             qris={content.gift.qris}
             physicalAddress={content.gift.physicalAddress}
+            physicalGiftTitle={content.giftUi.physicalGiftTitle}
+            copyAddressButton={content.giftUi.copyAddressButton}
+            copyAddressSuccess={content.giftUi.copyAddressSuccess}
             copySuccess={content.giftUi.copyAccountSuccess}
             copyError={content.giftUi.copyError}
             waNumber={content.contact.whatsappNumber}
@@ -235,17 +256,13 @@ export function BallroomApp({ guestName, guestId, inviteSlug = null }: Props) {
             />
           ) : null}
           {content.guestbook.enabled ? (
-            <Wishes
-              guestId={guestId}
-              inviteSlug={inviteSlug}
-              guestName={guestName}
-              onToast={show}
-            />
+            <Wishes guestId={guestId} guestName={guestName} onToast={show} />
           ) : null}
           <HashtagSection
             title={content.hashtag.title}
             tag={content.hashtag.tag}
             photo={content.hashtag.photo}
+            onToast={show}
           />
           <footer className="footer">
             <div className="footer__glow" aria-hidden="true" />
@@ -259,6 +276,9 @@ export function BallroomApp({ guestName, guestId, inviteSlug = null }: Props) {
             />
             <p className="eyebrow">Dengan penuh kasih</p>
             <p className="footer__names">{content.site.title}</p>
+            {content.quote?.trim() ? (
+              <p className="footer__quote">{content.quote}</p>
+            ) : null}
             <div className="ornament" aria-hidden="true" />
             {content.closing.paragraphs.map((p) => (
               <p key={p.slice(0, 24)} className="footer__msg">
@@ -266,7 +286,36 @@ export function BallroomApp({ guestName, guestId, inviteSlug = null }: Props) {
               </p>
             ))}
             <p className="footer__date">{dateFooter}</p>
-            <p className="footer__copy">{content.footer.creditPrefix}</p>
+            <div className="footer__credits">
+              <p className="footer__copy">
+                {content.footer.creditPrefix} {content.site.creator.name}
+              </p>
+              {content.footer.portfolioPrompt ? (
+                <p className="footer__prompt">{content.footer.portfolioPrompt}</p>
+              ) : null}
+              <div className="footer__links">
+                {(content.site.creator.websiteUrl || content.site.creator.url) ? (
+                  <a
+                    href={content.site.creator.websiteUrl || content.site.creator.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={content.footer.websiteAriaLabel}
+                  >
+                    Web
+                  </a>
+                ) : null}
+                {content.site.creator.instagramUrl ? (
+                  <a
+                    href={content.site.creator.instagramUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={content.footer.instagramAriaLabel}
+                  >
+                    IG
+                  </a>
+                ) : null}
+              </div>
+            </div>
           </footer>
         </main>
 

@@ -47,7 +47,7 @@ test.beforeAll(async ({ request }) => {
 });
 
 async function openInvitation(page: import("@playwright/test").Page) {
-  await page.goto("/?guest=functional-test");
+  await page.goto("/?guest=keluarga-tampubolon");
   await page.getByRole("button", { name: /buka undangan/i }).click();
   const skip = page.getByRole("button", { name: /lewati/i });
   if (await skip.isVisible().catch(() => false)) {

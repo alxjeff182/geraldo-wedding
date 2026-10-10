@@ -9,6 +9,7 @@
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Geraldo & Christin" />
     <meta property="og:description" content="Pernikahan Geraldo & Christin. Tangerang, 25 April 2026" />
+    <meta property="og:url" content="/" />
     <meta property="og:image" content="/assets/ballroom/og-image.jpg" />
     <meta property="og:locale" content="id_ID" />
 
@@ -24,23 +25,48 @@
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "Event",
-        "name": "Pernikahan Geraldo & Christin",
-        "startDate": "2026-04-25T08:00:00+07:00",
-        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
-        "eventStatus": "https://schema.org/EventScheduled",
-        "location": {
-          "@type": "Place",
-          "name": "GPI Pondok Arum",
-          "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "Perum. Pondok Arum, Blok J No. 26",
-            "addressLocality": "Tangerang",
-            "addressCountry": "ID"
+        "@graph": [
+          {
+            "@type": "Event",
+            "name": "Pemberkatan — Geraldo & Christin",
+            "startDate": "2026-04-25T08:00:00+07:00",
+            "endDate": "2026-04-25T10:00:00+07:00",
+            "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+            "eventStatus": "https://schema.org/EventScheduled",
+            "location": {
+              "@type": "Place",
+              "name": "GPI Pondok Arum",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "Perum. Pondok Arum, Blok J No. 26, Kel. Pabuaran Tumpeng, Kec. Karawaci",
+                "addressLocality": "Tangerang",
+                "addressCountry": "ID"
+              }
+            },
+            "image": "/assets/ballroom/og-image.jpg",
+            "description": "Pemberkatan pernikahan Geraldo & Christin"
+          },
+          {
+            "@type": "Event",
+            "name": "Resepsi & Adat — Geraldo & Christin",
+            "startDate": "2026-04-25T11:00:00+07:00",
+            "endDate": "2026-04-25T15:00:00+07:00",
+            "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+            "eventStatus": "https://schema.org/EventScheduled",
+            "location": {
+              "@type": "Place",
+              "name": "UFIT HALL GK",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "Jl. Palem Raja Raya No.31, Panunggangan Bar., Kec. Cibodas",
+                "addressLocality": "Kab. Tangerang",
+                "addressCountry": "ID"
+              }
+            },
+            "image": "/assets/ballroom/og-image.jpg",
+            "description": "Resepsi & adat pernikahan Geraldo & Christin"
           }
-        },
-        "image": "/assets/ballroom/og-image.jpg",
-        "description": "Pernikahan Geraldo & Christin. Tangerang, 25 April 2026"
+        ]
       }
 </script>
 

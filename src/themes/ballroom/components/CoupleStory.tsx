@@ -3,9 +3,18 @@ import { useEffect, useRef, useState, type RefObject } from "react";
 type Person = {
   role: string;
   name: string;
+  fullName?: string;
   parents: string;
   photo: string;
+  instagramHandle?: string;
 };
+
+function igHref(handle?: string): string | null {
+  if (!handle?.trim()) return null;
+  const clean = handle.replace(/^@/, "").trim();
+  if (!clean) return null;
+  return `https://www.instagram.com/${clean}/`;
+}
 
 type Props = {
   scrollRootRef: RefObject<HTMLElement | null>;
@@ -197,8 +206,19 @@ export function CoupleStory({
                   </div>
                   <div className="couple-card__face couple-card__face--back">
                     <p className="couple-card__role">{person.role}</p>
-                    <h4>{person.name}</h4>
+                    <h4>{person.fullName?.trim() || person.name}</h4>
                     <ParentsLine text={person.parents} />
+                    {igHref(person.instagramHandle) ? (
+                      <a
+                        className="couple-card__ig"
+                        href={igHref(person.instagramHandle)!}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {person.instagramHandle}
+                      </a>
+                    ) : null}
                     <p className="couple-card__tap">Ketuk untuk kembali</p>
                   </div>
                 </div>

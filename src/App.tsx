@@ -19,7 +19,7 @@ type AppProps = {
 
 export default function App({ adminMode = false }: AppProps) {
   const { content, loading: contentLoading, loadError, refresh } = useWeddingContent();
-  const { guestName, guestId, inviteSlug, loading: guestLoading } = useGuestName();
+  const { guestName, guestId, loading: guestLoading } = useGuestName();
   const [bootStuck, setBootStuck] = useState(false);
   const { alert, showError, hideAlert } = useAlertDialog();
 
@@ -72,7 +72,7 @@ export default function App({ adminMode = false }: AppProps) {
 
   return (
     <Suspense fallback={<div className="boot-screen">Memuat undangan...</div>}>
-      <BallroomApp guestName={guestName} guestId={guestId} inviteSlug={inviteSlug} />
+      <BallroomApp guestName={guestName} guestId={guestId} />
       <AlertDialog alert={alert} onClose={hideAlert} />
     </Suspense>
   );

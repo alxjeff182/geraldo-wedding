@@ -12,6 +12,9 @@ type Props = {
   accounts: GiftAccount[];
   qris?: string;
   physicalAddress?: string;
+  physicalGiftTitle?: string;
+  copyAddressButton?: string;
+  copyAddressSuccess?: string;
   copySuccess: string;
   copyError: string;
   waNumber: string;
@@ -32,6 +35,9 @@ export function GiftHub({
   accounts,
   qris,
   physicalAddress,
+  physicalGiftTitle = "Alamat kirim",
+  copyAddressButton = "Salin Alamat",
+  copyAddressSuccess,
   copySuccess,
   copyError,
   waNumber,
@@ -53,11 +59,11 @@ export function GiftHub({
     onTabChange?.(next);
   };
 
-  const copy = async (value: string, key: string) => {
+  const copy = async (value: string, key: string, successMsg = copySuccess) => {
     try {
       await navigator.clipboard.writeText(value);
       setCopiedKey(key);
-      onToast(copySuccess);
+      onToast(successMsg);
       window.clearTimeout(timerRef.current);
       timerRef.current = window.setTimeout(() => setCopiedKey(null), 1600);
     } catch {
@@ -135,10 +141,20 @@ export function GiftHub({
             );
           })}
           {physicalAddress ? (
-            <p className="gift-address">
-              <span className="gift-address__label">Alamat kirim</span>
-              {physicalAddress}
-            </p>
+            <div className="gift-address">
+              <span className="gift-address__label">{physicalGiftTitle}</span>
+              <p className="gift-address__text">{physicalAddress}</p>
+              <button
+                type="button"
+                className={`copy-btn${copiedKey === "address" ? " is-copied" : ""}`}
+                onClick={() =>
+                  void copy(physicalAddress, "address", copyAddressSuccess ?? copySuccess)
+                }
+              >
+                <IconCopy />
+                <span>{copiedKey === "address" ? "Tersalin" : copyAddressButton}</span>
+              </button>
+            </div>
           ) : null}
         </div>
       )}

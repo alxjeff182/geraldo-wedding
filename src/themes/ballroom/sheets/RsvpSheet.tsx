@@ -16,7 +16,7 @@ import {
 } from "../../../lib/guest-whatsapp";
 import { IconCheck, IconMail, IconSuccess, IconWhatsApp, IconX } from "../icons";
 
-type Attendance = "hadir" | "tidak_hadir";
+type Attendance = "hadir" | "tidak_hadir" | "ragu";
 
 type Props = {
   open: boolean;
@@ -48,6 +48,7 @@ export function RsvpSheet({
 
   const deadlinePassed = isRsvpDeadlinePassed(rsvp.deadline);
   const deadlineHint = formatRsvpDeadlineLabel(rsvp.deadlineLabel, rsvp.deadline);
+  const locked = !guestId;
   const maxGuests = Math.max(
     1,
     ...(rsvp.guestCountOptions?.map((o) => Number(o)).filter(Boolean) ?? [5]),
@@ -61,14 +62,19 @@ export function RsvpSheet({
     if (open) formOpenedAt.current = Date.now();
   }, [open]);
 
+  useEffect(() => {
+    setDone(hasRsvpSubmitted(guestId));
+  }, [guestId]);
+
   const attendanceLabel = (value: Attendance) => {
     if (value === "hadir") return rsvp.attendanceHadir;
+    if (value === "ragu") return rsvp.attendanceRagu;
     return rsvp.attendanceTidak;
   };
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (submitting || deadlinePassed) return;
+    if (submitting || deadlinePassed || !guestId) return;
 
     const guard = checkRsvpClientGuard(guestId, formOpenedAt.current, name);
     if (!guard.allowed) {
@@ -150,7 +156,11 @@ export function RsvpSheet({
         <p className="sheet__sub">{deadlineHint || rsvp.subtitle}</p>
       </header>
       <div className="sheet__body">
-        {done ? (
+        {locked ? (
+          <p className="wishes-locked">{rsvp.note}</p>
+        ) : deadlinePassed ? (
+          <p className="wishes-locked">{rsvp.deadlineClosedMessage}</p>
+        ) : done ? (
           <div className="sheet-success">
             <div className="sheet-success__icon" aria-hidden="true">
               <IconSuccess />
@@ -208,6 +218,16 @@ export function RsvpSheet({
                     {rsvp.attendanceTidak}
                   </span>
                 </label>
+                <label className="choice__pill">
+                  <input
+                    type="radio"
+                    name="attendance"
+                    value="ragu"
+                    checked={attendance === "ragu"}
+                    onChange={() => setAttendance("ragu")}
+                  />
+                  <span>{rsvp.attendanceRagu}</span>
+                </label>
               </div>
             </fieldset>
             <label className="sheet-form__field">
@@ -252,20 +272,20 @@ export function RsvpSheet({
                 maxLength={200}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Tulis ucapan untuk kami…"
+                placeholder={rsvp.messagePlaceholder ?? "Tulis ucapan untuk kami…"}
               />
               <span className="sheet-form__count">{message.length}/200</span>
             </label>
           </form>
         )}
       </div>
-      {!done ? (
+      {!locked && !deadlinePassed && !done ? (
         <footer className="sheet__foot">
           <button
             type="submit"
             className="btn sheet__cta"
             form="sheetRsvpForm"
-            disabled={submitting || deadlinePassed}
+            disabled={submitting}
           >
             {submitting ? rsvp.submitting : rsvp.submit}
           </button>

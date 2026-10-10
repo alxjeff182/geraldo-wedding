@@ -33,7 +33,7 @@ export const wedding = {
       name: "Jeffry Alexander",
       url: "https://jeff-interactive-resume.vercel.app/en",
       websiteUrl: "https://jeff-interactive-resume.vercel.app/en",
-      instagramUrl: "https://jeff-interactive-resume.vercel.app/en",
+      instagramUrl: "https://instagram.com/",
     },
   },
 
@@ -111,12 +111,12 @@ export const wedding = {
   ] satisfies WeddingEvent[],
 
   story: {
-    enabled: false,
+    enabled: true,
     title: "Our Story",
     subtitle: "Constantly, consistently, continually, You.",
     paragraphs: [
-      "Perjalanan kami dimulai dari pertemuan yang sederhana, lalu tumbuh menjadi kasih yang kami syukuri setiap hari.",
-      "Dengan penuh sukacita kami melangkah menuju pemberkatan pernikahan di hadapan Tuhan Yesus Kristus.",
+      "[Cerita kalian di sini] Ceritakan singkat bagaimana kalian bertemu dan tumbuh bersama.",
+      "[Cerita kalian di sini] Tutup dengan rasa syukur dan undangan untuk merayakan bersama.",
     ],
   },
 
@@ -195,6 +195,7 @@ export const wedding = {
       "Batas konfirmasi kehadiran telah berakhir. Terima kasih atas perhatiannya.",
     nameLabel: "Nama",
     namePlaceholder: "Nama lengkap",
+    messagePlaceholder: "Tulis ucapan untuk kami…",
     attendanceLabel: "Kehadiran",
     attendanceAriaLabel: "Pilihan kehadiran",
     guestCountLabel: "Jumlah tamu",

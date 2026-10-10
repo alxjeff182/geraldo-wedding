@@ -52,6 +52,7 @@ export function useAudio() {
   const play = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return;
+    if (!audio.src || audio.src === window.location.href) return;
 
     const startPlayback = () => {
       const result = audio.play();

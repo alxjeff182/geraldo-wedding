@@ -761,6 +761,20 @@ textarea.admin-input {
   padding: 1rem;
 }
 
+.admin-gallery-row__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.admin-gallery-row__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
 .admin-media-grid {
   display: grid;
   gap: 1rem;

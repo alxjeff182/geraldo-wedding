@@ -230,7 +230,27 @@ serve(async (req) => {
       const name = sanitizeString(payload?.name, MAX_NAME);
       const guestCount = Number(payload?.guest_count);
       const attendance = payload?.attendance;
-      const guestId = payload?.guest_id ?? null;
+      const guestId = isUuid(payload?.guest_id) ? payload.guest_id : null;
+
+      if (!guestId) {
+        return new Response(
+          JSON.stringify({ error: "Buka undangan dari link pribadi Anda untuk konfirmasi kehadiran." }),
+          { status: 403, headers: { ...headers, "Content-Type": "application/json" } },
+        );
+      }
+
+      const { data: rsvpGuest, error: rsvpGuestError } = await supabase
+        .from("guests")
+        .select("id")
+        .eq("id", guestId)
+        .maybeSingle();
+      if (rsvpGuestError) throw rsvpGuestError;
+      if (!rsvpGuest?.id) {
+        return new Response(JSON.stringify({ error: "Tamu tidak valid" }), {
+          status: 400,
+          headers: { ...headers, "Content-Type": "application/json" },
+        });
+      }
 
       if (!name || !Number.isInteger(guestCount) || guestCount < 1 || guestCount > 3) {
         return new Response(JSON.stringify({ error: "Data RSVP tidak valid" }), {
@@ -253,14 +273,7 @@ serve(async (req) => {
         });
       }
 
-      if (guestId !== null && !isUuid(guestId)) {
-        return new Response(JSON.stringify({ error: "Tamu tidak valid" }), {
-          status: 400,
-          headers: { ...headers, "Content-Type": "application/json" },
-        });
-      }
-
-      if (guestId && (await guestAlreadySubmitted(supabase, guestId))) {
+      if (await guestAlreadySubmitted(supabase, guestId)) {
         return new Response(JSON.stringify({ error: "Konfirmasi kehadiran untuk undangan ini sudah pernah dikirim." }), {
           status: 409,
           headers: { ...headers, "Content-Type": "application/json" },
@@ -296,15 +309,7 @@ serve(async (req) => {
       }
 
       const message = sanitizeString(payload?.message, MAX_WISH_MESSAGE);
-      let guestId = isUuid(payload?.guest_id) ? payload.guest_id : null;
-      const guestSlugRaw = typeof payload?.guest_slug === "string" ? payload.guest_slug : "";
-      const guestSlug = guestSlugRaw
-        .toLowerCase()
-        .trim()
-        .replace(/[^a-z0-9-]+/g, "-")
-        .replace(/^-+|-+$/g, "")
-        .slice(0, 60);
-      const payloadName = sanitizeString(payload?.name, MAX_NAME);
+      const guestId = isUuid(payload?.guest_id) ? payload.guest_id : null;
 
       if (!message) {
         return new Response(JSON.stringify({ error: "Data ucapan tidak valid" }), {
@@ -313,11 +318,11 @@ serve(async (req) => {
         });
       }
 
-      if (!guestId && guestSlug.length < 2) {
-        return new Response(JSON.stringify({ error: "Buka undangan dari link pribadi Anda untuk mengirim ucapan." }), {
-          status: 403,
-          headers: { ...headers, "Content-Type": "application/json" },
-        });
+      if (!guestId) {
+        return new Response(
+          JSON.stringify({ error: "Buka undangan dari link pribadi Anda untuk mengirim ucapan." }),
+          { status: 403, headers: { ...headers, "Content-Type": "application/json" } },
+        );
       }
 
       const spamReason = isSpammyMessage(message);
@@ -328,40 +333,14 @@ serve(async (req) => {
         });
       }
 
-      let guest: { id: string; display_name: string } | null = null;
+      const { data: guest, error: guestError } = await supabase
+        .from("guests")
+        .select("id, display_name")
+        .eq("id", guestId)
+        .maybeSingle();
+      if (guestError) throw guestError;
 
-      if (guestId) {
-        const { data, error: guestError } = await supabase
-          .from("guests")
-          .select("id, display_name")
-          .eq("id", guestId)
-          .maybeSingle();
-        if (guestError) throw guestError;
-        guest = data;
-      }
-
-      if (!guest && guestSlug.length >= 2) {
-        const displayName =
-          payloadName ||
-          guestSlug
-            .split("-")
-            .filter(Boolean)
-            .map((part: string) => part.charAt(0).toUpperCase() + part.slice(1))
-            .join(" ");
-        const { data: upserted, error: upsertError } = await supabase
-          .from("guests")
-          .upsert(
-            { slug: guestSlug, display_name: displayName },
-            { onConflict: "slug" },
-          )
-          .select("id, display_name")
-          .maybeSingle();
-        if (upsertError) throw upsertError;
-        guest = upserted;
-        guestId = upserted?.id ?? null;
-      }
-
-      if (!guest?.id || !guest.display_name || !guestId) {
+      if (!guest?.id || !guest.display_name) {
         return new Response(JSON.stringify({ error: "Tamu tidak valid" }), {
           status: 400,
           headers: { ...headers, "Content-Type": "application/json" },

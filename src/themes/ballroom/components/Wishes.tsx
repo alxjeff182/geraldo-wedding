@@ -12,7 +12,6 @@ import { useWeddingContent } from "../../../context/WeddingContentContext";
 
 type Props = {
   guestId: string | null;
-  inviteSlug?: string | null;
   guestName: string;
   onToast: (msg: string) => void;
 };
@@ -56,16 +55,17 @@ function guardMessage(
   return gb.errorMessage;
 }
 
-export function Wishes({ guestId, inviteSlug = null, guestName, onToast }: Props) {
+export function Wishes({ guestId, guestName, onToast }: Props) {
   const { content } = useWeddingContent();
   const gb = content.guestbook;
-  const guestKey = guestId ?? inviteSlug;
+  const guestKey = guestId;
   const formOpenedAt = useRef(Date.now());
   const [items, setItems] = useState<Wish[]>([]);
   const [page, setPage] = useState(0);
   const [message, setMessage] = useState("");
   const [company, setCompany] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [supabaseOk, setSupabaseOk] = useState(isSupabaseConfigured);
   const [sentCount, setSentCount] = useState(() => getWishCount(guestKey));
 
   useEffect(() => {
@@ -73,25 +73,42 @@ export function Wishes({ guestId, inviteSlug = null, guestName, onToast }: Props
     formOpenedAt.current = Date.now();
   }, [guestKey]);
 
-  useEffect(() => {
-    if (!isSupabaseConfigured) return;
+  const fetchWishes = () => {
+    if (!isSupabaseConfigured) {
+      setSupabaseOk(false);
+      return;
+    }
     const supabase = getSupabase();
-    if (!supabase) return;
+    if (!supabase) {
+      setSupabaseOk(false);
+      return;
+    }
     void supabase
       .from("wishes")
       .select("id, guest_id, name, message, attendance, created_at")
       .eq("hidden", false)
       .order("created_at", { ascending: false })
       .limit(50)
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) {
+          setSupabaseOk(false);
+          return;
+        }
+        setSupabaseOk(true);
         if (data) setItems(data as Wish[]);
       });
+  };
+
+  useEffect(() => {
+    fetchWishes();
+    const id = window.setInterval(fetchWishes, 30_000);
+    return () => window.clearInterval(id);
   }, []);
 
   const pages = Math.max(1, Math.ceil(items.length / PAGE));
   const slice = items.slice(page * PAGE, page * PAGE + PAGE);
   const remaining = Math.max(0, WISH_MAX_PER_GUEST - sentCount);
-  const canSubmit = Boolean(guestKey) && remaining > 0;
+  const canSubmit = Boolean(guestId) && remaining > 0;
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -111,7 +128,6 @@ export function Wishes({ guestId, inviteSlug = null, guestName, onToast }: Props
       formOpenedAt: formOpenedAt.current,
       payload: {
         guest_id: guestId,
-        guest_slug: inviteSlug,
         name: guestName.trim() || "Tamu",
         message: message.trim(),
       },
@@ -146,6 +162,7 @@ export function Wishes({ guestId, inviteSlug = null, guestName, onToast }: Props
     setMessage("");
     setPage(0);
     formOpenedAt.current = Date.now();
+    fetchWishes();
   };
 
   return (
@@ -196,13 +213,13 @@ export function Wishes({ guestId, inviteSlug = null, guestName, onToast }: Props
         </form>
       ) : (
         <p className="wishes-locked">
-          {!guestKey ? gb.lockedMessage : gb.limitReachedMessage}
+          {!guestId ? gb.lockedMessage : gb.limitReachedMessage}
         </p>
       )}
 
       <div className="wishes-list">
         {slice.length === 0 ? (
-          <p className="gift__lead">{gb.emptyMessage}</p>
+          <p className="gift__lead">{supabaseOk ? gb.emptyMessage : gb.emptyNoSupabase}</p>
         ) : (
           slice.map((wish) => (
             <article key={wish.id} className="wish-card">

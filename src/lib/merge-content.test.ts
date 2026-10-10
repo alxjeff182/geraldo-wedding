@@ -49,9 +49,9 @@ describe("mergeWeddingContent", () => {
     expect("desktopBg" in merged.media).toBe(false);
   });
 
-  it("keeps story off; guestGuide and guestbook on by default", () => {
+  it("keeps story, guestGuide and guestbook on by default", () => {
     const merged = mergeWeddingContent({});
-    expect(merged.story.enabled).toBe(false);
+    expect(merged.story.enabled).toBe(true);
     expect(merged.guestGuide.enabled).toBe(true);
     expect(merged.guestbook.enabled).toBe(true);
     expect(merged.rsvp.deadline).toContain("2026-04-18");

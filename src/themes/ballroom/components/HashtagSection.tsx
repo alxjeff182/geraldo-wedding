@@ -1,11 +1,28 @@
+import { useWeddingContent } from "../../../context/WeddingContentContext";
+import { hashtagExploreUrl } from "../../../lib/hashtag-url";
+
 type Props = {
   title: string;
   tag: string;
   photo?: string;
+  onToast?: (msg: string) => void;
 };
 
-export function HashtagSection({ title, tag, photo }: Props) {
+export function HashtagSection({ title, tag, photo, onToast }: Props) {
+  const { content } = useWeddingContent();
   if (!tag.trim()) return null;
+
+  const display = tag.startsWith("#") ? tag : `#${tag}`;
+  const explore = hashtagExploreUrl(tag);
+
+  const copyTag = async () => {
+    try {
+      await navigator.clipboard.writeText(display);
+      onToast?.(content.giftUi.copyAccountSuccess || "Tersalin");
+    } catch {
+      onToast?.(content.giftUi.copyError || "Gagal menyalin");
+    }
+  };
 
   return (
     <section id="hashtag" className="section hashtag-mod fade-up" aria-label={title}>
@@ -17,7 +34,17 @@ export function HashtagSection({ title, tag, photo }: Props) {
       {photo ? (
         <img className="hashtag-mod__photo" src={photo} alt="" width={720} height={480} />
       ) : null}
-      <p className="hashtag-mod__tag">{tag}</p>
+      <button type="button" className="hashtag-mod__tag hashtag-mod__tag--btn" onClick={() => void copyTag()}>
+        {display}
+      </button>
+      <a
+        className="btn btn--ghost hashtag-mod__ig"
+        href={explore}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Lihat di Instagram
+      </a>
     </section>
   );
 }

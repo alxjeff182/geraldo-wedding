@@ -10,6 +10,7 @@ export type RsvpContent = {
   deadlineClosedMessage?: string;
   nameLabel?: string;
   namePlaceholder?: string;
+  messagePlaceholder?: string;
   guestCountLabel?: string;
   guestCountAriaLabel?: string;
   guestCountPlaceholder?: string;
