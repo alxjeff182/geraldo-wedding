@@ -110,7 +110,7 @@ export function BallroomApp({ guestName, guestId }: Props) {
   return (
     <div className={`theme-ballroom${!revealed ? " is-locked" : ""}`}>
       <div ref={stageRef} className={`stage${sheet.isOpen ? " is-sheet-open" : ""}`} id="stage">
-        {hasAudio ? <audio ref={audioRef} src={content.media.audio} loop preload="none" /> : null}
+        {hasAudio ? <audio ref={audioRef} src={content.media.audio} loop preload="auto" /> : null}
 
         {hasAudio && revealed ? (
           <button
