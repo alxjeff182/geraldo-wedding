@@ -8,19 +8,13 @@ type Options = {
   scrollRootRef: RefObject<HTMLElement | null>;
   heroRef: RefObject<HTMLElement | null>;
   enabled?: boolean;
-  /** Progress (0–1) where the auto intro lands before handing off to user scroll. */
-  introProgress?: number;
-  /** Auto-intro duration in ms. */
+  /** Total duration to play every frame once on open. */
   introDurationMs?: number;
   onProgress?: (progress: number) => void;
 };
 
 function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n));
-}
-
-function easeOutCubic(t: number) {
-  return 1 - (1 - t) ** 3;
 }
 
 export function useHeroFrames({
@@ -31,8 +25,7 @@ export function useHeroFrames({
   scrollRootRef,
   heroRef,
   enabled = true,
-  introProgress = 0.32,
-  introDurationMs = 3200,
+  introDurationMs = 3600,
   onProgress,
 }: Options) {
   const onProgressRef = useRef(onProgress);
@@ -43,9 +36,7 @@ export function useHeroFrames({
 
     let cancelled = false;
     let cleanupScroll: (() => void) | null = null;
-    let cleanupIntro: (() => void) | null = null;
     let rafWait = 0;
-    let rafStep = 0;
     let rafIntro = 0;
     let drawnFallback = false;
 
@@ -63,9 +54,7 @@ export function useHeroFrames({
 
       const frames: (HTMLImageElement | null)[] = new Array(frameCount).fill(null);
       let lastDrawn = -1;
-      let displayIndex = 0;
-      let targetIndex = 0;
-      let stepping = false;
+      let loadedCount = 0;
       let ticking = false;
       let introActive = false;
       let userTookOver = false;
@@ -82,78 +71,41 @@ export function useHeroFrames({
       };
 
       const paint = (index: number) => {
-        const img = frames[index];
+        const safe = clamp(index, 0, frameCount - 1);
+        const img = frames[safe];
         if (!img || !img.complete || !img.naturalWidth) {
+          // Prefer nearest loaded neighbor so motion never blanks.
+          for (let d = 1; d < frameCount; d += 1) {
+            const left = frames[safe - d];
+            if (left?.complete && left.naturalWidth) {
+              if (safe - d !== lastDrawn) {
+                lastDrawn = safe - d;
+                ctx.drawImage(left, 0, 0, canvas.width, canvas.height);
+              }
+              return true;
+            }
+            const right = frames[safe + d];
+            if (right?.complete && right.naturalWidth) {
+              if (safe + d !== lastDrawn) {
+                lastDrawn = safe + d;
+                ctx.drawImage(right, 0, 0, canvas.width, canvas.height);
+              }
+              return true;
+            }
+          }
           drawFallback();
           return false;
         }
-        if (index === lastDrawn) return true;
-        lastDrawn = index;
+        if (safe === lastDrawn) return true;
+        lastDrawn = safe;
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         return true;
       };
 
-      const stepTowardTarget = () => {
-        stepping = false;
-        if (cancelled) return;
-        if (displayIndex === targetIndex) {
-          paint(displayIndex);
-          return;
-        }
-        displayIndex += displayIndex < targetIndex ? 1 : -1;
-        paint(displayIndex);
-        if (displayIndex !== targetIndex) {
-          stepping = true;
-          rafStep = requestAnimationFrame(stepTowardTarget);
-        }
-      };
-
-      const setTargetIndex = (next: number) => {
-        targetIndex = clamp(next, 0, frameCount - 1);
-        if (displayIndex === targetIndex) {
-          paint(displayIndex);
-          return;
-        }
-        if (!stepping) {
-          stepping = true;
-          rafStep = requestAnimationFrame(stepTowardTarget);
-        }
-      };
-
-      const loadFrame = (i: number) => {
-        if (frames[i]) return;
-        const img = new Image();
-        img.decoding = "async";
-        if (i < 4) img.fetchPriority = "high";
-        const n = String(i + 1).padStart(3, "0");
-        img.src = `${basePath.replace(/\/$/, "")}/${n}.jpg`;
-        img.onload = () => {
-          if (cancelled) return;
-          void img.decode?.().catch(() => undefined);
-          if (lastDrawn === -1 && i === 0) {
-            displayIndex = 0;
-            targetIndex = 0;
-            paint(0);
-          } else if (i === targetIndex || i === displayIndex) {
-            lastDrawn = -1;
-            paint(displayIndex);
-          }
-        };
-        frames[i] = img;
-      };
-
-      for (let i = 0; i < frameCount; i += 1) loadFrame(i);
-
       const heroInner = heroEl.querySelector(".hero__inner") as HTMLElement | null;
       const revealEls = heroEl.querySelectorAll("[data-reveal]");
 
-      const syncFromScroll = () => {
-        const viewH = scrollRoot.clientHeight || 1;
-        const maxScroll = Math.max(1, heroEl.offsetHeight - viewH);
-        const progress = clamp(scrollRoot.scrollTop / maxScroll, 0, 1);
-        const index = Math.round(progress * (frameCount - 1));
-        setTargetIndex(index);
-
+      const applyProgressUi = (progress: number) => {
         revealEls.forEach((node) => {
           const el = node as HTMLElement;
           const at = Number(el.getAttribute("data-reveal")) || 0;
@@ -168,6 +120,41 @@ export function useHeroFrames({
         heroEl.classList.toggle("is-reading", progress >= 0.22);
         onProgressRef.current?.(progress);
       };
+
+      const maxScrollForHero = () => {
+        const viewH = scrollRoot.clientHeight || 1;
+        return Math.max(1, heroEl.offsetHeight - viewH);
+      };
+
+      const applyProgress = (progress: number, { syncScroll }: { syncScroll?: boolean } = {}) => {
+        const p = clamp(progress, 0, 1);
+        // Map continuously across every frame (no rounding gaps during intro).
+        const exact = p * (frameCount - 1);
+        const index = clamp(Math.round(exact), 0, frameCount - 1);
+        paint(index);
+        if (syncScroll) {
+          scrollRoot.scrollTop = maxScrollForHero() * p;
+        }
+        applyProgressUi(p);
+      };
+
+      const loadFrame = (i: number) => {
+        if (frames[i]) return;
+        const img = new Image();
+        img.decoding = "async";
+        if (i < 6) img.fetchPriority = "high";
+        const n = String(i + 1).padStart(3, "0");
+        img.src = `${basePath.replace(/\/$/, "")}/${n}.jpg`;
+        img.onload = () => {
+          if (cancelled) return;
+          loadedCount += 1;
+          void img.decode?.().catch(() => undefined);
+          if (lastDrawn === -1 && i === 0) paint(0);
+        };
+        frames[i] = img;
+      };
+
+      for (let i = 0; i < frameCount; i += 1) loadFrame(i);
 
       const stopIntro = () => {
         if (!introActive) return;
@@ -186,7 +173,8 @@ export function useHeroFrames({
         if (ticking) return;
         ticking = true;
         requestAnimationFrame(() => {
-          syncFromScroll();
+          const progress = clamp(scrollRoot.scrollTop / maxScrollForHero(), 0, 1);
+          applyProgress(progress);
           ticking = false;
         });
       };
@@ -209,58 +197,66 @@ export function useHeroFrames({
 
       const runIntro = () => {
         if (cancelled || userTookOver) {
-          syncFromScroll();
+          applyProgress(clamp(scrollRoot.scrollTop / maxScrollForHero(), 0, 1));
           return;
         }
 
-        const viewH = scrollRoot.clientHeight || 1;
-        const maxScroll = Math.max(1, heroEl.offsetHeight - viewH);
-        const targetTop = maxScroll * clamp(introProgress, 0.05, 0.9);
-
-        if (reduceMotion || targetTop <= 0) {
-          scrollRoot.scrollTop = targetTop;
-          syncFromScroll();
+        if (reduceMotion) {
+          applyProgress(1, { syncScroll: true });
           return;
         }
 
         introActive = true;
-        const from = scrollRoot.scrollTop;
         const startedAt = performance.now();
+        // Hold first + last frame briefly so the sequence reads complete.
+        const holdRatio = 0.06;
+        const playSpan = 1 - holdRatio * 2;
 
         const tick = (now: number) => {
           if (cancelled || userTookOver || !introActive) {
             introActive = false;
-            syncFromScroll();
+            applyProgress(clamp(scrollRoot.scrollTop / maxScrollForHero(), 0, 1));
             return;
           }
+
           const t = clamp((now - startedAt) / introDurationMs, 0, 1);
-          const eased = easeOutCubic(t);
-          scrollRoot.scrollTop = from + (targetTop - from) * eased;
-          syncFromScroll();
+          let progress: number;
+          if (t <= holdRatio) progress = 0;
+          else if (t >= 1 - holdRatio) progress = 1;
+          else progress = (t - holdRatio) / playSpan;
+
+          // Linear time → linear frame index (every frame gets equal time).
+          applyProgress(progress, { syncScroll: true });
+
           if (t < 1) {
             rafIntro = requestAnimationFrame(tick);
           } else {
             introActive = false;
-            syncFromScroll();
+            applyProgress(1, { syncScroll: true });
           }
         };
 
         rafIntro = requestAnimationFrame(tick);
       };
 
-      // Start intro once the first frame is ready (or after a short fallback wait).
       const beginWhenReady = () => {
         if (cancelled) return;
-        const first = frames[0];
-        if (first?.complete && first.naturalWidth) {
-          runIntro();
+        const firstReady = Boolean(frames[0]?.complete && frames[0]?.naturalWidth);
+        const enoughReady = loadedCount >= Math.min(frameCount, 8);
+        if (firstReady && (enoughReady || loadedCount >= 1)) {
+          // Small delay lets more frames decode before the sweep starts.
+          window.setTimeout(() => {
+            if (!cancelled) runIntro();
+          }, enoughReady ? 80 : 280);
           return;
         }
         const started = performance.now();
         const wait = () => {
           if (cancelled) return;
-          const img = frames[0];
-          if ((img?.complete && img.naturalWidth) || performance.now() - started > 900) {
+          if (
+            (frames[0]?.complete && frames[0]?.naturalWidth && loadedCount >= 4) ||
+            performance.now() - started > 1200
+          ) {
             runIntro();
             return;
           }
@@ -270,10 +266,6 @@ export function useHeroFrames({
       };
 
       beginWhenReady();
-
-      cleanupIntro = () => {
-        stopIntro();
-      };
     };
 
     start();
@@ -281,20 +273,8 @@ export function useHeroFrames({
     return () => {
       cancelled = true;
       cancelAnimationFrame(rafWait);
-      cancelAnimationFrame(rafStep);
       cancelAnimationFrame(rafIntro);
       cleanupScroll?.();
-      cleanupIntro?.();
     };
-  }, [
-    basePath,
-    frameCount,
-    posterSrc,
-    canvasRef,
-    scrollRootRef,
-    heroRef,
-    enabled,
-    introProgress,
-    introDurationMs,
-  ]);
+  }, [basePath, frameCount, posterSrc, canvasRef, scrollRootRef, heroRef, enabled, introDurationMs]);
 }
