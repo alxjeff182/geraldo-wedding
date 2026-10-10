@@ -274,13 +274,13 @@
 }
 
 .theme-ballroom .footer__credits {
-  margin-top: 1.5rem;
+  margin-top: 1rem;
   text-align: center;
 }
 
 .theme-ballroom .footer__porto {
   display: inline-block;
-  margin-top: 0.55rem;
+  margin-top: 0.4rem;
   color: var(--gold-soft);
   font-family: var(--font-body);
   font-size: 0.68rem;

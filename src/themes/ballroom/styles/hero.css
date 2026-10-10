@@ -9,8 +9,9 @@
   -webkit-overflow-scrolling: touch;
   background: var(--bg);
   overscroll-behavior: contain;
-  padding-bottom: calc(var(--dock-space) + env(safe-area-inset-bottom));
-  scroll-padding-bottom: calc(var(--dock-space) + env(safe-area-inset-bottom));
+  /* Dock only appears on hero — keep a light end pad when it's hidden */
+  padding-bottom: calc(1.25rem + env(safe-area-inset-bottom));
+  scroll-padding-bottom: calc(1.25rem + env(safe-area-inset-bottom));
   scrollbar-width: thin;
   scrollbar-color: var(--gold-a40) transparent;
 }
@@ -29,6 +30,10 @@
 }
 .theme-ballroom .invitation.is-revealed {
   animation: inviteIn 1.4s var(--ease-out) both;
+}
+.theme-ballroom .invitation.has-dock {
+  padding-bottom: calc(var(--dock-space) + env(safe-area-inset-bottom));
+  scroll-padding-bottom: calc(var(--dock-space) + env(safe-area-inset-bottom));
 }
 @keyframes inviteIn {
   from {

@@ -149,7 +149,7 @@ export function BallroomApp({ guestName, guestId }: Props) {
         <main
           id="invitation"
           ref={inviteRef}
-          className={`invitation${revealed ? " is-revealed" : ""}`}
+          className={`invitation${revealed ? " is-revealed" : ""}${dockVisible ? " has-dock" : ""}`}
           hidden={!revealed}
         >
           <Hero
