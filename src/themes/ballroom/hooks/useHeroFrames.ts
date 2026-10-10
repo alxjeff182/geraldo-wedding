@@ -113,8 +113,9 @@ export function useHeroFrames({
         });
 
         if (heroInner) {
+          // Keep motion subtle — large negative Y clips the eyebrow under overflow:hidden.
           const textProgress = Math.max(0, (progress - 0.12) / 0.88);
-          heroInner.style.transform = `translate3d(0, ${textProgress * -28}px, 0)`;
+          heroInner.style.transform = `translate3d(0, ${textProgress * -8}px, 0)`;
         }
 
         heroEl.classList.toggle("is-reading", progress >= 0.22);

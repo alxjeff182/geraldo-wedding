@@ -97,8 +97,8 @@
   z-index: 2;
   width: 100%;
   max-width: 36rem;
-  /* Keep title stack in the upper safe band above faces */
-  padding: max(1.35rem, env(safe-area-inset-top, 0px) + 0.85rem) 1.25rem 0;
+  /* Extra top inset so eyebrow never clips under overflow:hidden / status bar */
+  padding: max(3.25rem, env(safe-area-inset-top, 0px) + 2.25rem) 1.25rem 0;
   transform: translate3d(0, 0, 0);
   will-change: transform;
 }
