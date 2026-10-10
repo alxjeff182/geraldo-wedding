@@ -75,19 +75,21 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.15rem;
-  width: 4.35rem;
-  height: 4.35rem;
+  gap: 0.22rem;
+  width: 4.1rem;
+  height: 4.1rem;
   border-radius: 50%;
   color: var(--gold-soft);
-  font-size: 0.7rem;
-  letter-spacing: 0.12em;
+  font-family: var(--font-body);
+  font-size: 0.52rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   background: linear-gradient(165deg, rgba(255, 255, 255, 0.08), var(--gold-a08));
-  border: 1.5px solid var(--gold-a60);
+  border: 1px solid var(--gold-a60);
   box-shadow:
     0 4px 14px rgba(0, 0, 0, 0.22),
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
@@ -174,12 +176,12 @@
   color: var(--white);
 }
 .theme-ballroom .float-dock__btn--gift {
-  gap: 0.08rem;
-  padding-top: 0.1rem;
+  gap: 0.14rem;
+  padding-top: 0.05rem;
 }
 .theme-ballroom .float-dock__btn--gift .float-dock__icon {
-  width: 1.2rem;
-  height: 1.2rem;
+  width: 1.05rem;
+  height: 1.05rem;
 }
 .theme-ballroom .float-dock__btn--gift .float-dock__icon svg {
   width: 100%;
@@ -189,10 +191,17 @@
 .theme-ballroom .float-dock__icon {
   display: grid;
   place-items: center;
+  width: 1.15rem;
+  height: 1.15rem;
   color: var(--gold);
   transition:
     transform 0.25s var(--ease-out),
     color 0.2s;
+}
+.theme-ballroom .float-dock__icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 .theme-ballroom .float-dock__btn:hover .float-dock__icon,
 .theme-ballroom .float-dock__btn:focus-visible .float-dock__icon {
@@ -204,9 +213,11 @@
   transform: scale(0.95);
 }
 .theme-ballroom .float-dock__label {
-  line-height: 1;
-  font-weight: 500;
-  max-width: 3.7rem;
+  line-height: 1.05;
+  font-weight: 400;
+  font-size: 0.52rem;
+  letter-spacing: 0.14em;
+  max-width: 3.35rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: clip;
@@ -215,23 +226,24 @@
     color 0.2s;
 }
 .theme-ballroom .float-dock__label--stack {
-  letter-spacing: 0.04em;
-  line-height: 1.12;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
   text-align: center;
-  font-size: var(--fs-eyebrow);
-  max-width: 3.6rem;
+  font-size: 0.48rem;
+  font-weight: 400;
+  max-width: 3.2rem;
   white-space: normal;
 }
 .theme-ballroom .float-dock__btn--gift .float-dock__label--stack {
   color: var(--gold-soft);
 }
 .theme-ballroom .float-dock__btn:hover .float-dock__label {
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   color: var(--white);
 }
 .theme-ballroom .float-dock__btn:hover .float-dock__label--stack,
 .theme-ballroom .float-dock__btn--gift:hover .float-dock__label--stack {
-  letter-spacing: 0.05em;
+  letter-spacing: 0.09em;
   color: var(--white);
 }
 @media (hover: none) {
@@ -254,9 +266,10 @@
 .theme-ballroom button.float-dock__btn {
   appearance: none;
   -webkit-appearance: none;
-  font-family: inherit;
-  font-size: 0.7rem;
-  line-height: 1;
+  font-family: var(--font-body);
+  font-size: 0.52rem;
+  font-weight: 400;
+  line-height: 1.05;
   padding: 0;
   margin: 0;
   cursor: pointer;
