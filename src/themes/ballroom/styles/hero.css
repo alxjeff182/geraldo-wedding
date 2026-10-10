@@ -44,7 +44,8 @@
 } /* Hero — scroll-scrubbed video parallax */
 .theme-ballroom .hero {
   position: relative;
-  height: 220vh;
+  /* Longer scrub track so all 24 frames advance gradually (≈10vh per step) */
+  height: 340vh;
   text-align: center;
 }
 .theme-ballroom .hero__pin {
@@ -61,8 +62,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* Prefer upper sky so names/countdown sit above the couple's faces */
-  object-position: center 18%;
+  /* Keep frame composition centered so consecutive frames scrub cleanly */
+  object-position: center center;
   background: #8a847c;
   display: block;
   filter: sepia(0.18) saturate(1.05) contrast(1.04);
