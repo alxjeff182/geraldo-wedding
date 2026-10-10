@@ -475,6 +475,43 @@ body:has(.theme-ballroom) {
   color: var(--gold);
   opacity: 0.75;
   padding-top: 0;
+}.theme-ballroom .hero__hint{
+  position: absolute;
+  left: 50%;
+  bottom: calc(1.1rem + env(safe-area-inset-bottom, 0px));
+  z-index: 3;
+  transform: translateX(-50%);
+  pointer-events: none;
+  opacity: 0.7;
+  transition: opacity 0.45s var(--ease-out), transform 0.45s var(--ease-out);
+}.theme-ballroom .hero__hint.is-gone{
+  opacity: 0;
+  transform: translateX(-50%) translateY(10px);
+}.theme-ballroom .hero__hint-motion{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.12rem;
+  animation: heroHintBob 1.8s var(--ease-out) infinite;
+}.theme-ballroom .hero__hint-chevron{
+  display: block;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-right: 1.5px solid var(--gold-soft);
+  border-bottom: 1.5px solid var(--gold-soft);
+  transform: rotate(45deg);
+  opacity: 0.9;
+  filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.35));
+}.theme-ballroom .hero__hint-chevron + .hero__hint-chevron{
+  margin-top: -0.18rem;
+  opacity: 0.45;
+}@keyframes heroHintBob{
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(5px); }
+}@media (prefers-reduced-motion: reduce){
+  .theme-ballroom .hero__hint-motion{
+    animation: none;
+  }
 }/* Buttons */.theme-ballroom .btn{
   display: inline-flex;
   align-items: center;

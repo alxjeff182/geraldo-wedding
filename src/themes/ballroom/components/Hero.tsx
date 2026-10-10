@@ -1,4 +1,4 @@
-import { useRef, type RefObject } from "react";
+import { useCallback, useRef, useState, type RefObject } from "react";
 import { useHeroFrames } from "../hooks/useHeroFrames";
 import { useCountdown } from "../../../hooks/useCountdown";
 
@@ -17,6 +17,8 @@ type Props = {
   onProgress?: (progress: number) => void;
 };
 
+const HINT_HIDE_AT = 0.04;
+
 export function Hero({
   scrollRootRef,
   eyebrow,
@@ -33,7 +35,16 @@ export function Hero({
 }: Props) {
   const heroRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [hintGone, setHintGone] = useState(false);
   const cd = useCountdown(weddingDate);
+
+  const handleProgress = useCallback(
+    (progress: number) => {
+      setHintGone(progress >= HINT_HIDE_AT);
+      onProgress?.(progress);
+    },
+    [onProgress],
+  );
 
   useHeroFrames({
     basePath: framesBase,
@@ -43,7 +54,7 @@ export function Hero({
     scrollRootRef,
     heroRef,
     enabled,
-    onProgress,
+    onProgress: handleProgress,
   });
 
   return (
@@ -93,6 +104,15 @@ export function Hero({
               <span>{String(cd.seconds).padStart(2, "0")}</span>
               <small>{labels.seconds}</small>
             </div>
+          </div>
+        </div>
+        <div
+          className={`hero__hint${hintGone ? " is-gone" : ""}`}
+          aria-hidden="true"
+        >
+          <div className="hero__hint-motion">
+            <span className="hero__hint-chevron" />
+            <span className="hero__hint-chevron" />
           </div>
         </div>
       </div>
