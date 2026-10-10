@@ -26,8 +26,9 @@ Setiap potongan nilai di penilaian awal sudah ditutup dengan perubahan kode + ge
 
 ## Bukti otomatis
 
-- CI: `.github/workflows/ci.yml` (lint, format, stylelint, unit+coverage, build, Playwright, Lighthouse)
-- Deploy: `.github/workflows/deploy.yml` (prebuilt prod, alias `geraldo-christin.vercel.app`, edge `submit`, smoke 403)
+- CI hijau: https://github.com/alxjeff182/geraldo-wedding/actions/runs/38026205051 (lint, format, stylelint, unit+coverage, build, Playwright e2e mock + mobile Chromium, Lighthouse Perf≥95 / A11y·SEO·BP=100)
+- Deploy prod: https://github.com/alxjeff182/geraldo-wedding/actions/runs/38026345548 (Vercel prebuilt + alias, `submit` function, smoke HTML + RSVP 403)
+- Workflows: `.github/workflows/ci.yml`, `.github/workflows/deploy.yml`
 - Arsitektur: `docs/ARCHITECTURE.md`
 - Checklist konten: `src/components/admin/SiapKirimChecklist.tsx`
 
