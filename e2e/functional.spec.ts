@@ -28,9 +28,9 @@ const supabaseUrl = env.VITE_SUPABASE_URL;
 const anonKey = env.VITE_SUPABASE_ANON_KEY;
 const isLiveSupabase = Boolean(
   supabaseUrl &&
-    anonKey &&
-    !/ci-mock|placeholder|example\.supabase|your-project/i.test(supabaseUrl) &&
-    !/ci-mock|placeholder/i.test(anonKey),
+  anonKey &&
+  !/ci-mock|placeholder|example\.supabase|your-project/i.test(supabaseUrl) &&
+  !/ci-mock|placeholder/i.test(anonKey),
 );
 
 let submitFunctionDeployed = false;
