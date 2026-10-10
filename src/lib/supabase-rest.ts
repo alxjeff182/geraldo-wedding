@@ -3,10 +3,17 @@ import type { RsvpInsert, Wish, WishInsert } from "./supabase";
 
 export type { Wish } from "./supabase";
 
-const url = import.meta.env.VITE_SUPABASE_URL;
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 
-export const isSupabaseConfigured = Boolean(url && anonKey);
+/** True only for a real project URL (not CI placeholders). */
+export const isSupabaseConfigured = Boolean(
+  url &&
+    anonKey &&
+    !/placeholder/i.test(url) &&
+    !/your-project|example\.supabase/i.test(url) &&
+    !/placeholder/i.test(anonKey),
+);
 
 function restHeaders(extra?: HeadersInit): HeadersInit {
   return {
