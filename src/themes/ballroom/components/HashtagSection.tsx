@@ -1,3 +1,4 @@
+import { MediaImage } from "../../../components/MediaImage";
 import { useWeddingContent } from "../../../context/use-wedding-content";
 import { hashtagExploreUrl } from "../../../lib/hashtag-url";
 
@@ -32,7 +33,14 @@ export function HashtagSection({ title, tag, photo, onToast }: Props) {
         <div className="ornament" aria-hidden="true" />
       </div>
       {photo ? (
-        <img className="hashtag-mod__photo" src={photo} alt="" width={720} height={480} />
+        <MediaImage
+          className="hashtag-mod__photo"
+          src={photo}
+          alt=""
+          width={720}
+          height={480}
+          loading="lazy"
+        />
       ) : null}
       <button
         type="button"

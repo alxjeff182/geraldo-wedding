@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
+import { MediaImage } from "../../../components/MediaImage";
 
 type Person = {
   role: string;
@@ -176,7 +177,13 @@ export function CoupleStory({
     >
       <div className="couple-story__pin">
         <div className="couple-story__bg" aria-hidden="true">
-          <img src="/assets/ballroom/couple/bg.jpg" alt="" width={1080} height={1350} />
+          <MediaImage
+            src="/assets/ballroom/couple/bg.jpg"
+            alt=""
+            width={1080}
+            height={1350}
+            loading="lazy"
+          />
         </div>
         <div className="couple-story__veil" aria-hidden="true" />
         <div className="couple-story__head">
@@ -208,7 +215,13 @@ export function CoupleStory({
               >
                 <div className="couple-card__inner">
                   <div className="couple-card__face couple-card__face--front">
-                    <img src={person.photo} alt={person.name} width={720} height={1280} />
+                    <MediaImage
+                      src={person.photo}
+                      alt={person.name}
+                      width={720}
+                      height={1280}
+                      loading="lazy"
+                    />
                     <div className="couple-card__caption">
                       <p className="couple-card__role">{person.role}</p>
                       <h4>{person.name}</h4>

@@ -66,8 +66,9 @@ body:has(.theme-ballroom) {
   --gold-a25: color-mix(in srgb, var(--gold) 25%, transparent);
   --gold-a40: color-mix(in srgb, var(--gold) 40%, transparent);
   --gold-a60: color-mix(in srgb, var(--gold) 60%, transparent);
-  --fs-eyebrow: 0.7rem;
-  --fs-caption: 0.72rem;
+  /* >= 12px at 16px root so Lighthouse mobile "legible font sizes" passes */
+  --fs-eyebrow: 0.75rem;
+  --fs-caption: 0.75rem;
   --fs-body: 0.92rem;
   --fs-lead: 1.05rem;
   --fs-h3: clamp(1.55rem, 6cqi, 1.9rem);

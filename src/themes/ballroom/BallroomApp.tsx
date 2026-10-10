@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useWeddingContent } from "../../context/use-wedding-content";
 import { useAudio } from "../../hooks/useAudio";
 import { useToast } from "../../hooks/useToast";
+import { MediaImage } from "../../components/MediaImage";
 import { Toast } from "../../components/ui/Toast";
 import { usePageMeta } from "../../hooks/usePageMeta";
 import { Cover } from "./components/Cover";
@@ -262,13 +263,13 @@ export function BallroomApp({ guestName, guestId }: Props) {
           />
           <footer className="footer">
             <div className="footer__glow" aria-hidden="true" />
-            <img
+            <MediaImage
               className="footer__logo"
               src={content.media.logo}
               alt=""
               width={562}
               height={562}
-              aria-hidden="true"
+              loading="lazy"
             />
             <p className="eyebrow">Dengan penuh kasih</p>
             <p className="footer__names">{content.site.title}</p>

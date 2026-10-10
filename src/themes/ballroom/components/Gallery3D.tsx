@@ -1,4 +1,5 @@
 import { useEffect, useRef, type RefObject } from "react";
+import { MediaImage } from "../../../components/MediaImage";
 import { IconChevronLeft, IconChevronRight } from "../icons";
 import { useGalleryRing } from "../hooks/useGalleryRing";
 
@@ -190,7 +191,14 @@ export function Gallery3D({ eyebrow, title, images, scrollRootRef, enabled = tru
                     <span>Foto</span>
                   </div>
                 ) : (
-                  <img src={img.src} alt={img.alt} width={720} height={960} draggable={false} />
+                  <MediaImage
+                    src={img.src}
+                    alt={img.alt}
+                    width={720}
+                    height={960}
+                    draggable={false}
+                    loading="lazy"
+                  />
                 )}
                 <figcaption>
                   <span className="gallery-plane__num">{String(i + 1).padStart(2, "0")}</span>
@@ -241,7 +249,7 @@ export function Gallery3D({ eyebrow, title, images, scrollRootRef, enabled = tru
         </button>
         {lightbox ? (
           <figure className="gallery-lightbox__figure">
-            <img src={lightbox.src} alt={lightbox.alt} />
+            <MediaImage src={lightbox.src} alt={lightbox.alt} loading="eager" />
             <figcaption>{lightbox.caption}</figcaption>
           </figure>
         ) : null}

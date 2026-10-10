@@ -1,3 +1,5 @@
+import { MediaImage } from "../../../components/MediaImage";
+
 type Props = {
   guestName: string;
   salutation: string;
@@ -24,12 +26,26 @@ export function Cover({
   return (
     <section className={`cover${leaving ? " is-leaving" : ""}`} aria-label="Pembuka undangan">
       <div className="cover__photo" aria-hidden="true">
-        <img src={coverBg} alt="" width={720} height={1280} />
+        <MediaImage
+          src={coverBg}
+          alt=""
+          width={720}
+          height={1280}
+          loading="eager"
+          fetchPriority="high"
+        />
       </div>
       <div className="cover__shade" aria-hidden="true" />
       <div className="cover__content">
         <div className="cover__logo-wrap">
-          <img className="cover__logo" src={logoSrc} alt="" width={562} height={562} />
+          <MediaImage
+            className="cover__logo"
+            src={logoSrc}
+            alt=""
+            width={562}
+            height={562}
+            loading="eager"
+          />
         </div>
         {guestName ? (
           <p className="cover__guest">

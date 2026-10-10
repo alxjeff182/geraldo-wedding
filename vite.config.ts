@@ -42,12 +42,20 @@ function sitemapPlugin(siteUrl: string): Plugin {
     <priority>1.0</priority>
   </url>
 </urlset>`;
+  const robots = `User-agent: *
+Allow: /
+Disallow: /admin
+
+Sitemap: ${base}/sitemap.xml
+`;
 
   return {
     name: "sitemap",
     closeBundle() {
       writeFileSync(resolve("dist", "sitemap.xml"), xml);
       writeFileSync(resolve("public", "sitemap.xml"), xml);
+      writeFileSync(resolve("dist", "robots.txt"), robots);
+      writeFileSync(resolve("public", "robots.txt"), robots);
     },
   };
 }

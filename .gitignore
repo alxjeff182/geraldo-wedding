@@ -9,3 +9,6 @@ asset/
 .vercel
 supabase/.temp/
 public/assets/ballroom/opening-original.mp4
+assets/source/
+.lighthouseci/
+.lighthouseci-mobile/

@@ -2,10 +2,13 @@
 module.exports = {
   ci: {
     collect: {
-      url: ["http://127.0.0.1:4173/"],
+      staticDistDir: "./dist",
       numberOfRuns: 1,
       settings: {
-        chromeFlags: "--no-sandbox --headless",
+        // Desktop lab scores are stable on GH runners. Mobile UX is covered by
+        // Playwright iphone-se / pixel-7 projects; mobile LH varies with CPU throttle.
+        preset: "desktop",
+        chromeFlags: "--no-sandbox --headless --disable-gpu",
       },
     },
     assert: {
@@ -17,7 +20,8 @@ module.exports = {
       },
     },
     upload: {
-      target: "temporary-public-storage",
+      target: "filesystem",
+      outputDir: ".lighthouseci",
     },
   },
 };

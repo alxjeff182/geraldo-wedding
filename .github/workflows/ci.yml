@@ -31,11 +31,4 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
       - name: Lighthouse CI
-        run: |
-          npm run preview &
-          PREVIEW_PID=$!
-          npx wait-on http://127.0.0.1:4173
-          npx @lhci/cli autorun --config=lighthouserc.cjs
-          kill $PREVIEW_PID
-        env:
-          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+        run: npx @lhci/cli autorun --config=lighthouserc.cjs
