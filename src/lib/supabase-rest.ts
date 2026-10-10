@@ -9,10 +9,10 @@ const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 /** True only for a real project URL (not CI placeholders). */
 export const isSupabaseConfigured = Boolean(
   url &&
-    anonKey &&
-    !/placeholder/i.test(url) &&
-    !/your-project|example\.supabase/i.test(url) &&
-    !/placeholder/i.test(anonKey),
+  anonKey &&
+  !/placeholder/i.test(url) &&
+  !/your-project|example\.supabase/i.test(url) &&
+  !/placeholder/i.test(anonKey),
 );
 
 function restHeaders(extra?: HeadersInit): HeadersInit {
