@@ -75,9 +75,13 @@ export async function submitForm(input: SubmitFormInput): Promise<SubmitResult> 
     };
   }
 
-  const { data, error } = await invokeSubmitFunction(input);
+  const { data, error, kind } = await invokeSubmitFunction(input);
 
   if (error) {
+    const isGenericHttp = /^HTTP \d+$/.test(error);
+    if (kind === "server" && !isGenericHttp) {
+      return { ok: false, error };
+    }
     return {
       ok: false,
       error: messages.networkError ?? error ?? "Gagal mengirim. Silakan coba lagi.",

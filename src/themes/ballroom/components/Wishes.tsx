@@ -52,7 +52,8 @@ function guardMessage(
   if (reason === "profanity") return "Ucapan mengandung kata yang tidak pantas.";
   if (reason === "too_short") return "Ucapan terlalu pendek.";
   if (reason === "too_long") return "Ucapan terlalu panjang (maks. 500 karakter).";
-  if (reason === "repeat" || reason === "empty") return "Ucapan tidak valid.";
+  if (reason === "empty") return "Ucapan tidak boleh kosong.";
+  if (reason === "repeat") return "Ucapan sama dengan sebelumnya.";
   return gb.errorMessage;
 }
 
@@ -197,7 +198,11 @@ export function Wishes({ guestId, guestName, onToast }: Props) {
       <p className="gift__lead">{gb.subtitle}</p>
 
       {canSubmit ? (
-        <form className="wishes-form sheet-form" onSubmit={(e) => void onSubmit(e)}>
+        <form
+          className="wishes-form sheet-form"
+          noValidate
+          onSubmit={(e) => void onSubmit(e)}
+        >
           <input
             type="text"
             name="company"

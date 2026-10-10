@@ -118,11 +118,17 @@ export type SubmitBody = {
   formOpenedAt?: number;
 };
 
-export async function invokeSubmitFunction(
-  body: SubmitBody,
-): Promise<{ data: unknown; error: string | null }> {
+export type InvokeSubmitKind = "network" | "server";
+
+export type InvokeSubmitResult = {
+  data: unknown;
+  error: string | null;
+  kind?: InvokeSubmitKind;
+};
+
+export async function invokeSubmitFunction(body: SubmitBody): Promise<InvokeSubmitResult> {
   if (!isSupabaseConfigured) {
-    return { data: null, error: "Supabase tidak dikonfigurasi" };
+    return { data: null, error: "Supabase tidak dikonfigurasi", kind: "network" };
   }
 
   try {
@@ -145,11 +151,11 @@ export async function invokeSubmitFunction(
         data && typeof data === "object" && "error" in data && data.error
           ? String((data as { error: unknown }).error)
           : `HTTP ${res.status}`;
-      return { data, error: message };
+      return { data, error: message, kind: "server" };
     }
 
     return { data, error: null };
   } catch {
-    return { data: null, error: "Gagal mengirim (jaringan)" };
+    return { data: null, error: "Gagal mengirim (jaringan)", kind: "network" };
   }
 }

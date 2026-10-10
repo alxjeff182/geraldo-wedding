@@ -39,15 +39,15 @@ export function AdminUmumTab({ merged, defaults, updateDraft, clearDraftPath }: 
           onChange={(e) => updateDraft(["dateLabel"], e.target.value)}
         />
       </label>
-      <label className="admin-field admin-field--wide">
-        <span className="admin-label">Intro Mempelai</span>
-        <textarea
-          className="admin-input"
-          rows={4}
-          value={merged.intro}
-          onChange={(e) => updateDraft(["intro"], e.target.value)}
-        />
-      </label>
+      <AdminOverrideTextField
+        label="Intro Mempelai"
+        wide
+        rows={4}
+        value={merged.intro}
+        defaultValue={defaults.intro}
+        onReset={() => clearDraftPath(["intro"])}
+        onChange={(value) => updateDraft(["intro"], value)}
+      />
       <AdminTextField
         label="Hero Eyebrow"
         value={merged.hero.eyebrow}
