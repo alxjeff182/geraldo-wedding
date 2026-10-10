@@ -42,21 +42,21 @@ export default defineConfig({
     reuseExistingServer: false,
     env: (() => {
       const local = loadEnvLocal();
-      const pick = (key: string, fallback: string) => {
-        // In CI, workflow env wins so mocks stay deterministic.
-        if (process.env.CI) {
-          return process.env[key]?.trim() || local[key]?.trim() || fallback;
-        }
-        return local[key]?.trim() || process.env[key]?.trim() || fallback;
-      };
+      const pick = (key: string, fallback: string) =>
+        local[key]?.trim() || process.env[key]?.trim() || fallback;
+      // E2E always uses a mockable host (never CI placeholders — those disable the client).
+      const e2eSupabaseUrl = process.env.CI
+        ? "https://ci-mock.supabase.co"
+        : pick("VITE_SUPABASE_URL", "https://ci-mock.supabase.co");
+      const e2eSupabaseKey = process.env.CI
+        ? "ci-mock-anon-key"
+        : pick("VITE_SUPABASE_ANON_KEY", "ci-mock-anon-key");
       return {
         ...process.env,
         ...local,
         VITE_SITE_URL: pick("VITE_SITE_URL", "http://localhost:5173"),
-        // Host must not contain "placeholder" — app treats that as unconfigured.
-        // Playwright route mocks intercept ci-mock.supabase.co in e2e specs.
-        VITE_SUPABASE_URL: pick("VITE_SUPABASE_URL", "https://ci-mock.supabase.co"),
-        VITE_SUPABASE_ANON_KEY: pick("VITE_SUPABASE_ANON_KEY", "ci-mock-anon-key"),
+        VITE_SUPABASE_URL: e2eSupabaseUrl,
+        VITE_SUPABASE_ANON_KEY: e2eSupabaseKey,
       };
     })(),
   },
