@@ -18,7 +18,7 @@ export function HashtagSection({ title, tag, photo, onToast }: Props) {
   const copyTag = async () => {
     try {
       await navigator.clipboard.writeText(display);
-      onToast?.(content.giftUi.copyAccountSuccess || "Tersalin");
+      onToast?.(content.hashtag.copySuccess ?? "Hashtag disalin");
     } catch {
       onToast?.(content.giftUi.copyError || "Gagal menyalin");
     }
@@ -34,7 +34,12 @@ export function HashtagSection({ title, tag, photo, onToast }: Props) {
       {photo ? (
         <img className="hashtag-mod__photo" src={photo} alt="" width={720} height={480} />
       ) : null}
-      <button type="button" className="hashtag-mod__tag hashtag-mod__tag--btn" onClick={() => void copyTag()}>
+      <button
+        type="button"
+        className="hashtag-mod__tag hashtag-mod__tag--btn"
+        aria-label={`Salin ${display}`}
+        onClick={() => void copyTag()}
+      >
         {display}
       </button>
       <a
@@ -43,7 +48,7 @@ export function HashtagSection({ title, tag, photo, onToast }: Props) {
         target="_blank"
         rel="noopener noreferrer"
       >
-        Lihat di Instagram
+        {content.hashtag.instagramButton}
       </a>
     </section>
   );

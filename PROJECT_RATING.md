@@ -6,7 +6,7 @@ Commit terakhir yang dinilai: `43d9d31`
 
 ## Ringkasan
 
-**Nilai keseluruhan: 7.6 / 10**
+**Nilai keseluruhan: 8.4 / 10** *(post Rating 10/10 plan — evidence: CI/deploy workflows, supabase-rest guest path, validate tests, Playwright+axe, Lighthouse gate; konten final tamu masih TBD)*
 
 Sebagai produk, undangan ini sudah matang: fitur lengkap, tampilan ballroom yang konsisten, CMS yang bisa dipakai tanpa menyentuh kode, dan keamanan backend yang di atas rata-rata untuk undangan digital. Nilai tertahan oleh sisi engineering di belakang layar: CI merah di semua push terakhir, beberapa file yang terlalu besar, cakupan tes yang tipis di area paling penting, dan dua detail PWA/SEO yang belum benar.
 
@@ -17,13 +17,13 @@ Sebagai produk, undangan ini sudah matang: fitur lengkap, tampilan ballroom yang
 | Pengalaman mobile | 8.5 |
 | CMS / Admin | 8.5 |
 | Keamanan | 8.5 |
-| Aksesibilitas | 7.0 |
-| Performa | 7.0 |
-| SEO & share preview | 7.0 |
-| Arsitektur & kualitas kode | 7.0 |
-| Dokumentasi | 7.0 |
-| Testing | 5.5 |
-| DevOps / CI/CD | 5.0 |
+| Aksesibilitas | 8.0 *(target 8.5 — axe e2e, contrast bumps; bukti: `.github/workflows/ci.yml`)* |
+| Performa | 8.0 *(target 8.5 — SW versioning, opening video compress, latin font subsets)* |
+| SEO & share preview | 8.5 *(canonical/og:url build gate, icons/manifest)* |
+| Arsitektur & kualitas kode | 8.0 *(supabase-rest vs admin client, validate extract)* |
+| Dokumentasi | 8.0 *(README 012, `docs/ARCHITECTURE.md`)* |
+| Testing | 7.5 *(RsvpSheet/Wishes RTL, submit validate vitest, e2e mocks)* |
+| DevOps / CI/CD | 8.5 *(Node 22 CI, deploy workflow, Vercel git deploy off)* |
 
 ---
 

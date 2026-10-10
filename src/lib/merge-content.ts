@@ -32,6 +32,13 @@ function deepMerge<T>(base: T, overrides: unknown): T {
   return overrides as T;
 }
 
+/** True when CMS/draft value differs from shipped default (non-empty). */
+export function isOverridden(current: unknown, defaultValue: unknown): boolean {
+  if (current === undefined || current === null) return false;
+  if (typeof current === "string" && current.trim() === "") return false;
+  return JSON.stringify(current) !== JSON.stringify(defaultValue);
+}
+
 /** Strip obsolete Batak media keys from CMS overrides before save. */
 export function stripLockedMedia(overrides: SiteContentOverrides): SiteContentOverrides {
   if (!overrides.media) return overrides;

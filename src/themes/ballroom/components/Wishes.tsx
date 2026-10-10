@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { getSupabase, isSupabaseConfigured, type Wish } from "../../../lib/supabase";
+import { fetchPublicWishes, isSupabaseConfigured, type Wish } from "../../../lib/supabase-rest";
 import { submitForm } from "../../../lib/submit-form";
 import {
   WISH_MAX_MESSAGE,
@@ -17,6 +17,7 @@ type Props = {
 };
 
 const PAGE = 5;
+const POLL_MS = 30_000;
 
 function relativeTime(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
@@ -60,6 +61,7 @@ export function Wishes({ guestId, guestName, onToast }: Props) {
   const gb = content.guestbook;
   const guestKey = guestId;
   const formOpenedAt = useRef(Date.now());
+  const sectionRef = useRef<HTMLElement>(null);
   const [items, setItems] = useState<Wish[]>([]);
   const [page, setPage] = useState(0);
   const [message, setMessage] = useState("");
@@ -67,6 +69,7 @@ export function Wishes({ guestId, guestName, onToast }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [supabaseOk, setSupabaseOk] = useState(isSupabaseConfigured);
   const [sentCount, setSentCount] = useState(() => getWishCount(guestKey));
+  const [inView, setInView] = useState(false);
 
   useEffect(() => {
     setSentCount(getWishCount(guestKey));
@@ -78,32 +81,46 @@ export function Wishes({ guestId, guestName, onToast }: Props) {
       setSupabaseOk(false);
       return;
     }
-    const supabase = getSupabase();
-    if (!supabase) {
-      setSupabaseOk(false);
-      return;
-    }
-    void supabase
-      .from("wishes")
-      .select("id, guest_id, name, message, attendance, created_at")
-      .eq("hidden", false)
-      .order("created_at", { ascending: false })
-      .limit(50)
-      .then(({ data, error }) => {
-        if (error) {
-          setSupabaseOk(false);
-          return;
-        }
-        setSupabaseOk(true);
-        if (data) setItems(data as Wish[]);
-      });
+    void fetchPublicWishes().then(({ data, error }) => {
+      if (error) {
+        setSupabaseOk(false);
+        return;
+      }
+      setSupabaseOk(true);
+      if (data) setItems(data);
+    });
   };
 
   useEffect(() => {
     fetchWishes();
-    const id = window.setInterval(fetchWishes, 30_000);
-    return () => window.clearInterval(id);
   }, []);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(entry?.isIntersecting ?? false),
+      { root: null, threshold: 0.15 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!inView || document.visibilityState !== "visible") return;
+    const id = window.setInterval(fetchWishes, POLL_MS);
+    return () => window.clearInterval(id);
+  }, [inView]);
+
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.visibilityState === "visible" && inView) {
+        fetchWishes();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
+  }, [inView]);
 
   const pages = Math.max(1, Math.ceil(items.length / PAGE));
   const slice = items.slice(page * PAGE, page * PAGE + PAGE);
@@ -166,7 +183,12 @@ export function Wishes({ guestId, guestName, onToast }: Props) {
   };
 
   return (
-    <section id="wishes" className="section wishes-mod fade-up" aria-label={gb.title}>
+    <section
+      ref={sectionRef}
+      id="wishes"
+      className="section wishes-mod fade-up"
+      aria-label={gb.title}
+    >
       <div className="section__head">
         <p className="eyebrow">Ucapan</p>
         <h3>{gb.title}</h3>

@@ -1,7 +1,53 @@
-@import "@fontsource/cinzel/400.css";
-@import "@fontsource/cinzel/600.css";
-@import "@fontsource/open-sans/400.css";
-@import "@fontsource/open-sans/500.css";
+@import "@fontsource/cinzel/latin-400.css";
+@import "@fontsource/cinzel/latin-600.css";
+@import "@fontsource/cinzel/latin-ext-400.css";
+@import "@fontsource/cinzel/latin-ext-600.css";
+@import "@fontsource/open-sans/latin-400.css";
+@import "@fontsource/open-sans/latin-500.css";
+@import "@fontsource/open-sans/latin-ext-400.css";
+@import "@fontsource/open-sans/latin-ext-500.css";
+
+.admin-checklist {
+  grid-column: 1 / -1;
+  padding: 1rem 1.1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(201, 164, 108, 0.35);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.admin-checklist__title {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+}
+
+.admin-checklist__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.admin-checklist__list li {
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-start;
+  font-size: 0.88rem;
+}
+
+.admin-checklist__list li.is-ok {
+  color: #86efac;
+}
+
+.admin-checklist__list li.is-pending {
+  color: rgba(245, 230, 200, 0.85);
+}
+
+.admin-checklist__list small {
+  display: block;
+  opacity: 0.75;
+  margin-top: 0.15rem;
+}
 
 @layer base {
   * {

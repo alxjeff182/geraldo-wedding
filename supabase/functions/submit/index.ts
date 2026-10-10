@@ -1,125 +1,32 @@
 import { serve } from "https://deno.land/std@0.208.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import {
+  MAX_NAME,
+  MAX_WISH_MESSAGE,
+  isAllowedOrigin,
+  isSpammyMessage,
+  isSpammyName,
+  isUuid,
+  isValidFormTiming,
+  normalizeName,
+  sanitizeString,
+} from "./validate.ts";
 
 const corsHeaders = (origin: string | null, allowedOrigin: string | null) => ({
   "Access-Control-Allow-Origin": allowedOrigin && origin ? origin : allowedOrigin ?? "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 });
 
-const MAX_NAME = 200;
-const MAX_WISH_MESSAGE = 500;
 const MAX_RSVP_PER_HOUR = 5;
 const MAX_WISH_PER_HOUR = 10;
 const MAX_WISH_PER_GUEST = 3;
 const MIN_RSVP_INTERVAL_MS = 30_000;
 const MIN_WISH_GUEST_INTERVAL_MS = 60_000;
-const MIN_FORM_MS = 3_000;
-const MAX_FORM_AGE_MS = 24 * 60 * 60 * 1000;
-
-const BAD_WORDS = [
-  "anjing",
-  "bangsat",
-  "bajingan",
-  "kontol",
-  "memek",
-  "ngentot",
-  "asu",
-  "fuck",
-  "shit",
-  "bitch",
-  "asshole",
-];
-
-function isUuid(value: unknown): value is string {
-  return (
-    typeof value === "string" &&
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
-  );
-}
-
-function sanitizeString(value: unknown, max: number): string | null {
-  if (typeof value !== "string") return null;
-  const trimmed = value.trim();
-  if (!trimmed || trimmed.length > max) return null;
-  return trimmed;
-}
-
-function normalizeName(name: string): string {
-  return name.trim().toLowerCase().replace(/\s+/g, " ");
-}
-
-function isSpammyName(name: string): boolean {
-  const trimmed = name.trim();
-  const lowered = trimmed.toLowerCase();
-  if (/https?:\/\/|www\.|\.[a-z]{2,}\//i.test(lowered)) return true;
-  if (/(.)\1{5,}/.test(trimmed)) return true;
-  if ((trimmed.match(/[a-zA-Z]/g) ?? []).length < 2) return true;
-  return false;
-}
-
-function normalizeWishText(value: string): string {
-  return value
-    .toLowerCase()
-    .replace(/[4@]/g, "a")
-    .replace(/[1!|]/g, "i")
-    .replace(/[3]/g, "e")
-    .replace(/[0]/g, "o")
-    .replace(/[5$]/g, "s")
-    .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function isSpammyMessage(message: string): string | null {
-  const trimmed = message.trim();
-  if (!trimmed) return "Data ucapan tidak valid";
-  if (trimmed.length > MAX_WISH_MESSAGE) {
-    return "Ucapan terlalu panjang (maks. 500 karakter).";
-  }
-
-  const letters = (trimmed.match(/[a-zA-Z\u00C0-\u024F]/g) ?? []).length;
-  if (letters < 3) return "Ucapan terlalu pendek.";
-
-  if (/https?:\/\/|www\.|[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i.test(trimmed)) {
-    return "Ucapan berisi tautan atau nomor tidak diperbolehkan.";
-  }
-  if (/\d[\d\s().-]{7,}\d/.test(trimmed) || (trimmed.match(/\d/g) ?? []).length >= 9) {
-    return "Ucapan berisi tautan atau nomor tidak diperbolehkan.";
-  }
-  if (/(.)\1{5,}/.test(trimmed)) return "Ucapan tidak valid.";
-
-  const normalized = normalizeWishText(trimmed);
-  if (BAD_WORDS.some((word) => new RegExp(`(?:^|\\s)${word}(?:$|\\s)`).test(normalized))) {
-    return "Ucapan mengandung kata yang tidak pantas.";
-  }
-
-  return null;
-}
-
-function isValidFormTiming(formOpenedAt: unknown): boolean {
-  if (typeof formOpenedAt !== "number" || !Number.isFinite(formOpenedAt)) return false;
-  const age = Date.now() - formOpenedAt;
-  if (formOpenedAt > Date.now() + 1_000) return false;
-  return age >= MIN_FORM_MS && age <= MAX_FORM_AGE_MS;
-}
 
 function fakeOk(headers: Record<string, string>) {
   return new Response(JSON.stringify({ ok: true }), {
     headers: { ...headers, "Content-Type": "application/json" },
   });
-}
-
-function isAllowedOrigin(req: Request, allowedOrigin: string | null): boolean {
-  if (!allowedOrigin) return true;
-
-  const normalizedAllowed = allowedOrigin.replace(/\/$/, "");
-  const origin = req.headers.get("Origin");
-  const referer = req.headers.get("Referer");
-
-  if (origin) return origin === normalizedAllowed || origin.startsWith(`${normalizedAllowed}/`);
-  if (referer) return referer.startsWith(normalizedAllowed);
-
-  return false;
 }
 
 async function cleanupRateLimits(supabase: ReturnType<typeof createClient>) {
@@ -199,7 +106,13 @@ serve(async (req) => {
     return new Response("ok", { headers });
   }
 
-  if (!isAllowedOrigin(req, allowedOrigin)) {
+  if (
+    !isAllowedOrigin(
+      requestOrigin,
+      req.headers.get("Referer"),
+      allowedOrigin,
+    )
+  ) {
     return new Response(JSON.stringify({ error: "Origin tidak diizinkan" }), {
       status: 403,
       headers: { ...headers, "Content-Type": "application/json" },
@@ -321,7 +234,9 @@ serve(async (req) => {
       if (!guestId) {
         return new Response(
           JSON.stringify({ error: "Buka undangan dari link pribadi Anda untuk mengirim ucapan." }),
-          { status: 403, headers: { ...headers, "Content-Type": "application/json" } },
+          { status: 403,
+            headers: { ...headers, "Content-Type": "application/json" },
+          },
         );
       }
 

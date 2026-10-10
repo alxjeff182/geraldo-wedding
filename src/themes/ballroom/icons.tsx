@@ -122,3 +122,14 @@ export function IconMusic({ size = 20 }: IconProps) {
     </svg>
   );
 }
+
+export function IconMusicOff({ size = 20 }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M9 18V6l10-2v12" />
+      <circle cx="7" cy="18" r="2.5" />
+      <circle cx="17" cy="16" r="2.5" />
+      <path d="m3 3 18 18" />
+    </svg>
+  );
+}

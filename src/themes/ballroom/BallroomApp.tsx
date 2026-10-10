@@ -17,6 +17,7 @@ import { IntroSection } from "./components/IntroSection";
 import { HashtagSection } from "./components/HashtagSection";
 import { Wishes } from "./components/Wishes";
 import { FloatDock } from "./components/FloatDock";
+import { IconMusic, IconMusicOff } from "./icons";
 import { RsvpSheet } from "./sheets/RsvpSheet";
 import { LocationSheet } from "./sheets/LocationSheet";
 import { GiftSheet } from "./sheets/GiftSheet";
@@ -121,10 +122,11 @@ export function BallroomApp({ guestName, guestId }: Props) {
           <button
             type="button"
             className={`audio-fab${playing ? " is-playing" : ""}`}
-            aria-label={playing ? "Matikan musik" : "Putar musik"}
+            aria-label={playing ? content.music.muteLabel : content.music.playLabel}
+            aria-pressed={playing}
             onClick={toggle}
           >
-            {playing ? "♪" : "🔇"}
+            {playing ? <IconMusic /> : <IconMusicOff />}
           </button>
         ) : null}
 
@@ -146,6 +148,7 @@ export function BallroomApp({ guestName, guestId }: Props) {
           active={opening}
           src={content.media.openingVideo}
           poster={content.media.coverBg}
+          skipLabel={content.opening.skipLabel}
           onReveal={onReveal}
         />
 

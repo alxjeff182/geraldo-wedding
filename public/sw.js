@@ -1,8 +1,11 @@
-const CACHE_NAME = "geraldo-wedding-v1";
+const CACHE_NAME = "geraldo-wedding-__CACHE_VERSION__";
 
-function isCacheFirst(url) {
-  if (url.pathname.startsWith("/assets/ballroom/")) return true;
-  return /\.(woff2?|ttf|otf)$/i.test(url.pathname);
+function isHashedAsset(pathname) {
+  return /^\/assets\/[^/]+-[A-Za-z0-9_-]{8,}\.(js|css|woff2?)$/i.test(pathname);
+}
+
+function isBallroomAsset(pathname) {
+  return pathname.startsWith("/assets/ballroom/");
 }
 
 function isHtmlRequest(request) {
@@ -20,6 +23,21 @@ async function cacheFirst(request) {
     cache.put(request, response.clone());
   }
   return response;
+}
+
+async function staleWhileRevalidate(request) {
+  const cache = await caches.open(CACHE_NAME);
+  const cached = await cache.match(request);
+  const network = fetch(request)
+    .then((response) => {
+      if (response.ok) {
+        cache.put(request, response.clone());
+      }
+      return response;
+    })
+    .catch(() => cached);
+
+  return cached ?? network;
 }
 
 async function networkFirst(request) {
@@ -54,8 +72,13 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
 
-  if (isCacheFirst(url)) {
+  if (isHashedAsset(url.pathname)) {
     event.respondWith(cacheFirst(event.request));
+    return;
+  }
+
+  if (isBallroomAsset(url.pathname)) {
+    event.respondWith(staleWhileRevalidate(event.request));
     return;
   }
 

@@ -20,7 +20,7 @@ Open [http://localhost:5173](http://localhost:5173)
 - Canonical: `?guest=jeffry-istri`
 - Legacy (auto-normalized): `?to=Jeffry+%26+Istri`
 
-Link personal membuka form ucapan. Kalau slug belum ada di admin, sistem bisa auto-daftar via `ensure_guest_by_slug` (migration `011`).
+Link personal membuka RSVP & ucapan. Setelah migration **`012_strict_guests`**, slug **harus sudah ada** di daftar tamu admin (tidak ada auto-create dari link publik).
 
 ## Supabase Setup
 
@@ -31,7 +31,8 @@ Link personal membuka form ucapan. Kalau slug belum ada di admin, sistem bisa au
    - `008_guest_invite_sent.sql` — WA invite sent tracking
    - `009_reset_gw5_copy.sql` — optional CMS copy reset (review before prod)
    - `010_wishes_moderation.sql` — wishes `hidden` + admin moderation RLS
-   - `011_ensure_guest.sql` — `ensure_guest_by_slug` for personal invite links
+   - `011_ensure_guest.sql` — `ensure_guest_by_slug` (ops/service role)
+   - `012_strict_guests.sql` — revoke `ensure_guest_by_slug` for anon/auth (strict invites)
 3. Deploy edge function (**redeploy after wish/RSVP logic changes**):
    ```bash
    npx supabase functions deploy submit
@@ -79,12 +80,18 @@ Fallback defaults live in `src/config/wedding.config.ts`:
 
 ## Build & Deploy
 
+Requires **Node 22+**. Production build needs `VITE_SITE_URL` (real URL, not placeholder).
+
 ```bash
 npm run build
 npm run preview
 ```
 
-Deploy to Vercel:
+**Default:** push to `main` → CI (`.github/workflows/ci.yml`) → deploy workflow (`.github/workflows/deploy.yml`) → Vercel prebuilt + Supabase. Vercel Git deploy for `main` is disabled in `vercel.json`.
+
+GitHub secrets for deploy: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, `VITE_SITE_URL`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.
+
+Emergency manual deploy:
 ```bash
 npx vercel deploy --prod --yes
 npx vercel alias set <deployment-url> geraldo-christin.vercel.app
@@ -97,7 +104,7 @@ npx vercel project protection disable geraldo-wedding --sso
 
 ### Pre-deploy checklist
 
-- [ ] Run migrations `001` through `011` (`npm run db:apply` + SQL Editor; `npm run db:verify`)
+- [ ] Run migrations `001` through `012` (`npm run db:apply` + SQL Editor; `npm run db:verify` incl. anon blocked on `ensure_guest_by_slug`)
 - [ ] Redeploy `submit` edge function + set `ALLOWED_ORIGIN` secret
 - [ ] Set `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_SITE_URL` in Vercel
 - [ ] Create admin user + verify email in `admin_allowlist`
@@ -114,7 +121,7 @@ npm run test        # Vitest unit tests
 npm run test:e2e    # Playwright e2e
 ```
 
-CI runs lint → unit tests → build → Playwright on push/PR (`.github/workflows/ci.yml`).
+CI runs lint → unit tests → coverage → build → Playwright (desktop + mobile) → Lighthouse on push/PR (`.github/workflows/ci.yml`).
 
 ## Troubleshooting
 
@@ -133,7 +140,8 @@ CI runs lint → unit tests → build → Playwright on push/PR (`.github/workfl
 - RSVP and guestbook submit via edge function `submit` (honeypot + rate limiting + origin check)
 - Direct public inserts to `rsvp_submissions` / `wishes` are disabled after migration `003`
 - Admin CMS, guests, RSVP admin, and media writes require `admin_allowlist` + `is_admin()` (migration `006`)
-- Guest lookup uses RPC `get_guest_by_slug`; personal links may call `ensure_guest_by_slug` (`011`)
+- Guest lookup uses RPC `get_guest_by_slug`; `ensure_guest_by_slug` is **not** callable by anon after `012`
+- Guest-facing reads/submit use `src/lib/supabase-rest.ts` (fetch); admin keeps `@supabase/supabase-js`
 - Wishes require a personal invite key; public list hides `hidden=true` rows (`010`)
 - Never commit `.env.local` or service role keys
 - Only `VITE_SUPABASE_ANON_KEY` belongs in the frontend
@@ -155,7 +163,7 @@ src/
   hooks/                        # useGuestName, useCountdown, useAudio, usePageMeta
   lib/                          # supabase, submit-form, merge-content, storage
 public/assets/                  # Default images, audio, video
-supabase/migrations/            # Database schema + RLS (001–011)
+supabase/migrations/            # Database schema + RLS (001–012)
 supabase/functions/submit/      # Secure form submission edge function
 e2e/                            # Playwright tests
 ```
@@ -170,8 +178,11 @@ e2e/                            # Playwright tests
 | `npm run test` | Vitest unit tests |
 | `npm run test:e2e` | Playwright e2e tests |
 | `npm run seed:guests` | Import guest CSV to Supabase |
-| `npm run db:verify` | Verify migrations 004–011 on production (needs service role key) |
-| `npm run db:apply` | Print combined SQL for migrations 004–011 |
+| `npm run db:verify` | Verify migrations 004–012 (service role; anon check for 012) |
+| `npm run db:apply` | Print combined SQL for pending migrations |
+| `npm run icons:generate` | PWA icons from logo (sharp) |
+| `npm run test:coverage` | Vitest with V8 coverage |
+| `npm run format:check` | Prettier check |
 
 ## Legacy Assets
 

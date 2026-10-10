@@ -175,8 +175,10 @@ export function GuestInvitePanel({
     setPage(1);
   }, [search, pageSize]);
 
-  const getGuestTemplateId = (guestId: string) =>
-    templateByGuest[guestId] ?? invite.defaultTemplateId;
+  const getGuestTemplateId = useCallback(
+    (guestId: string) => templateByGuest[guestId] ?? invite.defaultTemplateId,
+    [templateByGuest, invite.defaultTemplateId],
+  );
 
   const buildMessage = (
     guest: Pick<Guest, "display_name" | "slug">,
@@ -238,8 +240,7 @@ export function GuestInvitePanel({
     sortKey,
     sortDir,
     templates,
-    templateByGuest,
-    invite.defaultTemplateId,
+    getGuestTemplateId,
   ]);
 
   const totalPages = Math.max(1, Math.ceil(filteredGuests.length / pageSize));

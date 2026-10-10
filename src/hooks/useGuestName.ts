@@ -1,11 +1,6 @@
 import { useEffect, useState } from "react";
 import { resolveInviteSlug } from "../lib/invite-links";
 
-function firstRow<T>(data: T | T[] | null | undefined): T | null {
-  if (!data) return null;
-  return Array.isArray(data) ? (data[0] ?? null) : data;
-}
-
 export function useGuestName() {
   const [guestName, setGuestName] = useState("Tamu Undangan");
   const [guestId, setGuestId] = useState<string | null>(null);
@@ -24,23 +19,14 @@ export function useGuestName() {
     setInviteSlug(slug);
 
     void (async () => {
-      const { getSupabase, isSupabaseConfigured } = await import("../lib/supabase");
+      const { getGuestBySlug, isSupabaseConfigured } = await import("../lib/supabase-rest");
 
       if (!isSupabaseConfigured) {
         setLoading(false);
         return;
       }
 
-      const supabase = getSupabase();
-      if (!supabase) {
-        setLoading(false);
-        return;
-      }
-
-      const { data: found } = await supabase.rpc("get_guest_by_slug", {
-        guest_slug: slug,
-      });
-      const row = firstRow(found);
+      const row = await getGuestBySlug(slug);
 
       if (row?.id) {
         setGuestName(row.display_name || "Tamu Undangan");

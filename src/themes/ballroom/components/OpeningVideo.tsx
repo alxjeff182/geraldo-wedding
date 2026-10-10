@@ -4,12 +4,13 @@ type Props = {
   active: boolean;
   src: string;
   poster: string;
+  skipLabel?: string;
   onReveal: () => void;
 };
 
 const REVEAL_BEFORE_END = 0.85;
 
-export function OpeningVideo({ active, src, poster, onReveal }: Props) {
+export function OpeningVideo({ active, src, poster, skipLabel = "Lewati", onReveal }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const revealedRef = useRef(false);
 
@@ -70,8 +71,8 @@ export function OpeningVideo({ active, src, poster, onReveal }: Props) {
       </video>
       <div className="opening__vignette" aria-hidden="true" />
       <div className="opening__skip-wrap">
-        <button type="button" className="opening__skip" onClick={() => reveal()}>
-          Lewati
+        <button type="button" className="opening__skip opening__skip--visible" onClick={() => reveal()}>
+          {skipLabel}
         </button>
       </div>
     </div>

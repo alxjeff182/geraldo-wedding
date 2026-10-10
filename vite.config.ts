@@ -1,8 +1,11 @@
+import { createHash } from "node:crypto";
+import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { resolve } from "node:path";
 import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-import { writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+
+const PLACEHOLDER_SITE = "https://your-domain.com";
 
 function htmlMetaPlugin(siteUrl: string): Plugin {
   const base = siteUrl.replace(/\/$/, "");
@@ -10,9 +13,24 @@ function htmlMetaPlugin(siteUrl: string): Plugin {
   return {
     name: "html-meta",
     transformIndexHtml(html) {
-      return html
+      let out = html
         .replace(/content="\/assets/g, `content="${base}/assets`)
-        .replace(/"image": "\/assets/g, `"image": "${base}/assets`);
+        .replace(/"image": "\/assets/g, `"image": "${base}/assets`)
+        .replace(/property="og:url" content="[^"]*"/, `property="og:url" content="${base}/"`);
+
+      if (!out.includes('rel="canonical"')) {
+        out = out.replace(
+          "</head>",
+          `    <link rel="canonical" href="${base}/" />\n  </head>`,
+        );
+      } else {
+        out = out.replace(
+          /<link rel="canonical" href="[^"]*"\s*\/>/,
+          `<link rel="canonical" href="${base}/" />`,
+        );
+      }
+
+      return out;
     },
   };
 }
@@ -37,12 +55,46 @@ function sitemapPlugin(siteUrl: string): Plugin {
   };
 }
 
+function serviceWorkerCacheVersionPlugin(version: string): Plugin {
+  return {
+    name: "sw-cache-version",
+    closeBundle() {
+      const swPath = resolve("dist", "sw.js");
+      if (!existsSync(swPath)) return;
+      const raw = readFileSync(swPath, "utf8");
+      writeFileSync(swPath, raw.replace(/__CACHE_VERSION__/g, version));
+    },
+  };
+}
+
+function resolveSiteUrl(mode: string, env: Record<string, string>): string {
+  const siteUrl = env.VITE_SITE_URL?.trim();
+  if (mode === "production") {
+    if (!siteUrl || siteUrl === PLACEHOLDER_SITE) {
+      throw new Error(
+        "VITE_SITE_URL must be set to your production URL for production builds (not https://your-domain.com).",
+      );
+    }
+    return siteUrl;
+  }
+  return siteUrl || "http://localhost:5173";
+}
+
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  const siteUrl = env.VITE_SITE_URL || "https://your-domain.com";
+  const siteUrl = resolveSiteUrl(mode, env);
+  const cacheVersion =
+    process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 12) ??
+    createHash("sha256").update(`${siteUrl}-${Date.now()}`).digest("hex").slice(0, 12);
 
   return {
-    plugins: [react(), tailwindcss(), htmlMetaPlugin(siteUrl), sitemapPlugin(siteUrl)],
+    plugins: [
+      react(),
+      tailwindcss(),
+      htmlMetaPlugin(siteUrl),
+      sitemapPlugin(siteUrl),
+      serviceWorkerCacheVersionPlugin(cacheVersion),
+    ],
     build: {
       rollupOptions: {
         output: {

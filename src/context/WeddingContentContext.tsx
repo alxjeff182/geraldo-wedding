@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { wedding, type WeddingConfig } from "../config/wedding.config";
 import { mergeWeddingContent } from "../lib/merge-content";
-import { getSupabase, isSupabaseConfigured } from "../lib/supabase";
+import { fetchSiteContentMain, isSupabaseConfigured } from "../lib/supabase-rest";
 import type { SiteContentOverrides } from "../types/site-content";
 
 type WeddingContentContextValue = {
@@ -33,28 +33,17 @@ export function WeddingContentProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    const supabase = getSupabase();
-    if (!supabase) {
-      setLoading(false);
-      setLoadError("Supabase belum dikonfigurasi.");
-      return;
-    }
-
     setLoading(true);
-    const { data, error } = await supabase
-      .from("site_content")
-      .select("content")
-      .eq("id", "main")
-      .maybeSingle();
+    const { content: cmsContent, error } = await fetchSiteContentMain();
 
     if (error) {
-      setLoadError(error.message || "Gagal memuat konten undangan.");
+      setLoadError(error);
       setLoading(false);
       return;
     }
 
-    if (data?.content && typeof data.content === "object") {
-      setOverrides(data.content as SiteContentOverrides);
+    if (cmsContent) {
+      setOverrides(cmsContent);
       setCmsLoaded(true);
     }
     setLoading(false);
@@ -82,6 +71,7 @@ export function WeddingContentProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- hook colocated with provider
 export function useWeddingContent() {
   return useContext(WeddingContentContext);
 }

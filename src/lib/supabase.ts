@@ -114,15 +114,20 @@ export type WeddingDatabase = {
   };
 };
 
+import { isSupabaseConfigured as restConfigured } from "./supabase-rest";
+
+export { isSupabaseConfigured } from "./supabase-rest";
+
 const url = import.meta.env.VITE_SUPABASE_URL;
 const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const isSupabaseConfigured = Boolean(url && anonKey);
+const configured = restConfigured;
 
 let client: SupabaseClient<WeddingDatabase> | null = null;
 
+/** Supabase JS client — use in `/admin` and moderation only; guest reads use `supabase-rest`. */
 export function getSupabase(): SupabaseClient<WeddingDatabase> | null {
-  if (!isSupabaseConfigured) return null;
+  if (!configured) return null;
   if (!client) {
     client = createClient<WeddingDatabase>(url!, anonKey!);
   }

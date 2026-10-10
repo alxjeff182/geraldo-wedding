@@ -168,6 +168,17 @@ export const wedding = {
     title: "Share Your Moments",
     tag: "#GeraldoChristin2026",
     photo: "/assets/ballroom/og-image.jpg",
+    copySuccess: "Hashtag disalin",
+    instagramButton: "Lihat di Instagram",
+  },
+
+  music: {
+    playLabel: "Putar musik",
+    muteLabel: "Matikan musik",
+  },
+
+  opening: {
+    skipLabel: "Lewati",
   },
 
   closing: {
@@ -302,6 +313,7 @@ export const wedding = {
     sheetCalendarButton: "Kalender",
     calendarIcsButton: "Unduh .ics",
     calendarFabLabel: "Tambah ke Kalender",
+    calendarSaveAll: "Simpan ke Kalender",
   },
 
   giftUi: {

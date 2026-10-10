@@ -113,13 +113,27 @@ export function CoupleStory({
       setDeep(isDeep);
     };
 
-    const onCardClick = (e: Event) => {
-      const card = e.currentTarget as HTMLElement;
+    const flipCard = (card: HTMLElement) => {
       if (!card.classList.contains("is-active")) return;
       card.classList.toggle("is-flipped");
     };
 
-    cards.forEach((card) => card.addEventListener("click", onCardClick));
+    const onCardClick = (e: Event) => {
+      flipCard(e.currentTarget as HTMLElement);
+    };
+
+    const onCardKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      flipCard(e.currentTarget as HTMLElement);
+    };
+
+    cards.forEach((card) => {
+      card.addEventListener("click", onCardClick);
+      card.addEventListener("keydown", onCardKeyDown);
+      card.setAttribute("tabindex", "0");
+      card.setAttribute("role", "button");
+    });
 
     const onScroll = () => {
       if (storyTicking) return;
@@ -136,7 +150,10 @@ export function CoupleStory({
 
     return () => {
       invitation.removeEventListener("scroll", onScroll);
-      cards.forEach((card) => card.removeEventListener("click", onCardClick));
+      cards.forEach((card) => {
+        card.removeEventListener("click", onCardClick);
+        card.removeEventListener("keydown", onCardKeyDown);
+      });
     };
   }, [scrollRootRef, enabled, people.length]);
 
@@ -182,7 +199,7 @@ export function CoupleStory({
         <div className="couple-story__scene">
           <div className="couple-story__carousel">
             {people.map((person, i) => (
-              <article
+              <div
                 key={person.name}
                 ref={(el) => {
                   cardsRef.current[i] = el;
@@ -222,7 +239,7 @@ export function CoupleStory({
                     <p className="couple-card__tap">Ketuk untuk kembali</p>
                   </div>
                 </div>
-              </article>
+              </div>
             ))}
           </div>
         </div>

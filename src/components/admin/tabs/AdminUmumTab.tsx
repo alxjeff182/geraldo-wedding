@@ -1,9 +1,11 @@
 import { AdminTextField } from "../AdminFields";
+import { SiapKirimChecklist } from "../SiapKirimChecklist";
 import type { AdminTabProps } from "../types";
 
 export function AdminUmumTab({ merged, updateDraft }: AdminTabProps) {
   return (
     <div className="admin-form-grid">
+      <SiapKirimChecklist merged={merged} />
       <label className="admin-field">
         <span className="admin-label">Judul Situs</span>
         <input

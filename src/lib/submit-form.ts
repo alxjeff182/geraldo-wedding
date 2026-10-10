@@ -1,4 +1,4 @@
-import { getSupabase, isSupabaseConfigured } from "./supabase";
+import { invokeSubmitFunction, isSupabaseConfigured } from "./supabase-rest";
 import type { RsvpInsert, WishInsert } from "./supabase";
 import type { GuestbookContent, RsvpContent } from "../types/site-content";
 
@@ -75,17 +75,13 @@ export async function submitForm(input: SubmitFormInput): Promise<SubmitResult> 
     };
   }
 
-  const supabase = getSupabase();
-  if (!supabase) {
-    return { ok: false, error: messages.supabaseError ?? "Supabase tidak tersedia" };
-  }
-
-  const { data, error } = await supabase.functions.invoke("submit", {
-    body: input,
-  });
+  const { data, error } = await invokeSubmitFunction(input);
 
   if (error) {
-    return { ok: false, error: messages.networkError ?? "Gagal mengirim. Silakan coba lagi." };
+    return {
+      ok: false,
+      error: messages.networkError ?? error ?? "Gagal mengirim. Silakan coba lagi.",
+    };
   }
 
   if (data && typeof data === "object" && "error" in data && data.error) {

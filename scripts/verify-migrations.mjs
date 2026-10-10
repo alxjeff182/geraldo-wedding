@@ -2,6 +2,7 @@
 /**
  * Verify production Supabase migrations 004–012.
  * Requires: SUPABASE_URL (or VITE_SUPABASE_URL), SUPABASE_SERVICE_ROLE_KEY
+ * Optional: VITE_SUPABASE_ANON_KEY — verifies anon cannot execute ensure_guest_by_slug (012)
  */
 import { readFileSync, existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
@@ -25,6 +26,7 @@ if (existsSync(envPath)) {
 
 const url = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL;
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const anonKey = process.env.VITE_SUPABASE_ANON_KEY ?? process.env.SUPABASE_ANON_KEY;
 
 if (!url || !key) {
   console.error("Set SUPABASE_URL (or VITE_SUPABASE_URL in .env.local) and SUPABASE_SERVICE_ROLE_KEY");
@@ -88,7 +90,7 @@ const checks = [
     },
   },
   {
-    name: "011 ensure_guest_by_slug() RPC",
+    name: "011 ensure_guest_by_slug() RPC (service role)",
     run: async () => {
       const { error } = await supabase.rpc("ensure_guest_by_slug", {
         guest_slug: "__verify_probe__",
@@ -100,25 +102,30 @@ const checks = [
     },
   },
   {
-    name: "012 ensure_guest_by_slug still exists (revoke anon/auth applied in SQL Editor)",
+    name: "012 anon cannot execute ensure_guest_by_slug",
+    skip: !anonKey,
     run: async () => {
-      // Service role can still execute; this only verifies the function remains after 012.
-      const { error } = await supabase.rpc("ensure_guest_by_slug", {
-        guest_slug: "__verify_probe_012__",
-        guest_name: "Verify Probe 012",
+      const anon = createClient(url, anonKey);
+      const { error } = await anon.rpc("ensure_guest_by_slug", {
+        guest_slug: "__verify_anon_blocked__",
+        guest_name: "Should Fail",
       });
-      if (error) return false;
-      await supabase.from("guests").delete().eq("slug", "__verify_probe_012__");
-      return true;
+      return Boolean(error);
     },
   },
 ];
 
 let failed = 0;
+let skipped = 0;
 
 console.log(`Checking Supabase at ${url}\n`);
 
 for (const check of checks) {
+  if (check.skip) {
+    console.log(`− skipped ${check.name} (no anon key)`);
+    skipped += 1;
+    continue;
+  }
   const ok = await check.run();
   console.log(`${ok ? "✓" : "✗"} ${check.name}`);
   if (!ok) failed += 1;
@@ -130,4 +137,4 @@ if (failed > 0) {
   process.exit(1);
 }
 
-console.log("\nAll migration checks passed.");
+console.log(`\nAll migration checks passed.${skipped ? ` (${skipped} skipped)` : ""}`);

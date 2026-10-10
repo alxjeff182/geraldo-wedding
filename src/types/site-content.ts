@@ -149,6 +149,7 @@ export type SiteContentOverrides = {
     sheetCalendarButton?: string;
     calendarIcsButton?: string;
     calendarFabLabel?: string;
+    calendarSaveAll?: string;
   };
   story?: {
     enabled?: boolean;
@@ -193,6 +194,15 @@ export type SiteContentOverrides = {
     title?: string;
     tag?: string;
     photo?: string;
+    copySuccess?: string;
+    instagramButton?: string;
+  };
+  music?: {
+    playLabel?: string;
+    muteLabel?: string;
+  };
+  opening?: {
+    skipLabel?: string;
   };
   closing?: {
     paragraphs?: string[];

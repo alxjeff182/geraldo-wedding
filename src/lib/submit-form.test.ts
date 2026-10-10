@@ -3,11 +3,9 @@ import { submitForm } from "./submit-form";
 
 const invokeMock = vi.fn();
 
-vi.mock("./supabase", () => ({
+vi.mock("./supabase-rest", () => ({
   isSupabaseConfigured: true,
-  getSupabase: () => ({
-    functions: { invoke: invokeMock },
-  }),
+  invokeSubmitFunction: (...args: unknown[]) => invokeMock(...args),
 }));
 
 describe("submitForm", () => {
@@ -27,15 +25,15 @@ describe("submitForm", () => {
     });
 
     expect(result.ok).toBe(true);
-    expect(invokeMock).toHaveBeenCalledWith("submit", {
-      body: expect.objectContaining({
+    expect(invokeMock).toHaveBeenCalledWith(
+      expect.objectContaining({
         type: "rsvp",
         payload: expect.objectContaining({
           name: "Budi",
           attendance: "hadir",
         }),
       }),
-    });
+    );
   });
 
   it("submits wish payload to edge function", async () => {
@@ -45,8 +43,8 @@ describe("submitForm", () => {
     });
 
     expect(result.ok).toBe(true);
-    expect(invokeMock).toHaveBeenCalledWith("submit", {
-      body: expect.objectContaining({ type: "wish" }),
-    });
+    expect(invokeMock).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "wish" }),
+    );
   });
 });

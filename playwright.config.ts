@@ -28,14 +28,26 @@ export default defineConfig({
     baseURL: "http://localhost:5173",
     trace: "on-first-retry",
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [
+    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    { name: "iphone-se", use: { ...devices["iPhone SE"] } },
+    { name: "pixel-7", use: { ...devices["Pixel 7"] } },
+  ],
   webServer: {
     command: "npm run dev",
     url: "http://localhost:5173",
-    reuseExistingServer: !process.env.CI,
-    env: {
-      ...process.env,
-      ...loadEnvLocal(),
-    },
+    reuseExistingServer: false,
+    env: (() => {
+      const local = loadEnvLocal();
+      const pick = (key: string, fallback: string) =>
+        local[key]?.trim() || process.env[key]?.trim() || fallback;
+      return {
+        ...process.env,
+        ...local,
+        VITE_SITE_URL: pick("VITE_SITE_URL", "http://localhost:5173"),
+        VITE_SUPABASE_URL: pick("VITE_SUPABASE_URL", "https://e2e-placeholder.supabase.co"),
+        VITE_SUPABASE_ANON_KEY: pick("VITE_SUPABASE_ANON_KEY", "e2e-placeholder-anon-key"),
+      };
+    })(),
   },
 });

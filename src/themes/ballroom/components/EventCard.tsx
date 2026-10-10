@@ -1,3 +1,4 @@
+import { useWeddingContent } from "../../../context/WeddingContentContext";
 import type { WeddingEvent } from "../../../config/wedding.config";
 import {
   buildIcsCalendar,
@@ -34,6 +35,8 @@ export function EventCard({
   calendarLabel,
   calendarIcsLabel = "Unduh .ics",
 }: Props) {
+  const { content } = useWeddingContent();
+  const saveAllLabel = content.eventsSection.calendarSaveAll;
   const first = events[0];
   const day = first ? new Date(first.startsAt).getDate() : "";
   const month = first
@@ -120,7 +123,7 @@ export function EventCard({
         <div className="event-card__divider" aria-hidden="true" />
         <div className="event-card__actions">
           <button type="button" className="event-card__btn" onClick={saveAll}>
-            Simpan ke Kalender
+            {saveAllLabel}
           </button>
           <button
             type="button"
