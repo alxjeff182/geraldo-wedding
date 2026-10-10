@@ -26,28 +26,38 @@ function loadEnvLocal(): Record<string, string> {
 const env = { ...process.env, ...loadEnvLocal() };
 const supabaseUrl = env.VITE_SUPABASE_URL;
 const anonKey = env.VITE_SUPABASE_ANON_KEY;
+const isLiveSupabase = Boolean(
+  supabaseUrl &&
+    anonKey &&
+    !/ci-mock|placeholder|example\.supabase|your-project/i.test(supabaseUrl) &&
+    !/ci-mock|placeholder/i.test(anonKey),
+);
 
 let submitFunctionDeployed = false;
 
 test.beforeAll(async ({ request }) => {
-  if (!supabaseUrl || !anonKey) return;
+  if (!isLiveSupabase || !supabaseUrl || !anonKey) return;
 
-  const response = await request.post(`${supabaseUrl}/functions/v1/submit`, {
-    headers: {
-      apikey: anonKey,
-      Authorization: `Bearer ${anonKey}`,
-      "Content-Type": "application/json",
-    },
-    data: {
-      type: "rsvp",
-      honeypot: "",
-      formOpenedAt: Date.now() - 5000,
-      payload: { name: "probe", guest_count: 1, attendance: "hadir" },
-    },
-    failOnStatusCode: false,
-  });
-
-  submitFunctionDeployed = response.status() !== 404;
+  try {
+    const response = await request.post(`${supabaseUrl}/functions/v1/submit`, {
+      headers: {
+        apikey: anonKey,
+        Authorization: `Bearer ${anonKey}`,
+        "Content-Type": "application/json",
+      },
+      data: {
+        type: "rsvp",
+        honeypot: "",
+        formOpenedAt: Date.now() - 5000,
+        payload: { name: "probe", guest_count: 1, attendance: "hadir" },
+      },
+      failOnStatusCode: false,
+      timeout: 8_000,
+    });
+    submitFunctionDeployed = response.status() !== 404;
+  } catch {
+    submitFunctionDeployed = false;
+  }
 });
 
 async function openInvitation(page: import("@playwright/test").Page) {
@@ -63,6 +73,7 @@ async function openInvitation(page: import("@playwright/test").Page) {
 }
 
 test("rsvp form submits to edge function", async ({ page }) => {
+  test.skip(!isLiveSupabase, "Live Supabase credentials required (skipped under CI mock URL)");
   test.skip(
     !submitFunctionDeployed,
     "Deploy edge function: npx supabase functions deploy submit --project-ref zuuwxxrpkbfmelyoibst",
@@ -98,6 +109,7 @@ test("rsvp form submits to edge function", async ({ page }) => {
 });
 
 test("guestbook form submits to edge function", async ({ page }) => {
+  test.skip(!isLiveSupabase, "Live Supabase credentials required (skipped under CI mock URL)");
   test.skip(
     !submitFunctionDeployed,
     "Deploy edge function: npx supabase functions deploy submit --project-ref zuuwxxrpkbfmelyoibst",
@@ -125,7 +137,21 @@ test("guestbook form submits to edge function", async ({ page }) => {
 });
 
 test("gift section shows bank details", async ({ page }) => {
-  await openInvitation(page);
+  const { mockSupabaseMinimal, mockSupabaseGuest } = await import("./helpers/supabase-mock");
+  await freezeBrowserTime(page, "2026-04-10T12:00:00+07:00");
+  await mockSupabaseMinimal(page);
+  await mockSupabaseGuest(page, "keluarga-tampubolon", {
+    id: "11111111-1111-4111-8111-111111111111",
+    display_name: "Keluarga Tampubolon",
+  });
+  await page.addInitScript(() => window.localStorage.clear());
+  await page.goto("/?guest=keluarga-tampubolon");
+  await page.getByRole("button", { name: /buka undangan/i }).click();
+  const skip = page.getByRole("button", { name: /lewati/i });
+  if (await skip.isVisible().catch(() => false)) {
+    await skip.click();
+  }
+  await expect(page.locator("#invitation")).toBeVisible({ timeout: 15000 });
 
   const gift = page.locator("#gift");
   await gift.scrollIntoViewIfNeeded();

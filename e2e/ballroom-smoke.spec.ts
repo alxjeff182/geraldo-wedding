@@ -11,8 +11,10 @@ test.describe("ballroom theme smoke", () => {
       display_name: "Keluarga Tampubolon",
     });
     await page.goto("/?guest=keluarga-tampubolon");
-    await expect(page.getByText("Kepada Yth.")).toBeVisible({ timeout: 20000 });
-    await expect(page.locator(".cover__guest-name")).toHaveText(/Keluarga Tampubolon/i);
+    await expect(page.locator(".cover__guest-name")).toHaveText(/Keluarga Tampubolon/i, {
+      timeout: 20000,
+    });
+    await expect(page.locator(".cover__guest-label")).toBeVisible();
 
     await page.getByRole("button", { name: /buka undangan/i }).click();
     const skip = page.getByRole("button", { name: /lewati/i });

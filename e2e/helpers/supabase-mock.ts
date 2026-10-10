@@ -5,7 +5,7 @@ export async function mockSupabaseGuest(
   slug: string,
   guest: { id: string; display_name: string },
 ) {
-  await page.route(/\/rest\/v1\/rpc\/get_guest_by_slug$/i, async (route) => {
+  await page.route(/get_guest_by_slug/i, async (route) => {
     if (route.request().method() !== "POST") {
       await route.continue();
       return;
