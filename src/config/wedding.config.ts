@@ -30,7 +30,7 @@ export const wedding = {
       name: "Jeffry Alexander",
       url: "https://jeff-interactive-resume.vercel.app/en",
       websiteUrl: "https://jeff-interactive-resume.vercel.app/en",
-      instagramUrl: "https://instagram.com/",
+      instagramUrl: "",
     },
   },
 
@@ -325,8 +325,9 @@ export const wedding = {
 
   footer: {
     creditPrefix: "© 2026 · Undangan Digital",
-    portfolioPrompt: "Kunjungi portfolio di bawah ini:",
-    websiteAriaLabel: "Kunjungi website",
+    portfolioPrompt: "",
+    portfolioLinkLabel: "Portfolio",
+    websiteAriaLabel: "Kunjungi portfolio pembuat undangan",
     instagramAriaLabel: "Kunjungi Instagram",
     ariaLabel: "Kredit pembuat undangan",
   },

@@ -282,34 +282,18 @@ export function BallroomApp({ guestName, guestId }: Props) {
             ))}
             <p className="footer__date">{dateFooter}</p>
             <div className="footer__credits">
-              <p className="footer__copy">
-                {content.footer.creditPrefix} {content.site.creator.name}
-              </p>
-              {content.footer.portfolioPrompt ? (
-                <p className="footer__prompt">{content.footer.portfolioPrompt}</p>
+              <p className="footer__copy">{content.footer.creditPrefix}</p>
+              {content.site.creator.websiteUrl || content.site.creator.url ? (
+                <a
+                  className="footer__porto"
+                  href={content.site.creator.websiteUrl || content.site.creator.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={content.footer.websiteAriaLabel}
+                >
+                  {content.footer.portfolioLinkLabel}
+                </a>
               ) : null}
-              <div className="footer__links">
-                {content.site.creator.websiteUrl || content.site.creator.url ? (
-                  <a
-                    href={content.site.creator.websiteUrl || content.site.creator.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={content.footer.websiteAriaLabel}
-                  >
-                    Web
-                  </a>
-                ) : null}
-                {content.site.creator.instagramUrl ? (
-                  <a
-                    href={content.site.creator.instagramUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={content.footer.instagramAriaLabel}
-                  >
-                    IG
-                  </a>
-                ) : null}
-              </div>
             </div>
           </footer>
         </main>

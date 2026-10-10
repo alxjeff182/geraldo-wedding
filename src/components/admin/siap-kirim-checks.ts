@@ -23,7 +23,8 @@ export function buildChecks(
   const qris = content.gift.qris ?? "";
   const audio = content.media.audio?.trim() ?? "";
   const storyText = (content.story.paragraphs ?? []).join(" ");
-  const creatorIg = content.site.creator.instagramUrl?.trim() ?? "";
+  const creatorSite =
+    content.site.creator.websiteUrl?.trim() || content.site.creator.url?.trim() || "";
   const deadlineOk = isRsvpDeadlineOk(content.rsvp.deadline, now);
 
   return [
@@ -53,9 +54,9 @@ export function buildChecks(
     },
     {
       id: "creator",
-      label: "Instagram pembuat",
-      ok: Boolean(creatorIg) && creatorIg !== "https://instagram.com/",
-      hint: "Isi link IG di tab Umum.",
+      label: "Link portfolio pembuat",
+      ok: Boolean(creatorSite),
+      hint: "Isi URL portfolio di tab Penutup.",
     },
     {
       id: "guests",

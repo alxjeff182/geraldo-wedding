@@ -226,6 +226,7 @@ export type SiteContentOverrides = {
   footer?: {
     creditPrefix?: string;
     portfolioPrompt?: string;
+    portfolioLinkLabel?: string;
     websiteAriaLabel?: string;
     instagramAriaLabel?: string;
     ariaLabel?: string;

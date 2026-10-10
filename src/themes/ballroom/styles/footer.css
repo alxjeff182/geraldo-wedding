@@ -59,9 +59,9 @@
   font-variant-numeric: lining-nums tabular-nums;
 }
 .theme-ballroom .footer__copy {
-  margin-top: 1.75rem;
-  font-size: 0.75rem;
-  letter-spacing: 0.16em;
+  margin: 0;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(212, 196, 176, 0.62);
+  color: rgba(212, 196, 176, 0.55);
 }
