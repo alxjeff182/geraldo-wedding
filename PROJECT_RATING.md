@@ -26,7 +26,7 @@ Setiap potongan nilai di penilaian awal sudah ditutup dengan perubahan kode + ge
 
 ## Bukti otomatis
 
-- CI hijau: https://github.com/alxjeff182/geraldo-wedding/actions/runs/38026205051 (lint, format, stylelint, unit+coverage, build, Playwright e2e mock + mobile Chromium, Lighthouse Perf≥95 / A11y·SEO·BP=100)
+- CI hijau: https://github.com/alxjeff182/geraldo-wedding/actions/runs/38026885887 (lint, format, stylelint, unit+coverage, build, Playwright e2e mock + mobile Chromium, Lighthouse Perf≥95 / A11y·SEO·BP=100)
 - Deploy prod: https://github.com/alxjeff182/geraldo-wedding/actions/runs/38026345548 (Vercel prebuilt + alias, `submit` function, smoke HTML + RSVP 403)
 - Workflows: `.github/workflows/ci.yml`, `.github/workflows/deploy.yml`
 - Arsitektur: `docs/ARCHITECTURE.md`
