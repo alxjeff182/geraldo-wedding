@@ -62,6 +62,19 @@ body {
   }
 }
 
+@media (orientation: landscape) and (max-height: 540px) {
+  .boot-screen__stage {
+    width: min(100vw, 30rem);
+    height: 100dvh;
+    aspect-ratio: auto;
+    gap: 1rem;
+  }
+
+  .boot-screen__mark {
+    width: min(32%, 8.5rem);
+  }
+}
+
 .boot-screen__atmosphere {
   position: absolute;
   inset: -20%;

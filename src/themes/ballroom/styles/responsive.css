@@ -1,0 +1,151 @@
+/* Per-device adjustments — loaded last so it can override section defaults */
+
+/* Phone landscape: a strict 9:16 frame would be ~220px wide, so use a readable column */
+@media (orientation: landscape) and (max-height: 540px) {
+  .theme-ballroom .stage {
+    width: min(100vw, 30rem);
+    height: 100dvh;
+    aspect-ratio: auto;
+  }
+}
+
+/* Tablet portrait / large desktop: scale rem-based UI with the larger frame */
+@media (orientation: portrait) and (min-width: 600px) and (min-height: 860px) {
+  html:has(.theme-ballroom) {
+    font-size: 18px;
+  }
+}
+@media (orientation: portrait) and (min-width: 900px) and (min-height: 1100px) {
+  html:has(.theme-ballroom) {
+    font-size: 20px;
+  }
+}
+@media (orientation: landscape) and (min-height: 1200px) {
+  html:has(.theme-ballroom) {
+    font-size: 18px;
+  }
+}
+
+.theme-ballroom .hero__names {
+  text-wrap: balance;
+}
+
+/* Frame wider than 9:16 crops the portrait video vertically — keep faces in view */
+@container stage (min-aspect-ratio: 2/3) {
+  .theme-ballroom .hero__video {
+    object-position: center 22%;
+  }
+}
+
+/* Short frame (phone landscape) */
+@container stage (max-height: 540px) {
+  .theme-ballroom .cover {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  .theme-ballroom .cover__photo img {
+    object-position: center 48%;
+  }
+  .theme-ballroom .cover__logo-wrap {
+    width: min(22%, 5.5rem);
+  }
+  .theme-ballroom .cover__date {
+    margin-top: 0.35rem;
+  }
+  .theme-ballroom .cover__cta {
+    margin-top: 0.55rem;
+    padding: 0.6rem 1.5rem;
+  }
+
+  .theme-ballroom .hero__inner {
+    padding-top: max(1.1rem, env(safe-area-inset-top, 0px) + 0.75rem);
+    padding-inline: 3.5rem;
+  }
+  .theme-ballroom .hero__eyebrow {
+    margin-bottom: 0.2rem;
+  }
+  .theme-ballroom .hero__names {
+    font-size: clamp(1.35rem, 8.5cqh, 2rem);
+    margin-bottom: 0.4rem;
+  }
+
+  .theme-ballroom .float-dock {
+    bottom: max(0.55rem, env(safe-area-inset-bottom));
+    gap: 0.4rem;
+    padding: 0.32rem;
+  }
+  .theme-ballroom .float-dock__btn,
+  .theme-ballroom button.float-dock__btn {
+    width: 3.25rem;
+    height: 3.25rem;
+  }
+
+  .theme-ballroom .couple-story__head {
+    padding: 0.6rem 3.5rem 0.15rem;
+  }
+  .theme-ballroom .couple-story__head h3,
+  .theme-ballroom .gallery-canvas__head h3 {
+    font-size: clamp(1.3rem, 7cqh, 1.75rem);
+  }
+  .theme-ballroom .gallery-canvas__head {
+    padding: 0.6rem 3.5rem 0;
+  }
+  .theme-ballroom .couple-story__progress {
+    margin: 0.3rem 0 0;
+  }
+  .theme-ballroom .couple-story__scene {
+    padding: 0.25rem 0 1.85rem;
+  }
+  .theme-ballroom .couple-story__carousel {
+    height: min(66cqh, 380px);
+    width: min(72%, calc(66cqh * 0.72));
+  }
+  .theme-ballroom .couple-card__caption {
+    padding: 2rem 0.6rem 0.6rem;
+  }
+  .theme-ballroom .couple-card__caption h4,
+  .theme-ballroom .couple-card__face--back h4 {
+    font-size: 1.25rem;
+  }
+  .theme-ballroom .couple-card__role,
+  .theme-ballroom .couple-card__parents span {
+    font-size: 0.6rem;
+  }
+  .theme-ballroom .couple-card__parents {
+    margin-top: 0.25rem;
+    font-size: 0.68rem;
+  }
+  .theme-ballroom .couple-card__face--back {
+    gap: 0.25rem;
+    padding: 0.85rem;
+  }
+  .theme-ballroom .couple-card__tap {
+    margin-top: 0.4rem;
+  }
+  .theme-ballroom .couple-story__hint {
+    bottom: 0.5rem;
+    font-size: 0.6rem;
+  }
+}
+
+/* Wide + tall frame (tablet portrait, large desktop) */
+@container stage (min-width: 600px) and (min-height: 860px) {
+  .theme-ballroom .cover__logo-wrap {
+    width: min(24%, 10rem);
+  }
+  .theme-ballroom .hero__inner {
+    max-width: 44rem;
+  }
+  .theme-ballroom .hero__cd-item {
+    min-width: 2.6rem;
+  }
+  .theme-ballroom .hero__cd-item span {
+    font-size: 1.2rem;
+  }
+  .theme-ballroom .hero__cd-item small {
+    font-size: 0.62rem;
+  }
+  .theme-ballroom .couple-story__carousel {
+    width: min(58%, 22rem);
+    height: min(60cqh, 32rem);
+  }
+}
