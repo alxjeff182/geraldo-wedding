@@ -132,7 +132,7 @@ export function GuestTable({ guests: g }: Props) {
         <button
           type="button"
           className="admin-btn admin-btn--primary"
-          disabled={g.adding || !g.newGuest.display_name.trim()}
+          disabled={g.adding}
           onClick={() => void g.handleAddGuest()}
         >
           {g.adding ? "..." : invite.addGuestButton}

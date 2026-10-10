@@ -368,6 +368,7 @@ export const wedding = {
     guestAdded: "Tamu berhasil ditambahkan",
     guestUpdated: "Data tamu diperbarui",
     guestDeleted: "Tamu dihapus",
+    guestNameRequired: "Nama tamu tidak boleh kosong.",
     guestError: "Gagal menyimpan data tamu",
     bulkToggle: "Import massal",
     bulkPastePlaceholder: "Satu baris per tamu: Nama, 08xxxxxxxxxx",

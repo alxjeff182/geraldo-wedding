@@ -231,7 +231,10 @@ export function useGuests({
     const phone = newGuest.phone.trim();
     const phoneKey = phoneUniquenessKey(phone);
 
-    if (!display_name) return;
+    if (!display_name) {
+      onNotify(invite.guestNameRequired);
+      return;
+    }
 
     if (phone && !phoneKey) {
       onNotify("Nomor WA tidak valid");

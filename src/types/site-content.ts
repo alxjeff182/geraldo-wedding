@@ -279,6 +279,7 @@ export type SiteContentOverrides = {
     guestAdded?: string;
     guestUpdated?: string;
     guestDeleted?: string;
+    guestNameRequired?: string;
     guestError?: string;
     bulkToggle?: string;
     bulkPastePlaceholder?: string;
