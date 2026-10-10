@@ -198,11 +198,7 @@ export function Wishes({ guestId, guestName, onToast }: Props) {
       <p className="gift__lead">{gb.subtitle}</p>
 
       {canSubmit ? (
-        <form
-          className="wishes-form sheet-form"
-          noValidate
-          onSubmit={(e) => void onSubmit(e)}
-        >
+        <form className="wishes-form sheet-form" noValidate onSubmit={(e) => void onSubmit(e)}>
           <input
             type="text"
             name="company"
