@@ -255,9 +255,28 @@
 }
 
 .theme-ballroom .hashtag-mod__ig {
-  display: flex;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
   margin: 1rem auto 0;
-  width: fit-content;
+  border-radius: 50%;
+  border: 1px solid var(--gold-a60);
+  color: var(--gold-soft);
+  background: transparent;
+  transition:
+    color 0.2s,
+    border-color 0.2s,
+    background 0.2s,
+    transform 0.2s;
+}
+
+.theme-ballroom .hashtag-mod__ig:hover,
+.theme-ballroom .hashtag-mod__ig:focus-visible {
+  color: var(--white);
+  border-color: var(--gold-soft);
+  background: var(--gold-a15);
+  transform: translateY(-2px);
 }
 
 .theme-ballroom .gift-address__text {

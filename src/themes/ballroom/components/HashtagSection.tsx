@@ -1,6 +1,7 @@
 import { MediaImage } from "../../../components/MediaImage";
 import { useWeddingContent } from "../../../context/use-wedding-content";
 import { hashtagExploreUrl } from "../../../lib/hashtag-url";
+import { IconInstagram } from "../icons";
 
 type Props = {
   title: string;
@@ -51,12 +52,13 @@ export function HashtagSection({ title, tag, photo, onToast }: Props) {
         {display}
       </button>
       <a
-        className="btn btn--ghost hashtag-mod__ig"
+        className="hashtag-mod__ig"
         href={explore}
         target="_blank"
         rel="noopener noreferrer"
+        aria-label={content.hashtag.instagramButton || "Instagram"}
       >
-        {content.hashtag.instagramButton}
+        <IconInstagram />
       </a>
     </section>
   );
