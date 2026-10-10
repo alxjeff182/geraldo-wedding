@@ -311,7 +311,7 @@ export const wedding = {
   },
 
   giftUi: {
-    openButton: "Kirim Hadiah",
+    openButton: "Hadiah",
     bankLabel: "Bank",
     accountNumberLabel: "No. Rekening —",
     accountHolderPrefix: "a.n",
