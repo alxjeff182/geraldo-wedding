@@ -23,7 +23,10 @@
     "custom-property-empty-line-before": null,
     "selector-not-notation": null,
     "no-invalid-position-at-import-rule": null,
-    "at-rule-no-unknown": [true, { "ignoreAtRules": ["theme", "tailwind", "apply", "layer", "config", "source"] }]
+    "at-rule-no-unknown": [
+      true,
+      { "ignoreAtRules": ["theme", "tailwind", "apply", "layer", "config", "source"] }
+    ]
   },
   "ignoreFiles": ["dist/**", "node_modules/**", "legacy/**", "asset/**"]
 }
