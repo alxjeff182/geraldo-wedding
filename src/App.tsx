@@ -4,6 +4,7 @@ import { useGuestName } from "./hooks/useGuestName";
 import { usePageMeta } from "./hooks/usePageMeta";
 import { useAlertDialog } from "./hooks/useAlertDialog";
 import { AlertDialog } from "./components/ui/AlertDialog";
+import { BootScreen } from "./components/BootScreen";
 
 const AdminPage = lazy(() => import("./pages/AdminPage").then((m) => ({ default: m.AdminPage })));
 
@@ -51,9 +52,11 @@ export default function App({ adminMode = false }: AppProps) {
     });
   }, [bootStuck, showError]);
 
+  const logoSrc = content.media.logo || "/assets/ballroom/logo.webp";
+
   if (adminMode) {
     return (
-      <Suspense fallback={<div className="boot-screen">Memuat admin...</div>}>
+      <Suspense fallback={<BootScreen logoSrc={logoSrc} label="Memuat admin…" />}>
         <AdminPage />
       </Suspense>
     );
@@ -61,15 +64,14 @@ export default function App({ adminMode = false }: AppProps) {
 
   if (guestLoading || contentLoading) {
     return (
-      <div className="boot-screen">
-        <p>Memuat undangan...</p>
+      <BootScreen logoSrc={logoSrc} label="Memuat undangan…">
         <AlertDialog alert={alert} onClose={hideAlert} />
-      </div>
+      </BootScreen>
     );
   }
 
   return (
-    <Suspense fallback={<div className="boot-screen">Memuat undangan...</div>}>
+    <Suspense fallback={<BootScreen logoSrc={logoSrc} label="Memuat undangan…" />}>
       <BallroomApp guestName={guestName} guestId={guestId} />
       <AlertDialog alert={alert} onClose={hideAlert} />
     </Suspense>

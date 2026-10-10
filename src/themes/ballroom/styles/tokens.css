@@ -36,20 +36,6 @@ body:has(.theme-ballroom) {
   place-items: center;
 }
 
-.boot-screen {
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  padding: 1.5rem;
-  background: #1a0f0c;
-  color: #c9a46c;
-  font-family: "Outfit", system-ui, sans-serif;
-  text-align: center;
-}
-
 .theme-ballroom {
   --bg: #1a0f0c;
   --bg-soft: #2a1814;
