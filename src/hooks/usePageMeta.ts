@@ -27,21 +27,25 @@ export function usePageMeta(content: WeddingConfig, options?: { noIndex?: boolea
   useEffect(() => {
     const siteUrl = content.site.url;
     const ogImage = absoluteUrl(siteUrl, content.media.ogImage);
-    const icon = absoluteUrl(siteUrl, content.media.coverBg || content.media.ogImage);
+    // Keep icon hrefs same-origin (relative). Absolute production URLs trip CORP
+    // when the page is previewed on another host (LHCI localhost, Vercel previews).
+    const icon = content.media.coverBg?.startsWith("http")
+      ? "/icon-192.png"
+      : content.media.coverBg || "/icon-192.png";
 
     document.title = content.site.title;
 
     setMeta("description", content.site.description);
     setMeta("og:title", content.site.title, true);
     setMeta("og:description", content.site.description, true);
-    setMeta("og:url", siteUrl.replace(/\/$/, ""), true);
+    setMeta("og:url", `${siteUrl.replace(/\/$/, "")}/`, true);
     setMeta("og:image", ogImage, true);
     setMeta("twitter:title", content.site.title);
     setMeta("twitter:description", content.site.description);
     setMeta("twitter:image", ogImage);
 
     setLink("icon", icon);
-    setLink("apple-touch-icon", icon);
+    setLink("apple-touch-icon", "/apple-touch-icon-180.png");
 
     if (content.site.noIndex || options?.noIndex) {
       setMeta("robots", "noindex, nofollow");
