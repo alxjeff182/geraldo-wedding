@@ -1,15 +1,17 @@
+import { AdminOverrideMediaField } from "../AdminFields";
 import { ImageUploader } from "../ImageUploader";
 import { MEDIA_SPECS } from "../../../config/media-specs";
 import type { AdminTabProps } from "../types";
 
-export function AdminMediaTab({ merged, updateDraft }: AdminTabProps) {
+export function AdminMediaTab({ merged, defaults, updateDraft, clearDraftPath }: AdminTabProps) {
   return (
     <div className="admin-media-grid">
       <div className="admin-fieldset admin-field--wide admin-media-guide">
         <legend>Panduan Upload Media</legend>
         <p className="admin-media-guide__intro">
-          Gunakan dimensi dan rasio yang sama dengan aset ballroom agar tampilan tidak terpotong atau blur.
-          Semua ukuran di bawah mengacu pada file di <code>public/assets/ballroom/</code>.
+          Gunakan dimensi dan rasio yang sama dengan aset ballroom agar tampilan tidak terpotong
+          atau blur. Semua ukuran di bawah mengacu pada file di <code>public/assets/ballroom/</code>
+          .
         </p>
       </div>
       <ImageUploader
@@ -60,14 +62,21 @@ export function AdminMediaTab({ merged, updateDraft }: AdminTabProps) {
           onChange={(e) => updateDraft(["media", "heroFrameCount"], Number(e.target.value) || 24)}
         />
       </label>
-      <ImageUploader
+      <AdminOverrideMediaField
         label="Audio"
-        folder="media"
-        accept="audio/mpeg,audio/mp3"
-        spec={MEDIA_SPECS.audio}
         value={merged.media.audio}
-        onChange={(url) => updateDraft(["media", "audio"], url)}
-      />
+        defaultValue={defaults.media.audio}
+        onReset={() => clearDraftPath(["media", "audio"])}
+      >
+        <ImageUploader
+          label=""
+          folder="media"
+          accept="audio/mpeg,audio/mp3"
+          spec={MEDIA_SPECS.audio}
+          value={merged.media.audio}
+          onChange={(url) => updateDraft(["media", "audio"], url)}
+        />
+      </AdminOverrideMediaField>
       <ImageUploader
         label="OG Image"
         folder="media"

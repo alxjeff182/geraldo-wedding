@@ -4,10 +4,7 @@ import { useEffect, type RefObject } from "react";
  * Ports Geraldo-Wedding-5 observeFades / bindEventPanels / bindParallax.
  * Runs once the invitation is revealed.
  */
-export function useInvitationFx(
-  inviteRef: RefObject<HTMLElement | null>,
-  enabled: boolean,
-) {
+export function useInvitationFx(inviteRef: RefObject<HTMLElement | null>, enabled: boolean) {
   useEffect(() => {
     if (!enabled) return;
     const invitation = inviteRef.current;
@@ -18,9 +15,7 @@ export function useInvitationFx(
     // observeFades (GW5 main.js 1197-1224)
     {
       // Include section.fade-up (Wishes/Story/Guide) — not only nested .fade-up.
-      const els = invitation.querySelectorAll(
-        ".fade-up, .section__head, .quote__card, .gift-hub",
-      );
+      const els = invitation.querySelectorAll(".fade-up, .section__head, .quote__card, .gift-hub");
       const io = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
@@ -101,8 +96,7 @@ export function useInvitationFx(
             cards.forEach((card) => {
               const el = card as HTMLElement;
               const rect = el.getBoundingClientRect();
-              const mid =
-                rect.top + rect.height / 2 - (stageRect.top + viewH / 2);
+              const mid = rect.top + rect.height / 2 - (stageRect.top + viewH / 2);
               const offset = mid * -0.04;
               el.style.transform = `translate3d(0, ${offset}px, 0)`;
             });

@@ -1,4 +1,4 @@
-import { useWeddingContent } from "../../../context/WeddingContentContext";
+import { useWeddingContent } from "../../../context/use-wedding-content";
 import { hashtagExploreUrl } from "../../../lib/hashtag-url";
 
 type Props = {

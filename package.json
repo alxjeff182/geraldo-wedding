@@ -16,6 +16,7 @@
     "test:e2e": "playwright test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "stylelint": "stylelint \"src/**/*.css\"",
     "icons:generate": "node scripts/generate-icons.mjs",
     "seed:guests": "node scripts/seed-guests.mjs",
     "db:verify": "node scripts/verify-migrations.mjs",
@@ -35,6 +36,8 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.1",
+    "@emnapi/core": "^1.11.3",
+    "@emnapi/runtime": "^1.11.3",
     "@eslint/js": "^9.21.0",
     "@lhci/cli": "^0.14.0",
     "@playwright/test": "^1.51.0",
@@ -55,15 +58,13 @@
     "jsdom": "^26.0.0",
     "prettier": "^3.5.3",
     "sharp": "^0.34.1",
+    "stylelint": "^16.18.0",
+    "stylelint-config-standard": "^37.0.0",
     "tailwindcss": "^4.0.9",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1",
     "vite": "^6.2.0",
     "vitest": "^3.0.7",
     "wait-on": "^8.0.3"
-  },
-  "optionalDependencies": {
-    "@emnapi/core": "1.11.3",
-    "@emnapi/runtime": "1.11.3"
   }
 }

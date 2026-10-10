@@ -1,4 +1,4 @@
-import { AdminTextField } from "../AdminFields";
+import { AdminOverrideMediaField, AdminTextField } from "../AdminFields";
 import { ImageUploader } from "../ImageUploader";
 import { MEDIA_SPECS } from "../../../config/media-specs";
 import type { GiftAccount } from "../../../config/wedding.config";
@@ -11,7 +11,7 @@ const emptyAccount = (): GiftAccount => ({
   logo: "",
 });
 
-export function AdminGiftTab({ merged, updateDraft }: AdminTabProps) {
+export function AdminGiftTab({ merged, defaults, updateDraft, clearDraftPath }: AdminTabProps) {
   const accounts = merged.gift.accounts;
 
   const setAccounts = (next: GiftAccount[]) => {
@@ -41,13 +41,20 @@ export function AdminGiftTab({ merged, updateDraft }: AdminTabProps) {
           onChange={(e) => updateDraft(["gift", "physicalAddress"], e.target.value)}
         />
       </label>
-      <ImageUploader
+      <AdminOverrideMediaField
         label="QRIS (kosong = tamu hanya lihat transfer bank)"
-        folder="gift"
-        spec={MEDIA_SPECS.qris}
         value={merged.gift.qris}
-        onChange={(url) => updateDraft(["gift", "qris"], url)}
-      />
+        defaultValue={defaults.gift.qris}
+        onReset={() => clearDraftPath(["gift", "qris"])}
+      >
+        <ImageUploader
+          label=""
+          folder="gift"
+          spec={MEDIA_SPECS.qris}
+          value={merged.gift.qris}
+          onChange={(url) => updateDraft(["gift", "qris"], url)}
+        />
+      </AdminOverrideMediaField>
       {accounts.map((account, index) => (
         <fieldset key={index} className="admin-fieldset">
           <legend>Rekening Bank {index + 1}</legend>

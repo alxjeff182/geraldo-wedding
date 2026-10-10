@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  formatRsvpDeadlineLabel,
-  isRsvpDeadlinePassed,
-  parseRsvpDeadline,
-} from "./rsvp-deadline";
+import { formatRsvpDeadlineLabel, isRsvpDeadlinePassed, parseRsvpDeadline } from "./rsvp-deadline";
 
 describe("rsvp-deadline", () => {
   it("parses valid deadlines and ignores empty", () => {
@@ -22,10 +18,7 @@ describe("rsvp-deadline", () => {
   });
 
   it("formats label with {date}", () => {
-    const label = formatRsvpDeadlineLabel(
-      "Konfirmasi sebelum {date}",
-      "2026-04-18T23:59:59+07:00",
-    );
+    const label = formatRsvpDeadlineLabel("Konfirmasi sebelum {date}", "2026-04-18T23:59:59+07:00");
     expect(label).toContain("Konfirmasi sebelum");
     expect(label).toMatch(/2026/);
   });

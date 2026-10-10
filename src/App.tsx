@@ -1,13 +1,11 @@
 import { lazy, Suspense, useEffect, useState } from "react";
-import { useWeddingContent } from "./context/WeddingContentContext";
+import { useWeddingContent } from "./context/use-wedding-content";
 import { useGuestName } from "./hooks/useGuestName";
 import { usePageMeta } from "./hooks/usePageMeta";
 import { useAlertDialog } from "./hooks/useAlertDialog";
 import { AlertDialog } from "./components/ui/AlertDialog";
 
-const AdminPage = lazy(() =>
-  import("./pages/AdminPage").then((m) => ({ default: m.AdminPage })),
-);
+const AdminPage = lazy(() => import("./pages/AdminPage").then((m) => ({ default: m.AdminPage })));
 
 const BallroomApp = lazy(() =>
   import("./themes/ballroom/BallroomApp").then((m) => ({ default: m.BallroomApp })),

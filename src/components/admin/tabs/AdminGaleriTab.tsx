@@ -70,9 +70,7 @@ export function AdminGaleriTab({ merged, updateDraft }: AdminTabProps) {
             spec={MEDIA_SPECS.galleryPhoto}
             value={img.src}
             onChange={(url) => {
-              setImages(
-                images.map((item, i) => (i === index ? { ...item, src: url } : item)),
-              );
+              setImages(images.map((item, i) => (i === index ? { ...item, src: url } : item)));
             }}
           />
           <label className="admin-field">
@@ -92,9 +90,7 @@ export function AdminGaleriTab({ merged, updateDraft }: AdminTabProps) {
       <button
         type="button"
         className="admin-btn admin-btn--ghost admin-btn--sm"
-        onClick={() =>
-          setImages([...images, { src: GALLERY_PLACEHOLDER, alt: "Foto baru" }])
-        }
+        onClick={() => setImages([...images, { src: GALLERY_PLACEHOLDER, alt: "Foto baru" }])}
       >
         Tambah foto
       </button>

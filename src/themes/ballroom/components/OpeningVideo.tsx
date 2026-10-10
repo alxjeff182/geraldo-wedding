@@ -46,10 +46,7 @@ export function OpeningVideo({ active, src, poster, skipLabel = "Lewati", onReve
   };
 
   return (
-    <div
-      className={`opening${active ? " is-active" : ""}`}
-      aria-hidden={!active}
-    >
+    <div className={`opening${active ? " is-active" : ""}`} aria-hidden={!active}>
       <video
         ref={videoRef}
         className="opening__video"
@@ -71,7 +68,11 @@ export function OpeningVideo({ active, src, poster, skipLabel = "Lewati", onReve
       </video>
       <div className="opening__vignette" aria-hidden="true" />
       <div className="opening__skip-wrap">
-        <button type="button" className="opening__skip opening__skip--visible" onClick={() => reveal()}>
+        <button
+          type="button"
+          className="opening__skip opening__skip--visible"
+          onClick={() => reveal()}
+        >
           {skipLabel}
         </button>
       </div>

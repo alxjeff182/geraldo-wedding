@@ -22,10 +22,7 @@ function formatDate(value: string): string {
   });
 }
 
-function attendanceLabel(
-  value: RsvpSubmission["attendance"],
-  copy: RsvpCopy,
-): string {
+function attendanceLabel(value: RsvpSubmission["attendance"], copy: RsvpCopy): string {
   if (value === "hadir") return copy.attendanceHadir;
   if (value === "tidak_hadir") return copy.attendanceTidak;
   return copy.attendanceRagu;
@@ -137,11 +134,8 @@ export function RsvpSubmissionsPanel({ rsvp, onNotify }: Props) {
       if (filter !== "all" && row.attendance !== filter) return false;
       if (!q) return true;
 
-      const guestName = row.guest_id ? guestsById[row.guest_id]?.display_name ?? "" : "";
-      return (
-        row.name.toLowerCase().includes(q) ||
-        guestName.toLowerCase().includes(q)
-      );
+      const guestName = row.guest_id ? (guestsById[row.guest_id]?.display_name ?? "") : "";
+      return row.name.toLowerCase().includes(q) || guestName.toLowerCase().includes(q);
     });
   }, [submissions, search, filter, guestsById]);
 
@@ -169,17 +163,11 @@ export function RsvpSubmissionsPanel({ rsvp, onNotify }: Props) {
   };
 
   const handleExport = () => {
-    const header = [
-      rsvp.colDate,
-      rsvp.colName,
-      rsvp.colCount,
-      rsvp.colAttendance,
-      rsvp.colGuest,
-    ];
+    const header = [rsvp.colDate, rsvp.colName, rsvp.colCount, rsvp.colAttendance, rsvp.colGuest];
 
     const lines = filtered.map((row) => {
       const guestLabel = row.guest_id
-        ? guestsById[row.guest_id]?.display_name ?? row.guest_id
+        ? (guestsById[row.guest_id]?.display_name ?? row.guest_id)
         : "-";
 
       return [
@@ -248,7 +236,11 @@ export function RsvpSubmissionsPanel({ rsvp, onNotify }: Props) {
               <strong>{stats.tidak}</strong> {rsvp.statTidak}
             </span>
           </div>
-          <button type="button" className="admin-btn admin-btn--ghost" onClick={() => void loadData()}>
+          <button
+            type="button"
+            className="admin-btn admin-btn--ghost"
+            onClick={() => void loadData()}
+          >
             {rsvp.refreshButton}
           </button>
           <button

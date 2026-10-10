@@ -21,10 +21,7 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   res.setHeader("Content-Type", "text/calendar; charset=utf-8");
-  res.setHeader(
-    "Content-Disposition",
-    'inline; filename="Pernikahan-Geraldo-Christin.ics"',
-  );
+  res.setHeader("Content-Disposition", 'inline; filename="Pernikahan-Geraldo-Christin.ics"');
   res.setHeader("Cache-Control", "no-store");
   res.status(200).send(body);
 }

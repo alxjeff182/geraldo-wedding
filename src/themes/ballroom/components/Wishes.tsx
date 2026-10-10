@@ -8,7 +8,7 @@ import {
   getWishCount,
   markWishSubmitted,
 } from "../../../lib/wish-guard";
-import { useWeddingContent } from "../../../context/WeddingContentContext";
+import { useWeddingContent } from "../../../context/use-wedding-content";
 
 type Props = {
   guestId: string | null;
@@ -234,9 +234,7 @@ export function Wishes({ guestId, guestName, onToast }: Props) {
           </button>
         </form>
       ) : (
-        <p className="wishes-locked">
-          {!guestId ? gb.lockedMessage : gb.limitReachedMessage}
-        </p>
+        <p className="wishes-locked">{!guestId ? gb.lockedMessage : gb.limitReachedMessage}</p>
       )}
 
       <div className="wishes-list">

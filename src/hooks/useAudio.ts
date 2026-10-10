@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-function syncPlayingState(
-  audio: HTMLAudioElement,
-  setPlayingState: (value: boolean) => void
-) {
+function syncPlayingState(audio: HTMLAudioElement, setPlayingState: (value: boolean) => void) {
   setPlayingState(!audio.paused && !audio.ended);
 }
 

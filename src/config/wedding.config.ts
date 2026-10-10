@@ -1,7 +1,4 @@
-import {
-  DEFAULT_INVITE_TEMPLATE_ID,
-  INVITE_MESSAGE_TEMPLATES,
-} from "./invite-templates";
+import { DEFAULT_INVITE_TEMPLATE_ID, INVITE_MESSAGE_TEMPLATES } from "./invite-templates";
 
 export type WeddingEvent = {
   name: string;
@@ -91,8 +88,7 @@ export const wedding = {
       dateLabel: "Sabtu\n25 . 04 . 2026",
       time: "08.00 WIB",
       venue: "GPI Pondok Arum",
-      address:
-        "Perum. Pondok Arum, Blok J No. 26, Kel. Pabuaran Tumpeng, Kec. Karawaci, Tangerang",
+      address: "Perum. Pondok Arum, Blok J No. 26, Kel. Pabuaran Tumpeng, Kec. Karawaci, Tangerang",
       mapsUrl: "https://share.google/grqB2yx9JoR0Cdkdq",
       startsAt: "2026-04-25T08:00:00+07:00",
       endsAt: "2026-04-25T10:00:00+07:00",
@@ -102,8 +98,7 @@ export const wedding = {
       dateLabel: "Sabtu\n25 . 04 . 2026",
       time: "11.00 WIB",
       venue: "UFIT HALL GK",
-      address:
-        "Jl. Palem Raja Raya No.31, Panunggangan Bar., Kec. Cibodas, Kab. Tangerang",
+      address: "Jl. Palem Raja Raya No.31, Panunggangan Bar., Kec. Cibodas, Kab. Tangerang",
       mapsUrl: "https://share.google/xxDvbeTIhjN0hvbBg",
       startsAt: "2026-04-25T11:00:00+07:00",
       endsAt: "2026-04-25T15:00:00+07:00",
@@ -128,8 +123,7 @@ export const wedding = {
     dressCode:
       "Formal / Elegant dengan nuansa maroon & gold. Untuk tamu keluarga adat, ulos dipersilakan sesuai kebiasaan keluarga masing-masing.",
     tipsTitle: "Parkir & Akomodasi",
-    tips:
-      "Parkir tersedia di area UFIT HALL GK untuk resepsi.\nTamu dari luar kota dapat menginap di sekitar Karawaci / Cibodas (akses mudah ke kedua venue).",
+    tips: "Parkir tersedia di area UFIT HALL GK untuk resepsi.\nTamu dari luar kota dapat menginap di sekitar Karawaci / Cibodas (akses mudah ke kedua venue).",
   },
 
   gallery: {
@@ -360,7 +354,8 @@ export const wedding = {
     noPhone: "Isi nomor telepon dulu",
     saveTemplateHint: "Setelah mengubah template pesan, klik «Simpan Perubahan» di atas.",
     templateLabel: "Template Pesan WhatsApp",
-    templatesSubtitle: "Pilih dan edit salah satu dari 3 template undangan. Setiap tamu bisa dikirim dengan template berbeda.",
+    templatesSubtitle:
+      "Pilih dan edit salah satu dari 3 template undangan. Setiap tamu bisa dikirim dengan template berbeda.",
     templateSelectLabel: "Template kirim",
     defaultTemplateLabel: "Template bawaan daftar tamu",
     templateNameLabel: "Nama template",
@@ -377,7 +372,8 @@ export const wedding = {
     bulkToggle: "Import massal",
     bulkPastePlaceholder: "Satu baris per tamu: Nama, 08xxxxxxxxxx",
     bulkPasteHint: "Pisahkan dengan koma, tab, |, atau titik koma. Nomor WA opsional.",
-    bulkCsvHint: "Unggah CSV (slug,display_name,phone). Kolom slug diabaikan — digenerate otomatis.",
+    bulkCsvHint:
+      "Unggah CSV (slug,display_name,phone). Kolom slug diabaikan — digenerate otomatis.",
     bulkCsvButton: "Pilih file CSV",
     bulkPreviewButton: "Preview",
     bulkImportButton: "Import {n} tamu",

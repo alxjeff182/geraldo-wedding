@@ -19,10 +19,7 @@ function htmlMetaPlugin(siteUrl: string): Plugin {
         .replace(/property="og:url" content="[^"]*"/, `property="og:url" content="${base}/"`);
 
       if (!out.includes('rel="canonical"')) {
-        out = out.replace(
-          "</head>",
-          `    <link rel="canonical" href="${base}/" />\n  </head>`,
-        );
+        out = out.replace("</head>", `    <link rel="canonical" href="${base}/" />\n  </head>`);
       } else {
         out = out.replace(
           /<link rel="canonical" href="[^"]*"\s*\/>/,

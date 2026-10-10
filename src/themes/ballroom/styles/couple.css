@@ -1,0 +1,383 @@
+/* Couple storyboard — 3D coverflow */
+.theme-ballroom .couple-story {
+  position: relative;
+  height: 220vh;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+}
+.theme-ballroom .couple-story__pin {
+  position: sticky;
+  top: 0;
+  height: 100cqh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.theme-ballroom .couple-story__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.theme-ballroom .couple-story__bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.65) brightness(0.28) blur(2px);
+  transform: scale(1.06);
+}
+.theme-ballroom .couple-story__veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 45%, rgba(26, 15, 12, 0.1), rgba(26, 15, 12, 0.78) 72%),
+    linear-gradient(
+      180deg,
+      rgba(26, 15, 12, 0.6) 0%,
+      transparent 28%,
+      transparent 68%,
+      rgba(26, 15, 12, 0.88) 100%
+    );
+}
+.theme-ballroom .couple-story__head {
+  position: relative;
+  z-index: 3;
+  text-align: center;
+  padding: 1.35rem 1.25rem 0.5rem;
+}
+.theme-ballroom .couple-story__head h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.75rem, 7cqi, 2.35rem);
+  color: var(--white);
+}
+.theme-ballroom .couple-story__progress {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  gap: 0.45rem;
+  margin: 0.65rem 0 0.25rem;
+}
+.theme-ballroom .couple-story__dot {
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: inherit;
+  background: var(--gold-a40);
+  cursor: pointer;
+  appearance: none;
+  transition:
+    transform 0.35s var(--ease-out),
+    background 0.35s,
+    width 0.35s;
+}
+.theme-ballroom .couple-story__dot.is-active {
+  width: 18px;
+  border-radius: var(--r-pill);
+  background: var(--gold);
+}
+.theme-ballroom .couple-story__scene {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  perspective: 1100px;
+  perspective-origin: 50% 45%;
+  display: grid;
+  place-items: center;
+  padding: 0.5rem 0 3.25rem;
+}
+.theme-ballroom .couple-story__carousel {
+  position: relative;
+  width: min(72%, 260px);
+  height: min(62cqh, 380px);
+  transform-style: preserve-3d;
+}
+.theme-ballroom .couple-card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform-origin: center center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  will-change: transform, opacity, filter;
+  transform: translate(-50%, -50%);
+}
+.theme-ballroom .couple-card__inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.7s var(--ease-out);
+}
+.theme-ballroom .couple-card.is-flipped .couple-card__inner {
+  transform: rotateY(180deg);
+}
+.theme-ballroom .couple-card__face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border: 1px solid var(--gold-a40);
+  background: #1a0f0c;
+  overflow: hidden;
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+.theme-ballroom .couple-card__face--front img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 18%;
+}
+.theme-ballroom .couple-card__caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 3.25rem 1rem 1rem;
+  text-align: center;
+  background: linear-gradient(180deg, transparent, rgba(10, 6, 5, 0.94) 62%);
+}
+.theme-ballroom .couple-card__face--back {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 1.5rem;
+  text-align: center;
+  transform: rotateY(180deg);
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(107, 42, 42, 0.45), transparent 60%),
+    linear-gradient(165deg, #2a1814, #120b09 70%);
+}
+.theme-ballroom .couple-card__role {
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.theme-ballroom .couple-card__caption h4,
+.theme-ballroom .couple-card__face--back h4 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.5rem, 6.5cqi, 1.95rem);
+  color: var(--white);
+  line-height: 1.1;
+}
+.theme-ballroom .couple-card__face--back h4 span {
+  font-style: italic;
+  color: var(--gold);
+  font-size: 0.7em;
+}
+.theme-ballroom .couple-card__amp {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.6rem;
+  color: var(--gold);
+  line-height: 1;
+}
+.theme-ballroom .couple-card__parents {
+  margin-top: 0.4rem;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(0.72rem, 3cqi, 0.82rem);
+  color: var(--cream-dim);
+  line-height: 1.35;
+}
+.theme-ballroom .couple-card__parents::before {
+  content: "";
+  display: block;
+  width: 24px;
+  height: 1px;
+  margin: 0 auto 0.4rem;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.theme-ballroom .couple-card__parents span {
+  display: block;
+  font-family: var(--font-body);
+  font-style: normal;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.15rem;
+}
+.theme-ballroom .couple-card__parents i {
+  font-style: normal;
+  color: var(--gold-a60);
+  margin: 0 0.2em;
+}
+.theme-ballroom .couple-card__bio {
+  margin-top: 0.35rem;
+  font-size: 0.88rem;
+  color: var(--cream-dim);
+  line-height: 1.5;
+  max-width: 14rem;
+}
+.theme-ballroom .couple-card__bio.couple-card__parents {
+  font-size: clamp(0.72rem, 3cqi, 0.82rem);
+  max-width: 15rem;
+}
+.theme-ballroom .couple-card__tap {
+  margin-top: 1rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-a60);
+}
+.theme-ballroom .couple-story__hint {
+  position: absolute;
+  z-index: 3;
+  bottom: 1.1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(212, 196, 176, 0.55);
+  white-space: nowrap;
+  transition: opacity 0.4s;
+}
+.theme-ballroom .couple-story.is-deep .couple-story__hint {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-ballroom .couple-card__inner {
+    transition: none;
+  }
+} /* Quote */
+.theme-ballroom .quote {
+  padding: 3.5rem 1.25rem;
+  text-align: center;
+  background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(107, 42, 42, 0.22), transparent 70%);
+}
+.theme-ballroom .quote__card {
+  position: relative;
+  max-width: 21rem;
+  margin: 0 auto;
+  padding: 2.75rem 1.5rem 2rem;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--gold-a25);
+  background: rgba(18, 11, 9, 0.45);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+.theme-ballroom .quote__card::before {
+  content: "";
+  position: absolute;
+  inset: -30% auto auto 50%;
+  width: 70%;
+  height: 50%;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, var(--gold-a15), transparent 68%);
+  pointer-events: none;
+}
+.theme-ballroom .quote__mark {
+  position: absolute;
+  top: 0.35rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-display);
+  font-size: 5rem;
+  line-height: 1;
+  color: var(--gold-a40);
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    opacity 0.7s var(--ease-out),
+    transform 0.7s var(--ease-out);
+}
+.theme-ballroom .quote__card p {
+  position: relative;
+  z-index: 1;
+  max-width: 17rem;
+  margin: 1.35rem auto 0;
+  font-family: var(--font-display);
+  font-style: normal;
+  font-weight: 400;
+  font-size: clamp(1.12rem, 4.6cqi, 1.3rem);
+  color: var(--cream);
+  line-height: 1.6;
+  text-wrap: balance;
+  hyphens: none;
+  -webkit-hyphens: none;
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.7s var(--ease-out) 0.12s,
+    transform 0.7s var(--ease-out) 0.12s;
+}
+.theme-ballroom .quote__card p em {
+  font-style: italic;
+  color: var(--gold-soft);
+}
+.theme-ballroom .quote__divider {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin: 1.5rem auto 0.85rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.7s var(--ease-out) 0.24s,
+    transform 0.7s var(--ease-out) 0.24s;
+}
+.theme-ballroom .quote__divider span {
+  display: block;
+  width: 28px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.theme-ballroom .quote__divider i {
+  display: block;
+  width: 5px;
+  height: 5px;
+  border: 1px solid var(--gold);
+  transform: rotate(45deg);
+  background: var(--gold-a40);
+}
+.theme-ballroom .quote__card cite {
+  position: relative;
+  z-index: 1;
+  display: block;
+  font-family: var(--font-body);
+  font-style: normal;
+  font-size: 0.7rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.7s var(--ease-out) 0.32s,
+    transform 0.7s var(--ease-out) 0.32s;
+}
+.theme-ballroom .quote__card.is-in .quote__mark,
+.theme-ballroom .quote__card.is-in p,
+.theme-ballroom .quote__card.is-in .quote__divider,
+.theme-ballroom .quote__card.is-in cite {
+  opacity: 1;
+  transform: translateY(0);
+}
+.theme-ballroom .quote__card.is-in .quote__mark {
+  transform: translateX(-50%) translateY(0);
+}

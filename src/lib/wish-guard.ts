@@ -50,13 +50,7 @@ const BAD_WORDS = [
 ];
 
 export type WishSpamReason =
-  | "empty"
-  | "too_short"
-  | "too_long"
-  | "link"
-  | "phone"
-  | "repeat"
-  | "profanity";
+  "empty" | "too_short" | "too_long" | "link" | "phone" | "repeat" | "profanity";
 
 export function isSpammyWishMessage(message: string): WishSpamReason | null {
   const trimmed = message.trim();

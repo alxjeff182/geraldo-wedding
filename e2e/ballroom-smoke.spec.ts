@@ -33,7 +33,10 @@ test.describe("ballroom theme smoke", () => {
     await expect(page.locator("#sheet-rsvp")).toBeVisible();
     await page.locator('#sheet-rsvp [aria-label="Tutup"]').click();
 
-    await page.getByRole("button", { name: /lokasi|open maps|events/i }).first().click();
+    await page
+      .getByRole("button", { name: /lokasi|open maps|events/i })
+      .first()
+      .click();
     await expect(page.locator("#sheet-location")).toBeVisible();
   });
 });

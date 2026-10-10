@@ -1,0 +1,95 @@
+/* Ballroom theme — scoped under .theme-ballroom */
+@import "@fontsource/cormorant-garamond/latin-400.css";
+@import "@fontsource/cormorant-garamond/latin-500.css";
+@import "@fontsource/cormorant-garamond/latin-600.css";
+@import "@fontsource/cormorant-garamond/latin-400-italic.css";
+@import "@fontsource/cormorant-garamond/latin-500-italic.css";
+@import "@fontsource/cormorant-garamond/latin-ext-400.css";
+@import "@fontsource/cormorant-garamond/latin-ext-500.css";
+@import "@fontsource/cormorant-garamond/latin-ext-600.css";
+@import "@fontsource/cormorant-garamond/latin-ext-400-italic.css";
+@import "@fontsource/cormorant-garamond/latin-ext-500-italic.css";
+@import "@fontsource/outfit/latin-300.css";
+@import "@fontsource/outfit/latin-400.css";
+@import "@fontsource/outfit/latin-500.css";
+@import "@fontsource/outfit/latin-ext-300.css";
+@import "@fontsource/outfit/latin-ext-400.css";
+@import "@fontsource/outfit/latin-ext-500.css";
+
+/* Page chrome when ballroom invitation is mounted */
+html:has(.theme-ballroom),
+body:has(.theme-ballroom) {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #0a0605;
+}
+
+body:has(.theme-ballroom) {
+  font-family: "Outfit", system-ui, sans-serif;
+  font-weight: 300;
+  color: #f3e8d8;
+  line-height: 1.6;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+}
+
+.boot-screen {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  background: #1a0f0c;
+  color: #c9a46c;
+  font-family: "Outfit", system-ui, sans-serif;
+  text-align: center;
+}
+
+.theme-ballroom {
+  --bg: #1a0f0c;
+  --bg-soft: #2a1814;
+  --cream: #f3e8d8;
+  --cream-dim: #d4c4b0;
+  --gold: #c9a46c;
+  --gold-soft: #e0c48a;
+  --burgundy: #6b2a2a;
+  --burgundy-deep: #3d1616;
+  --ink: #1a0f0c;
+  --white: #fffaf4;
+  --gold-a08: color-mix(in srgb, var(--gold) 8%, transparent);
+  --gold-a15: color-mix(in srgb, var(--gold) 15%, transparent);
+  --gold-a25: color-mix(in srgb, var(--gold) 25%, transparent);
+  --gold-a40: color-mix(in srgb, var(--gold) 40%, transparent);
+  --gold-a60: color-mix(in srgb, var(--gold) 60%, transparent);
+  --fs-eyebrow: 0.7rem;
+  --fs-caption: 0.72rem;
+  --fs-body: 0.92rem;
+  --fs-lead: 1.05rem;
+  --fs-h3: clamp(1.55rem, 6cqi, 1.9rem);
+  --fs-h2: clamp(1.85rem, 7cqi, 2.35rem);
+  --fs-display: clamp(2.1rem, 10cqi, 3.1rem);
+  --r-sm: 0.5rem;
+  --r-md: 0.85rem;
+  --r-lg: 1.25rem;
+  --r-pill: 999px;
+  --ctl-h: 2.75rem;
+  --surface: rgba(255, 250, 244, 0.03);
+  --line: var(--gold-a25);
+  --focus-ring: 2px solid var(--gold-soft);
+  --focus-offset: 3px;
+  --dock-space: 5.5rem;
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-body: "Outfit", system-ui, sans-serif;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  font-family: var(--font-body);
+  font-weight: 300;
+  color: var(--cream);
+  background: #0a0605;
+  line-height: 1.6;
+}

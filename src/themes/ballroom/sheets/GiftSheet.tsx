@@ -1,10 +1,7 @@
 import { useState } from "react";
 import { GiftHub } from "../components/GiftHub";
-import { useWeddingContent } from "../../../context/WeddingContentContext";
-import {
-  buildGiftWhatsappMessage,
-  buildGuestWhatsAppUrl,
-} from "../../../lib/guest-whatsapp";
+import { useWeddingContent } from "../../../context/use-wedding-content";
+import { buildGiftWhatsappMessage, buildGuestWhatsAppUrl } from "../../../lib/guest-whatsapp";
 import { IconGift, IconWhatsApp } from "../icons";
 
 type Props = {
@@ -74,7 +71,12 @@ export function GiftSheet({ open, guestName, onClose, setSheetRef, onToast }: Pr
       </div>
       {waHref ? (
         <footer className="sheet__foot">
-          <a className="btn btn--wa sheet__cta" href={waHref} target="_blank" rel="noopener noreferrer">
+          <a
+            className="btn btn--wa sheet__cta"
+            href={waHref}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <IconWhatsApp />
             <span>Konfirmasi via WhatsApp</span>
           </a>

@@ -4,6 +4,8 @@ import { INVITE_MESSAGE_TEMPLATES } from "../config/invite-templates";
 describe("invite-templates", () => {
   it("ships 3 default WhatsApp templates", () => {
     expect(INVITE_MESSAGE_TEMPLATES).toHaveLength(3);
-    expect(INVITE_MESSAGE_TEMPLATES.every((item) => item.id && item.name && item.message)).toBe(true);
+    expect(INVITE_MESSAGE_TEMPLATES.every((item) => item.id && item.name && item.message)).toBe(
+      true,
+    );
   });
 });

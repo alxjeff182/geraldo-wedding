@@ -175,12 +175,8 @@ export function buildAndroidInsertIntent(event: CalendarEventInput): string | nu
     "type=vnd.android.cursor.item/event",
     "package=com.google.android.calendar",
     `S.title=${encodeURIComponent(event.title)}`,
-    event.details?.trim()
-      ? `S.description=${encodeURIComponent(event.details.trim())}`
-      : null,
-    event.location?.trim()
-      ? `S.eventLocation=${encodeURIComponent(event.location.trim())}`
-      : null,
+    event.details?.trim() ? `S.description=${encodeURIComponent(event.details.trim())}` : null,
+    event.location?.trim() ? `S.eventLocation=${encodeURIComponent(event.location.trim())}` : null,
     `l.beginTime=${begin}`,
     `l.endTime=${end}`,
     fallback ? `S.browser_fallback_url=${fallback}` : null,
@@ -233,10 +229,7 @@ export function openAndroidCalendar(event: CalendarEventInput): boolean {
   return true;
 }
 
-export function openCalendarForEvent(
-  event: CalendarEventInput,
-  filename = "wedding.ics",
-): boolean {
+export function openCalendarForEvent(event: CalendarEventInput, filename = "wedding.ics"): boolean {
   return openCalendarForEvents([event], event.title, filename);
 }
 

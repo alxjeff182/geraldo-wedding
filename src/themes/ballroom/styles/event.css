@@ -1,0 +1,262 @@
+/* Event */ /* Event — modern minimal interactive panels */
+.theme-ballroom .event-mod {
+  position: relative;
+  padding: 3.5rem 1.25rem 4rem;
+  background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(107, 42, 42, 0.22), transparent 60%);
+}
+.theme-ballroom .event-mod__head {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.theme-ballroom .event-mod__head h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2rem, 7cqi, 2.6rem);
+  color: var(--white);
+}
+.theme-ballroom .event-card {
+  position: relative;
+  isolation: isolate;
+  max-width: 22rem;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 1.3rem;
+  border-radius: var(--r-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(18, 11, 9, 0.45);
+  backdrop-filter: blur(16px) saturate(1.15);
+  -webkit-backdrop-filter: blur(16px) saturate(1.15);
+  box-shadow:
+    0 14px 36px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    transform 0.45s var(--ease-out),
+    border-color 0.3s,
+    box-shadow 0.3s,
+    opacity 0.7s var(--ease-out);
+}
+.theme-ballroom .event-card.is-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+.theme-ballroom .event-card__glow {
+  position: absolute;
+  inset: -40% auto auto 50%;
+  width: 70%;
+  height: 55%;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, var(--gold-a25), transparent 68%);
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: -1;
+  transition: opacity 0.35s;
+}
+.theme-ballroom .event-card:hover,
+.theme-ballroom .event-card:focus-within {
+  border-color: var(--gold-a40);
+  box-shadow:
+    0 18px 44px rgba(0, 0, 0, 0.35),
+    0 0 0 1px var(--gold-a15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.theme-ballroom .event-card.is-in:hover,
+.theme-ballroom .event-card.is-in:focus-within {
+  transform: translateY(-3px);
+}
+.theme-ballroom .event-card:hover .event-card__glow,
+.theme-ballroom .event-card:focus-within .event-card__glow {
+  opacity: 1;
+}
+.theme-ballroom .event-card.is-in.is-pressed {
+  transform: translateY(0) scale(0.985);
+}
+.theme-ballroom .event-card__date {
+  display: flex;
+  align-items: center;
+  gap: 0.95rem;
+}
+.theme-ballroom .event-card__day {
+  font-family: var(--font-display);
+  font-size: 3.6rem;
+  line-height: 1;
+  color: var(--white);
+  letter-spacing: -0.03em;
+  min-width: 2.6rem;
+}
+.theme-ballroom .event-card__rule {
+  width: 1px;
+  height: 3.1rem;
+  background: linear-gradient(to bottom, transparent, var(--gold-a60), transparent);
+  flex-shrink: 0;
+}
+.theme-ballroom .event-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+}
+.theme-ballroom .event-card__meta small {
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.theme-ballroom .event-card__meta strong {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.35rem;
+  color: var(--cream);
+  line-height: 1.1;
+}
+.theme-ballroom .event-card__meta span {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: var(--cream-dim);
+}
+.theme-ballroom .event-card__divider {
+  height: 1px;
+  margin: 1.15rem 0;
+  background: linear-gradient(90deg, transparent, var(--gold-a40), transparent);
+}
+.theme-ballroom .event-timeline {
+  list-style: none;
+  position: relative;
+  padding-left: 1.4rem;
+  margin: 0;
+  display: grid;
+  gap: 1.15rem;
+}
+.theme-ballroom .event-timeline::before {
+  content: "";
+  position: absolute;
+  left: 0.2rem;
+  top: 0.35rem;
+  bottom: 0.35rem;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--gold-a60), var(--gold-a15));
+}
+.theme-ballroom .event-timeline__item {
+  position: relative;
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.55s var(--ease-out),
+    transform 0.55s var(--ease-out);
+}
+.theme-ballroom .event-timeline__item:nth-child(1) {
+  transition-delay: 0.15s;
+}
+.theme-ballroom .event-timeline__item:nth-child(2) {
+  transition-delay: 0.3s;
+}
+.theme-ballroom .event-card.is-in .event-timeline__item {
+  opacity: 1;
+  transform: translateY(0);
+}
+.theme-ballroom .event-timeline__item::before {
+  content: "";
+  position: absolute;
+  left: -1.28rem;
+  top: 0.28rem;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--gold);
+  background: #4a1c1c;
+  box-shadow: 0 0 10px var(--gold-a40);
+}
+.theme-ballroom .event-timeline__time {
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.2rem;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+.theme-ballroom .event-timeline__name {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: var(--white);
+  line-height: 1.15;
+  margin-bottom: 0.2rem;
+}
+.theme-ballroom .event-timeline__note {
+  font-size: 0.78rem;
+  color: var(--cream-dim);
+  line-height: 1.4;
+}
+.theme-ballroom .event-card__venue {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  margin-bottom: 1.2rem;
+}
+.theme-ballroom .event-card__icon {
+  display: grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 50%;
+  border: 1px solid var(--gold-a40);
+  color: var(--gold);
+  flex-shrink: 0;
+  background: var(--gold-a08);
+  margin-top: 0.1rem;
+}
+.theme-ballroom .event-card__venue strong {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.05rem;
+  color: var(--cream);
+  line-height: 1.2;
+}
+.theme-ballroom .event-card__venue small {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.74rem;
+  color: var(--cream-dim);
+  line-height: 1.35;
+}
+.theme-ballroom .event-card__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+.theme-ballroom .event-card__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem 0.5rem;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--gold-a60);
+  background: linear-gradient(165deg, var(--gold-a40), rgba(107, 42, 42, 0.35));
+  color: var(--gold-soft);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+  transition:
+    transform 0.22s var(--ease-out),
+    background 0.22s,
+    color 0.22s,
+    border-color 0.22s;
+}
+.theme-ballroom .event-card__btn:hover,
+.theme-ballroom .event-card__btn:focus-visible {
+  transform: translateY(-2px);
+  color: var(--white);
+  border-color: rgba(224, 196, 138, 0.9);
+  background: linear-gradient(165deg, var(--gold-a60), rgba(107, 42, 42, 0.45));
+}
+.theme-ballroom .event-card__btn--ghost {
+  background: transparent;
+  border-color: var(--gold-a40);
+  color: var(--cream-dim);
+}
+.theme-ballroom .event-card__btn--ghost:hover,
+.theme-ballroom .event-card__btn--ghost:focus-visible {
+  background: var(--gold-a15);
+  color: var(--gold-soft);
+}

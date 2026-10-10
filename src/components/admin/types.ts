@@ -14,9 +14,13 @@ export type AdminTab =
 
 export type UpdateDraft = (path: string[], value: unknown) => void;
 
+export type ClearDraftPath = (path: string[]) => void;
+
 export type AdminTabProps = {
   merged: WeddingConfig;
+  defaults: WeddingConfig;
   updateDraft: UpdateDraft;
+  clearDraftPath: ClearDraftPath;
 };
 
 export type AdminTabContentProps = AdminTabProps & {

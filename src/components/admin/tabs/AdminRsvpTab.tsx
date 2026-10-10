@@ -117,7 +117,10 @@ export function AdminRsvpTab({ merged, updateDraft, setMessage }: AdminRsvpTabPr
         </div>
       </fieldset>
 
-      <RsvpSubmissionsPanel rsvp={merged.rsvp} onNotify={(text, options) => setMessage(text, options)} />
+      <RsvpSubmissionsPanel
+        rsvp={merged.rsvp}
+        onNotify={(text, options) => setMessage(text, options)}
+      />
     </div>
   );
 }

@@ -1,12 +1,12 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import {
-  mockSupabaseGuest,
-  mockSupabaseMinimal,
-} from "./helpers/supabase-mock";
+import { mockSupabaseGuest, mockSupabaseMinimal } from "./helpers/supabase-mock";
 import { freezeBrowserTime } from "./helpers/time-freeze";
 
-async function openInvitation(page: import("@playwright/test").Page, path = "/?guest=keluarga-tampubolon") {
+async function openInvitation(
+  page: import("@playwright/test").Page,
+  path = "/?guest=keluarga-tampubolon",
+) {
   await freezeBrowserTime(page, "2026-04-10T12:00:00+07:00");
   await mockSupabaseMinimal(page);
   await mockSupabaseGuest(page, "keluarga-tampubolon", {

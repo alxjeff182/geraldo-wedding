@@ -14,13 +14,7 @@ type Props = {
 
 const SWIPE_CLOSE_PX = 88;
 
-export function Gallery3D({
-  eyebrow,
-  title,
-  images,
-  scrollRootRef,
-  enabled = true,
-}: Props) {
+export function Gallery3D({ eyebrow, title, images, scrollRootRef, enabled = true }: Props) {
   const n = images.length;
   const lightboxRef = useRef<HTMLDivElement | null>(null);
   const {
@@ -143,12 +137,7 @@ export function Gallery3D({
   if (!n) return null;
 
   return (
-    <section
-      ref={sectionRef}
-      id="gallery"
-      className="gallery-canvas"
-      aria-label={title}
-    >
+    <section ref={sectionRef} id="gallery" className="gallery-canvas" aria-label={title}>
       <div className="gallery-canvas__bg" aria-hidden="true">
         <span className="gallery-canvas__orb gallery-canvas__orb--a" />
         <span className="gallery-canvas__orb gallery-canvas__orb--b" />
@@ -188,12 +177,7 @@ export function Gallery3D({
 
         <div className="gallery-ring" ref={ringRef} id="galleryRing">
           {images.map((img, i) => (
-            <figure
-              key={`${img.src}-${i}`}
-              className="gallery-plane"
-              data-plane
-              data-index={i}
-            >
+            <figure key={`${img.src}-${i}`} className="gallery-plane" data-plane data-index={i}>
               <div className="gallery-plane__frame">
                 {img.src.includes("gallery-placeholder") ? (
                   <div
@@ -206,18 +190,10 @@ export function Gallery3D({
                     <span>Foto</span>
                   </div>
                 ) : (
-                  <img
-                    src={img.src}
-                    alt={img.alt}
-                    width={720}
-                    height={960}
-                    draggable={false}
-                  />
+                  <img src={img.src} alt={img.alt} width={720} height={960} draggable={false} />
                 )}
                 <figcaption>
-                  <span className="gallery-plane__num">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
+                  <span className="gallery-plane__num">{String(i + 1).padStart(2, "0")}</span>
                   <span className="gallery-plane__title">{img.alt}</span>
                 </figcaption>
               </div>

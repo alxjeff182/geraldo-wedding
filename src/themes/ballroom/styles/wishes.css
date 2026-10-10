@@ -1,0 +1,318 @@
+/* ========== EXTRA SECTIONS (Story / Guest guide / Wishes) ========== */
+.theme-ballroom .story-mod,
+.theme-ballroom .guide-mod,
+.theme-ballroom .wishes-mod,
+.theme-ballroom .hashtag-mod,
+.theme-ballroom .intro-mod {
+  padding: 3.25rem 1.35rem;
+  position: relative;
+}
+
+.theme-ballroom .intro-mod__text {
+  max-width: 22rem;
+  margin: 0 auto;
+  text-align: center;
+  font-size: var(--fs-lead);
+  line-height: 1.7;
+  color: var(--cream-dim);
+  font-weight: 300;
+}
+
+.theme-ballroom .hashtag-mod__photo {
+  display: block;
+  width: min(100%, 18rem);
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  margin: 0 auto 1.25rem;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+}
+
+.theme-ballroom .hashtag-mod__tag {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 5cqi, 1.75rem);
+  color: var(--gold-soft);
+  letter-spacing: 0.04em;
+}
+
+.theme-ballroom .gift-address {
+  width: 100%;
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border-radius: var(--r-md);
+  border: 1px dashed var(--gold-a25);
+  background: rgba(0, 0, 0, 0.15);
+  color: var(--cream-dim);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.theme-ballroom .gift-address__label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.theme-ballroom .qris-dummy-note {
+  margin: 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: rgba(212, 196, 176, 0.55);
+  text-align: center;
+}
+
+.theme-ballroom .wishes-locked {
+  max-width: 34rem;
+  margin: 0 auto 1.5rem;
+  padding: 1rem 1.15rem;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--cream-dim);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.theme-ballroom .wishes-namechip {
+  margin: 0;
+  min-height: var(--ctl-h);
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--white);
+  font-size: 0.95rem;
+}
+
+.theme-ballroom .wishes-remaining {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: rgba(212, 196, 176, 0.55);
+}
+
+.theme-ballroom .story-mod__body {
+  display: grid;
+  gap: 1rem;
+  max-width: 34rem;
+  margin-inline: auto;
+}
+
+.theme-ballroom .story-mod__p {
+  font-size: var(--fs-lead);
+  line-height: 1.7;
+  color: var(--cream-dim);
+  text-align: center;
+  font-weight: 300;
+}
+
+.theme-ballroom .guide-mod__grid {
+  display: grid;
+  gap: 0.85rem;
+  max-width: 34rem;
+  margin-inline: auto;
+}
+
+.theme-ballroom .guide-card {
+  padding: 1.15rem 1.1rem;
+  border-radius: var(--r-md);
+  border: 1px solid var(--gold-a15);
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--bg-soft) 88%, transparent),
+    color-mix(in srgb, var(--bg) 92%, transparent)
+  );
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+}
+
+.theme-ballroom .guide-card__label {
+  margin: 0 0 0.45rem;
+  font-family: var(--font-display);
+  font-size: var(--fs-eyebrow);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.theme-ballroom .guide-card__text {
+  margin: 0;
+  font-size: var(--fs-body);
+  line-height: 1.65;
+  color: var(--cream-dim);
+}
+
+.theme-ballroom .wishes-form {
+  max-width: 34rem;
+  margin: 0 auto 1.5rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.theme-ballroom .wishes-list {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 34rem;
+  margin-inline: auto;
+}
+
+.theme-ballroom .wish-card {
+  padding: 1rem 1.1rem;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.theme-ballroom .wish-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+}
+
+.theme-ballroom .wish-card__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--gold-soft);
+}
+
+.theme-ballroom .wish-card__time {
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: rgba(212, 196, 176, 0.72);
+  white-space: nowrap;
+}
+
+.theme-ballroom .couple-card:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
+}
+
+.theme-ballroom .wish-card__msg {
+  margin: 0;
+  font-size: var(--fs-body);
+  line-height: 1.55;
+  color: var(--cream-dim);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.theme-ballroom .wishes-pager {
+  display: flex;
+  justify-content: center;
+  gap: 0.65rem;
+  margin-top: 1.15rem;
+}
+
+.theme-ballroom .wishes-pager .btn--small {
+  margin-top: 0;
+}
+
+.theme-ballroom .event-card__venue--inline {
+  margin-top: 0.65rem;
+  text-align: left;
+}
+
+.theme-ballroom .event-card__actions--inline {
+  margin-top: 0.55rem;
+  grid-template-columns: 1fr 1fr;
+}
+
+.theme-ballroom .event-timeline__item + .event-timeline__item {
+  margin-top: 1.15rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.theme-ballroom .couple-card__ig {
+  display: inline-block;
+  margin: 0.65rem 0 0;
+  color: var(--gold-soft);
+  font-size: 0.85rem;
+  text-decoration: none;
+  border-bottom: 1px solid var(--gold-a40);
+}
+
+.theme-ballroom .hashtag-mod__tag--btn {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
+
+.theme-ballroom .hashtag-mod__ig {
+  display: flex;
+  margin: 1rem auto 0;
+  width: fit-content;
+}
+
+.theme-ballroom .gift-address__text {
+  margin: 0 0 0.65rem;
+  white-space: pre-wrap;
+}
+
+.theme-ballroom .footer__quote {
+  margin: 0.35rem 0 0;
+  font-style: italic;
+  font-size: 0.85rem;
+  color: rgba(212, 196, 176, 0.7);
+  letter-spacing: 0.02em;
+}
+
+.theme-ballroom .footer__credits {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.theme-ballroom .footer__prompt {
+  margin: 0.35rem 0 0;
+  font-size: 0.72rem;
+  color: rgba(212, 196, 176, 0.55);
+}
+
+.theme-ballroom .footer__links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.65rem;
+}
+
+.theme-ballroom .footer__links a {
+  color: var(--gold-soft);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-bottom: 1px solid var(--gold-a40);
+}
+
+.theme-ballroom .audio-fab {
+  position: absolute;
+  top: max(0.85rem, env(safe-area-inset-top));
+  right: max(0.85rem, env(safe-area-inset-right));
+  z-index: 40;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--gold-a40);
+  background: rgba(20, 12, 12, 0.72);
+  color: var(--gold-soft);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}

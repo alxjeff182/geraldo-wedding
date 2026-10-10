@@ -15,9 +15,7 @@ describe("Wishes invite gating", () => {
         <Wishes guestId={null} guestName="Tamu" onToast={() => undefined} />
       </WeddingContentProvider>,
     );
-    expect(
-      screen.getByText(/buka undangan dari link pribadi/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/buka undangan dari link pribadi/i)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /kirim ucapan/i })).toBeNull();
   });
 

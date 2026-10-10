@@ -1,0 +1,67 @@
+/* Footer — closing composition */
+.theme-ballroom .footer {
+  position: relative;
+  isolation: isolate;
+  padding: 4.5rem 1.5rem calc(6.5rem + env(safe-area-inset-bottom));
+  text-align: center;
+  overflow: hidden;
+  border-top: 1px solid var(--gold-a15);
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 0%, rgba(107, 42, 42, 0.28), transparent 62%),
+    radial-gradient(ellipse 50% 40% at 50% 100%, var(--gold-a08), transparent 55%);
+  color: var(--cream-dim);
+}
+.theme-ballroom .footer__glow {
+  position: absolute;
+  inset: -20% auto auto 50%;
+  width: 70%;
+  height: 55%;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, var(--gold-a15), transparent 68%);
+  pointer-events: none;
+  z-index: -1;
+}
+.theme-ballroom .footer__logo {
+  display: block;
+  width: 5.5rem;
+  height: auto;
+  margin: 0 auto 1.15rem;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.35));
+}
+.theme-ballroom .footer .eyebrow {
+  margin-bottom: 0.55rem;
+}
+.theme-ballroom .footer__names {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.85rem, 7cqi, 2.35rem);
+  color: var(--white);
+  line-height: 1.15;
+  margin-bottom: 0;
+}
+.theme-ballroom .footer .ornament {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+.theme-ballroom .footer__msg {
+  max-width: 16rem;
+  margin: 0 auto;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--cream);
+}
+.theme-ballroom .footer__date {
+  margin-top: 1.1rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+.theme-ballroom .footer__copy {
+  margin-top: 1.75rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(212, 196, 176, 0.62);
+}

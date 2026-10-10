@@ -44,7 +44,9 @@ export function ImageUploader({
     if (spec) {
       const validationError = await validateMediaFile(file, spec);
       if (validationError) {
-        setWarning(`${validationError} Upload tetap dilanjutkan — pertimbangkan resize agar tampilan optimal.`);
+        setWarning(
+          `${validationError} Upload tetap dilanjutkan — pertimbangkan resize agar tampilan optimal.`,
+        );
       }
     }
 
@@ -62,7 +64,7 @@ export function ImageUploader({
 
   return (
     <div className="admin-uploader">
-      <span className="admin-label">{label}</span>
+      {label ? <span className="admin-label">{label}</span> : null}
       {spec && (
         <div className="admin-uploader__spec">
           <p className="admin-uploader__spec-line">
@@ -89,39 +91,41 @@ export function ImageUploader({
       {locked ? (
         <p className="admin-hint">{lockedNote}</p>
       ) : (
-      <div className="admin-uploader__actions">
-        <input
-          ref={inputRef}
-          type="file"
-          accept={accept}
-          className="sr-only"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) void handleFile(file);
-            e.target.value = "";
-          }}
-        />
-        <button
-          type="button"
-          className="admin-btn admin-btn--secondary"
-          disabled={uploading}
-          onClick={() => inputRef.current?.click()}
-        >
-          {uploading ? "Mengunggah..." : "Unggah File"}
-        </button>
-        <input
-          type="url"
-          className="admin-input"
-          value={value}
-          placeholder="atau tempel URL"
-          onChange={(e) => onChange(e.target.value)}
-        />
-      </div>
+        <div className="admin-uploader__actions">
+          <input
+            ref={inputRef}
+            type="file"
+            accept={accept}
+            className="sr-only"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) void handleFile(file);
+              e.target.value = "";
+            }}
+          />
+          <button
+            type="button"
+            className="admin-btn admin-btn--secondary"
+            disabled={uploading}
+            onClick={() => inputRef.current?.click()}
+          >
+            {uploading ? "Mengunggah..." : "Unggah File"}
+          </button>
+          <input
+            type="url"
+            className="admin-input"
+            value={value}
+            placeholder="atau tempel URL"
+            onChange={(e) => onChange(e.target.value)}
+          />
+        </div>
       )}
       {warning && <p className="admin-uploader__warning">{warning}</p>}
       {error && <p className="admin-error">{error}</p>}
       {!spec && (
-        <p className="admin-hint">Rekomendasi: WebP untuk foto, MP4 terkompresi untuk video. Maks. 10 MB.</p>
+        <p className="admin-hint">
+          Rekomendasi: WebP untuk foto, MP4 terkompresi untuk video. Maks. 10 MB.
+        </p>
       )}
     </div>
   );

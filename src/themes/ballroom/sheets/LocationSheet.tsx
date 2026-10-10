@@ -24,8 +24,7 @@ export function LocationSheet({
 }: Props) {
   const [tab, setTab] = useState(0);
   const event = events[tab] ?? events[0];
-  const sameVenue =
-    events.length > 0 && events.every((item) => item.venue === events[0]?.venue);
+  const sameVenue = events.length > 0 && events.every((item) => item.venue === events[0]?.venue);
 
   useEffect(() => {
     if (open) setTab(0);
@@ -142,12 +141,22 @@ export function LocationSheet({
       </div>
       <footer className="sheet__foot sheet__foot--row">
         {event ? (
-          <a className="btn sheet__cta" href={event.mapsUrl} target="_blank" rel="noopener noreferrer">
+          <a
+            className="btn sheet__cta"
+            href={event.mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             {mapsLabel}
           </a>
         ) : null}
         {calUrl ? (
-          <a className="btn btn--ghost sheet__cta" href={calUrl} target="_blank" rel="noopener noreferrer">
+          <a
+            className="btn btn--ghost sheet__cta"
+            href={calUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             {calendarLabel}
           </a>
         ) : null}

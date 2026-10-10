@@ -40,8 +40,7 @@ export function isSpammyRsvpName(name: string): boolean {
 }
 
 export type RsvpClientGuardResult =
-  | { allowed: true }
-  | { allowed: false; reason: "already_submitted" | "too_fast" | "spam_name" };
+  { allowed: true } | { allowed: false; reason: "already_submitted" | "too_fast" | "spam_name" };
 
 export function checkRsvpClientGuard(
   guestId: string | null,

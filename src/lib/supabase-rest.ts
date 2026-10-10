@@ -32,10 +32,9 @@ export async function fetchSiteContentMain(): Promise<{
     return { content: null, error: null };
   }
 
-  const res = await fetch(
-    restUrl("site_content", { id: "eq.main", select: "content" }),
-    { headers: restHeaders({ Accept: "application/json" }) },
-  );
+  const res = await fetch(restUrl("site_content", { id: "eq.main", select: "content" }), {
+    headers: restHeaders({ Accept: "application/json" }),
+  });
 
   if (!res.ok) {
     return { content: null, error: `Gagal memuat konten (${res.status})` };

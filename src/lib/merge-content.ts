@@ -81,10 +81,7 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
   }
 
   const merged = deepMerge(structuredClone(wedding) as WeddingConfig, normalized) as WeddingConfig;
-  const whatsappTemplates = resolveInviteTemplates(
-    [...merged.invite.whatsappTemplates],
-    undefined,
-  );
+  const whatsappTemplates = resolveInviteTemplates([...merged.invite.whatsappTemplates], undefined);
 
   const defaultTemplateId = whatsappTemplates.some(
     (item) => item.id === merged.invite.defaultTemplateId,

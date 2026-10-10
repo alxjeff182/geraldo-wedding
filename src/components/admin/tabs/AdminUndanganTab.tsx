@@ -1,15 +1,19 @@
 import { GuestInvitePanel } from "../GuestInvitePanel";
-import { AdminTextField } from "../AdminFields";
+import { AdminOverrideBooleanSelect, AdminOverrideTextField, AdminTextField } from "../AdminFields";
 import type { AdminTabProps } from "../types";
 
 type AdminUndanganTabProps = AdminTabProps & {
   setMessage: (text: string | null, options?: { retry?: () => void }) => void;
 };
 
-export function AdminUndanganTab({ merged, updateDraft, setMessage }: AdminUndanganTabProps) {
-  const acaraSummary = merged.events
-    .map((event) => `${event.name} ${event.time}`)
-    .join(" · ");
+export function AdminUndanganTab({
+  merged,
+  defaults,
+  updateDraft,
+  clearDraftPath,
+  setMessage,
+}: AdminUndanganTabProps) {
+  const acaraSummary = merged.events.map((event) => `${event.name} ${event.time}`).join(" · ");
   const venueSummary = merged.events.map((event) => event.venue).join(" · ");
 
   return (
@@ -17,32 +21,34 @@ export function AdminUndanganTab({ merged, updateDraft, setMessage }: AdminUndan
       <fieldset className="admin-fieldset">
         <legend>Situs & SEO</legend>
         <div className="admin-form-grid">
-          <AdminTextField
+          <AdminOverrideTextField
             label="URL undangan (untuk link share)"
             wide
             value={merged.site.url}
+            defaultValue={defaults.site.url}
+            onReset={() => clearDraftPath(["site", "url"])}
             onChange={(value) => updateDraft(["site", "url"], value)}
           />
-          <label className="admin-field">
-            <span className="admin-label">Sembunyikan dari mesin pencari (noindex)</span>
-            <select
-              className="admin-input"
-              value={merged.site.noIndex ? "1" : "0"}
-              onChange={(e) => updateDraft(["site", "noIndex"], e.target.value === "1")}
-            >
-              <option value="0">Indeks (live)</option>
-              <option value="1">Noindex (staging / preview)</option>
-            </select>
-          </label>
+          <AdminOverrideBooleanSelect
+            label="Sembunyikan dari mesin pencari (noindex)"
+            value={merged.site.noIndex}
+            defaultValue={defaults.site.noIndex}
+            onReset={() => clearDraftPath(["site", "noIndex"])}
+            onChange={(value) => updateDraft(["site", "noIndex"], value)}
+            falseOption="Indeks (live)"
+            trueOption="Noindex (staging / preview)"
+          />
         </div>
       </fieldset>
 
       <fieldset className="admin-fieldset">
         <legend>WhatsApp Tamu (RSVP & Gift)</legend>
         <div className="admin-form-grid">
-          <AdminTextField
+          <AdminOverrideTextField
             label="Nomor WhatsApp pasangan (62…)"
             value={merged.contact.whatsappNumber}
+            defaultValue={defaults.contact.whatsappNumber}
+            onReset={() => clearDraftPath(["contact", "whatsappNumber"])}
             onChange={(value) => updateDraft(["contact", "whatsappNumber"], value)}
           />
           {merged.contact.whatsappNumber.includes("81234567890") ? (

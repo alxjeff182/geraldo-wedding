@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useWeddingContent } from "../../context/WeddingContentContext";
+import { useWeddingContent } from "../../context/use-wedding-content";
 import { useAudio } from "../../hooks/useAudio";
 import { useToast } from "../../hooks/useToast";
 import { Toast } from "../../components/ui/Toast";
@@ -100,8 +100,7 @@ export function BallroomApp({ guestName, guestId }: Props) {
   }, []);
 
   const coupleTitle = `${content.couple.groom.shortName} & ${content.couple.bride.shortName}`;
-  const dockVisible =
-    revealed && inFirstSection && heroProgress >= DOCK_AT && !sheet.isOpen;
+  const dockVisible = revealed && inFirstSection && heroProgress >= DOCK_AT && !sheet.isOpen;
 
   const dateFooter = content.dateLabel.includes("·")
     ? content.dateLabel
@@ -109,14 +108,8 @@ export function BallroomApp({ guestName, guestId }: Props) {
 
   return (
     <div className={`theme-ballroom${!revealed ? " is-locked" : ""}`}>
-      <div
-        ref={stageRef}
-        className={`stage${sheet.isOpen ? " is-sheet-open" : ""}`}
-        id="stage"
-      >
-        {hasAudio ? (
-          <audio ref={audioRef} src={content.media.audio} loop preload="none" />
-        ) : null}
+      <div ref={stageRef} className={`stage${sheet.isOpen ? " is-sheet-open" : ""}`} id="stage">
+        {hasAudio ? <audio ref={audioRef} src={content.media.audio} loop preload="none" /> : null}
 
         {hasAudio && revealed ? (
           <button
@@ -279,9 +272,7 @@ export function BallroomApp({ guestName, guestId }: Props) {
             />
             <p className="eyebrow">Dengan penuh kasih</p>
             <p className="footer__names">{content.site.title}</p>
-            {content.quote?.trim() ? (
-              <p className="footer__quote">{content.quote}</p>
-            ) : null}
+            {content.quote?.trim() ? <p className="footer__quote">{content.quote}</p> : null}
             <div className="ornament" aria-hidden="true" />
             {content.closing.paragraphs.map((p) => (
               <p key={p.slice(0, 24)} className="footer__msg">
@@ -297,7 +288,7 @@ export function BallroomApp({ guestName, guestId }: Props) {
                 <p className="footer__prompt">{content.footer.portfolioPrompt}</p>
               ) : null}
               <div className="footer__links">
-                {(content.site.creator.websiteUrl || content.site.creator.url) ? (
+                {content.site.creator.websiteUrl || content.site.creator.url ? (
                   <a
                     href={content.site.creator.websiteUrl || content.site.creator.url}
                     target="_blank"

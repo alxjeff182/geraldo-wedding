@@ -10,29 +10,35 @@ import { AdminGuestbookTab } from "./tabs/AdminGuestbookTab";
 import { AdminPenutupTab } from "./tabs/AdminPenutupTab";
 import { AdminMediaTab } from "./tabs/AdminMediaTab";
 
-export function AdminTabContent({ tab, merged, updateDraft, setMessage }: AdminTabContentProps) {
+export function AdminTabContent({
+  tab,
+  merged,
+  defaults,
+  updateDraft,
+  clearDraftPath,
+  setMessage,
+}: AdminTabContentProps) {
+  const tabProps = { merged, defaults, updateDraft, clearDraftPath };
   switch (tab) {
     case "umum":
-      return <AdminUmumTab merged={merged} updateDraft={updateDraft} />;
+      return <AdminUmumTab {...tabProps} />;
     case "undangan":
-      return <AdminUndanganTab merged={merged} updateDraft={updateDraft} setMessage={setMessage} />;
+      return <AdminUndanganTab {...tabProps} setMessage={setMessage} />;
     case "mempelai":
-      return <AdminMempelaiTab merged={merged} updateDraft={updateDraft} />;
+      return <AdminMempelaiTab {...tabProps} />;
     case "acara":
-      return <AdminAcaraTab merged={merged} updateDraft={updateDraft} />;
+      return <AdminAcaraTab {...tabProps} />;
     case "galeri":
-      return <AdminGaleriTab merged={merged} updateDraft={updateDraft} />;
+      return <AdminGaleriTab {...tabProps} />;
     case "gift":
-      return <AdminGiftTab merged={merged} updateDraft={updateDraft} />;
+      return <AdminGiftTab {...tabProps} />;
     case "rsvp":
-      return <AdminRsvpTab merged={merged} updateDraft={updateDraft} setMessage={setMessage} />;
+      return <AdminRsvpTab {...tabProps} setMessage={setMessage} />;
     case "guestbook":
-      return (
-        <AdminGuestbookTab merged={merged} updateDraft={updateDraft} setMessage={setMessage} />
-      );
+      return <AdminGuestbookTab {...tabProps} setMessage={setMessage} />;
     case "penutup":
-      return <AdminPenutupTab merged={merged} updateDraft={updateDraft} />;
+      return <AdminPenutupTab {...tabProps} />;
     case "media":
-      return <AdminMediaTab merged={merged} updateDraft={updateDraft} />;
+      return <AdminMediaTab {...tabProps} />;
   }
 }

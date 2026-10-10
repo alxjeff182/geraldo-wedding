@@ -4,15 +4,11 @@
       "main": false
     }
   },
-  "rewrites": [
-    { "source": "/((?!api/).*)", "destination": "/" }
-  ],
+  "rewrites": [{ "source": "/((?!api/).*)", "destination": "/" }],
   "headers": [
     {
       "source": "/admin",
-      "headers": [
-        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
-      ]
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
     },
     {
       "source": "/(.*)",

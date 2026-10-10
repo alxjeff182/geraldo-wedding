@@ -13,7 +13,7 @@ import {
 } from "./validate.ts";
 
 const corsHeaders = (origin: string | null, allowedOrigin: string | null) => ({
-  "Access-Control-Allow-Origin": allowedOrigin && origin ? origin : allowedOrigin ?? "*",
+  "Access-Control-Allow-Origin": allowedOrigin && origin ? origin : (allowedOrigin ?? "*"),
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 });
 
@@ -106,13 +106,7 @@ serve(async (req) => {
     return new Response("ok", { headers });
   }
 
-  if (
-    !isAllowedOrigin(
-      requestOrigin,
-      req.headers.get("Referer"),
-      allowedOrigin,
-    )
-  ) {
+  if (!isAllowedOrigin(requestOrigin, req.headers.get("Referer"), allowedOrigin)) {
     return new Response(JSON.stringify({ error: "Origin tidak diizinkan" }), {
       status: 403,
       headers: { ...headers, "Content-Type": "application/json" },
@@ -147,7 +141,9 @@ serve(async (req) => {
 
       if (!guestId) {
         return new Response(
-          JSON.stringify({ error: "Buka undangan dari link pribadi Anda untuk konfirmasi kehadiran." }),
+          JSON.stringify({
+            error: "Buka undangan dari link pribadi Anda untuk konfirmasi kehadiran.",
+          }),
           { status: 403, headers: { ...headers, "Content-Type": "application/json" } },
         );
       }
@@ -187,25 +183,36 @@ serve(async (req) => {
       }
 
       if (await guestAlreadySubmitted(supabase, guestId)) {
-        return new Response(JSON.stringify({ error: "Konfirmasi kehadiran untuk undangan ini sudah pernah dikirim." }), {
-          status: 409,
-          headers: { ...headers, "Content-Type": "application/json" },
-        });
+        return new Response(
+          JSON.stringify({
+            error: "Konfirmasi kehadiran untuk undangan ini sudah pernah dikirim.",
+          }),
+          {
+            status: 409,
+            headers: { ...headers, "Content-Type": "application/json" },
+          },
+        );
       }
 
       if (await duplicateNameRecently(supabase, name)) {
-        return new Response(JSON.stringify({ error: "Konfirmasi dengan nama ini sudah pernah dikirim hari ini." }), {
-          status: 409,
-          headers: { ...headers, "Content-Type": "application/json" },
-        });
+        return new Response(
+          JSON.stringify({ error: "Konfirmasi dengan nama ini sudah pernah dikirim hari ini." }),
+          {
+            status: 409,
+            headers: { ...headers, "Content-Type": "application/json" },
+          },
+        );
       }
 
       const allowed = await checkRateLimit(supabase, ip, "rsvp", MAX_RSVP_PER_HOUR);
       if (!allowed) {
-        return new Response(JSON.stringify({ error: "Terlalu banyak permintaan. Coba lagi nanti." }), {
-          status: 429,
-          headers: { ...headers, "Content-Type": "application/json" },
-        });
+        return new Response(
+          JSON.stringify({ error: "Terlalu banyak permintaan. Coba lagi nanti." }),
+          {
+            status: 429,
+            headers: { ...headers, "Content-Type": "application/json" },
+          },
+        );
       }
 
       const { error } = await supabase.from("rsvp_submissions").insert({
@@ -234,9 +241,7 @@ serve(async (req) => {
       if (!guestId) {
         return new Response(
           JSON.stringify({ error: "Buka undangan dari link pribadi Anda untuk mengirim ucapan." }),
-          { status: 403,
-            headers: { ...headers, "Content-Type": "application/json" },
-          },
+          { status: 403, headers: { ...headers, "Content-Type": "application/json" } },
         );
       }
 
@@ -272,20 +277,26 @@ serve(async (req) => {
 
       const wishRows = recentWishes ?? [];
       if (wishRows.length >= MAX_WISH_PER_GUEST) {
-        return new Response(JSON.stringify({ error: "Batas 3 ucapan per undangan sudah tercapai." }), {
-          status: 429,
-          headers: { ...headers, "Content-Type": "application/json" },
-        });
+        return new Response(
+          JSON.stringify({ error: "Batas 3 ucapan per undangan sudah tercapai." }),
+          {
+            status: 429,
+            headers: { ...headers, "Content-Type": "application/json" },
+          },
+        );
       }
 
       const latest = wishRows[0];
       if (latest?.created_at) {
         const elapsed = Date.now() - new Date(latest.created_at).getTime();
         if (elapsed < MIN_WISH_GUEST_INTERVAL_MS) {
-          return new Response(JSON.stringify({ error: "Tunggu sebentar sebelum mengirim ucapan lagi." }), {
-            status: 429,
-            headers: { ...headers, "Content-Type": "application/json" },
-          });
+          return new Response(
+            JSON.stringify({ error: "Tunggu sebentar sebelum mengirim ucapan lagi." }),
+            {
+              status: 429,
+              headers: { ...headers, "Content-Type": "application/json" },
+            },
+          );
         }
       }
 
@@ -298,10 +309,13 @@ serve(async (req) => {
 
       const allowed = await checkRateLimit(supabase, ip, "wish", MAX_WISH_PER_HOUR);
       if (!allowed) {
-        return new Response(JSON.stringify({ error: "Terlalu banyak permintaan. Coba lagi nanti." }), {
-          status: 429,
-          headers: { ...headers, "Content-Type": "application/json" },
-        });
+        return new Response(
+          JSON.stringify({ error: "Terlalu banyak permintaan. Coba lagi nanti." }),
+          {
+            status: 429,
+            headers: { ...headers, "Content-Type": "application/json" },
+          },
+        );
       }
 
       const { error } = await supabase.from("wishes").insert({

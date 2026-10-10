@@ -30,8 +30,7 @@ function toPhoneOwnerMap(
   existing?: ReadonlyMap<string, string> | Readonly<Record<string, string>>,
 ): Map<string, string> {
   if (!existing) return new Map();
-  const entries =
-    existing instanceof Map ? [...existing.entries()] : Object.entries(existing);
+  const entries = existing instanceof Map ? [...existing.entries()] : Object.entries(existing);
   return new Map(
     entries
       .map(([key, name]) => [key.trim().toLowerCase(), name.trim()] as const)
@@ -41,9 +40,7 @@ function toPhoneOwnerMap(
 
 export function phoneAlreadyTakenMessage(ownerName?: string | null): string {
   const name = ownerName?.trim();
-  return name
-    ? `Nomor WA sudah dipakai oleh "${name}"`
-    : "Nomor WA sudah ada di daftar";
+  return name ? `Nomor WA sudah dipakai oleh "${name}"` : "Nomor WA sudah ada di daftar";
 }
 
 /** Keep display-friendly local digits (08…); reject numbers that cannot be WA’d. */
@@ -232,7 +229,11 @@ export function parseGuestBulkText(
   lines.forEach((line, idx) => {
     const trimmed = line.trim();
     if (!trimmed) return;
-    if (idx === 0 && HEADER_RE.test(trimmed) && /display_name|nama|name|phone|slug/i.test(trimmed)) {
+    if (
+      idx === 0 &&
+      HEADER_RE.test(trimmed) &&
+      /display_name|nama|name|phone|slug/i.test(trimmed)
+    ) {
       return;
     }
 

@@ -18,14 +18,20 @@ if (existsSync(envPath)) {
     const eq = trimmed.indexOf("=");
     if (eq === -1) continue;
     const key = trimmed.slice(0, eq).trim();
-    const value = trimmed.slice(eq + 1).trim().replace(/^["']|["']$/g, "");
+    const value = trimmed
+      .slice(eq + 1)
+      .trim()
+      .replace(/^["']|["']$/g, "");
     if (!process.env[key]) process.env[key] = value;
   }
 }
 
 const url = process.env.VITE_SUPABASE_URL ?? process.env.SUPABASE_URL;
 const anonKey = process.env.VITE_SUPABASE_ANON_KEY;
-const siteUrl = (process.env.VITE_SITE_URL ?? "https://geraldo-christin.vercel.app").replace(/\/$/, "");
+const siteUrl = (process.env.VITE_SITE_URL ?? "https://geraldo-christin.vercel.app").replace(
+  /\/$/,
+  "",
+);
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!url || !anonKey) {
@@ -72,7 +78,9 @@ const stamp = Date.now();
 
 // 2. Guest lookup RPC
 {
-  const { data, error } = await supabase.rpc("get_guest_by_slug", { guest_slug: "nonexistent-slug-xyz" });
+  const { data, error } = await supabase.rpc("get_guest_by_slug", {
+    guest_slug: "nonexistent-slug-xyz",
+  });
   if (!error && Array.isArray(data)) pass("RPC get_guest_by_slug", `returns ${data.length} row(s)`);
   else fail("RPC get_guest_by_slug", error.message);
 }
@@ -91,7 +99,8 @@ const stamp = Date.now();
     },
   });
   if (!error && data?.ok) pass("Edge submit RSVP", `QA RSVP ${stamp}`);
-  else if (error?.message?.includes("non-2xx")) fail("Edge submit RSVP", "function not deployed? run: npx supabase functions deploy submit");
+  else if (error?.message?.includes("non-2xx"))
+    fail("Edge submit RSVP", "function not deployed? run: npx supabase functions deploy submit");
   else fail("Edge submit RSVP", error?.message ?? JSON.stringify(data));
 }
 

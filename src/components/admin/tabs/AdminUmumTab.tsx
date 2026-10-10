@@ -1,8 +1,8 @@
-import { AdminTextField } from "../AdminFields";
+import { AdminOverrideTextField, AdminTextField } from "../AdminFields";
 import { SiapKirimChecklist } from "../SiapKirimChecklist";
 import type { AdminTabProps } from "../types";
 
-export function AdminUmumTab({ merged, updateDraft }: AdminTabProps) {
+export function AdminUmumTab({ merged, defaults, updateDraft, clearDraftPath }: AdminTabProps) {
   return (
     <div className="admin-form-grid">
       <SiapKirimChecklist merged={merged} />
@@ -138,11 +138,13 @@ export function AdminUmumTab({ merged, updateDraft }: AdminTabProps) {
             value={merged.story.subtitle}
             onChange={(value) => updateDraft(["story", "subtitle"], value)}
           />
-          <AdminTextField
+          <AdminOverrideTextField
             label="Paragraf (pisah baris kosong = paragraf baru)"
             wide
             rows={6}
             value={merged.story.paragraphs.join("\n\n")}
+            defaultValue={defaults.story.paragraphs.join("\n\n")}
+            onReset={() => clearDraftPath(["story", "paragraphs"])}
             onChange={(value) =>
               updateDraft(
                 ["story", "paragraphs"],

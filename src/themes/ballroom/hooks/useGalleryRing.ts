@@ -173,8 +173,7 @@ export function useGalleryRing({ count, scrollRootRef, enabled = true }: Options
       const el = planeEls[index];
       if (!el) return;
       const img = el.querySelector("img");
-      const title =
-        el.querySelector(".gallery-plane__title")?.textContent?.trim() || "";
+      const title = el.querySelector(".gallery-plane__title")?.textContent?.trim() || "";
       const num =
         el.querySelector(".gallery-plane__num")?.textContent?.trim() ||
         String(index + 1).padStart(2, "0");

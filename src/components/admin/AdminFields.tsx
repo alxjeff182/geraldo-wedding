@@ -1,3 +1,6 @@
+import type { ReactNode } from "react";
+import { isOverridden } from "../../lib/merge-content";
+
 type TextFieldProps = {
   label: string;
   value: string;
@@ -6,6 +9,35 @@ type TextFieldProps = {
   placeholder?: string;
   wide?: boolean;
 };
+
+type OverrideFieldProps = {
+  label: string;
+  overridden: boolean;
+  onReset?: () => void;
+  wide?: boolean;
+  children: ReactNode;
+};
+
+export function OverrideField({ label, overridden, onReset, wide, children }: OverrideFieldProps) {
+  return (
+    <div className={`admin-field${wide ? " admin-field--wide" : ""}`}>
+      <div className="admin-label-row">
+        <span className="admin-label">{label}</span>
+        {overridden ? (
+          <span className="admin-override-meta">
+            <span className="admin-override-badge">Diubah</span>
+            {onReset ? (
+              <button type="button" className="admin-override-reset" onClick={onReset}>
+                Reset
+              </button>
+            ) : null}
+          </span>
+        ) : null}
+      </div>
+      {children}
+    </div>
+  );
+}
 
 export function AdminTextField({
   label,
@@ -28,6 +60,98 @@ export function AdminTextField({
         onChange={(e) => onChange(e.target.value)}
       />
     </label>
+  );
+}
+
+type OverrideTextFieldProps = TextFieldProps & {
+  defaultValue: unknown;
+  onReset: () => void;
+};
+
+export function AdminOverrideTextField({
+  label,
+  value,
+  defaultValue,
+  onChange,
+  onReset,
+  rows,
+  placeholder,
+  wide,
+}: OverrideTextFieldProps) {
+  const Input = rows ? "textarea" : "input";
+  const overridden = isOverridden(value, defaultValue);
+
+  return (
+    <OverrideField label={label} overridden={overridden} onReset={onReset} wide={wide}>
+      <Input
+        className="admin-input"
+        value={value}
+        rows={rows}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    </OverrideField>
+  );
+}
+
+type OverrideBooleanSelectProps = {
+  label: string;
+  value: boolean;
+  defaultValue: boolean;
+  onChange: (value: boolean) => void;
+  onReset: () => void;
+  wide?: boolean;
+  falseOption: string;
+  trueOption: string;
+};
+
+export function AdminOverrideBooleanSelect({
+  label,
+  value,
+  defaultValue,
+  onChange,
+  onReset,
+  wide,
+  falseOption,
+  trueOption,
+}: OverrideBooleanSelectProps) {
+  const overridden = isOverridden(value, defaultValue);
+
+  return (
+    <OverrideField label={label} overridden={overridden} onReset={onReset} wide={wide}>
+      <select
+        className="admin-input"
+        value={value ? "1" : "0"}
+        onChange={(e) => onChange(e.target.value === "1")}
+      >
+        <option value="0">{falseOption}</option>
+        <option value="1">{trueOption}</option>
+      </select>
+    </OverrideField>
+  );
+}
+
+type OverrideMediaFieldProps = {
+  label: string;
+  value: string;
+  defaultValue: string;
+  onReset: () => void;
+  children: ReactNode;
+};
+
+export function AdminOverrideMediaField({
+  label,
+  value,
+  defaultValue,
+  onReset,
+  children,
+}: OverrideMediaFieldProps) {
+  const overridden = isOverridden(value, defaultValue);
+
+  return (
+    <OverrideField label={label} overridden={overridden} onReset={onReset} wide>
+      {children}
+    </OverrideField>
   );
 }
 

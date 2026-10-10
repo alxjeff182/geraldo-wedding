@@ -1,19 +1,13 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { useWeddingContent } from "../../../context/WeddingContentContext";
+import { useWeddingContent } from "../../../context/use-wedding-content";
 import { submitForm } from "../../../lib/submit-form";
 import {
   checkRsvpClientGuard,
   hasRsvpSubmitted,
   markRsvpSubmitted,
 } from "../../../lib/rsvp-spam-guard";
-import {
-  formatRsvpDeadlineLabel,
-  isRsvpDeadlinePassed,
-} from "../../../lib/rsvp-deadline";
-import {
-  buildGuestWhatsAppUrl,
-  buildRsvpWhatsappMessage,
-} from "../../../lib/guest-whatsapp";
+import { formatRsvpDeadlineLabel, isRsvpDeadlinePassed } from "../../../lib/rsvp-deadline";
+import { buildGuestWhatsAppUrl, buildRsvpWhatsappMessage } from "../../../lib/guest-whatsapp";
 import { IconCheck, IconMail, IconSuccess, IconWhatsApp, IconX } from "../icons";
 
 type Attendance = "hadir" | "tidak_hadir" | "ragu";
@@ -27,14 +21,7 @@ type Props = {
   onToast: (msg: string) => void;
 };
 
-export function RsvpSheet({
-  open,
-  guestId,
-  guestName,
-  onClose,
-  setSheetRef,
-  onToast,
-}: Props) {
+export function RsvpSheet({ open, guestId, guestName, onClose, setSheetRef, onToast }: Props) {
   const { content } = useWeddingContent();
   const rsvp = content.rsvp;
   const formOpenedAt = useRef(Date.now());
@@ -170,7 +157,12 @@ export function RsvpSheet({
             </p>
             <p className="sheet-success__text">{rsvp.successMessage}</p>
             {waHref ? (
-              <a className="btn btn--wa sheet__cta" href={waHref} target="_blank" rel="noopener noreferrer">
+              <a
+                className="btn btn--wa sheet__cta"
+                href={waHref}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <IconWhatsApp />
                 <span>Kirim juga via WhatsApp</span>
               </a>

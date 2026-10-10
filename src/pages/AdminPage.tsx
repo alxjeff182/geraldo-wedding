@@ -1,8 +1,12 @@
-import { useEffect, useState } from "react";
-import { mergeWeddingContent, stripLockedMedia } from "../lib/merge-content";
+import { useEffect, useMemo, useState } from "react";
+import {
+  getDefaultWeddingContent,
+  mergeWeddingContent,
+  stripLockedMedia,
+} from "../lib/merge-content";
 import { getSupabase, isSupabaseConfigured } from "../lib/supabase";
 import type { SiteContentOverrides } from "../types/site-content";
-import { useWeddingContent } from "../context/WeddingContentContext";
+import { useWeddingContent } from "../context/use-wedding-content";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { checkAdminAccess } from "../lib/admin-access";
 import {
@@ -79,21 +83,18 @@ export function AdminPage() {
 
     const stuckTimer = window.setTimeout(() => {
       if (cancelled || resolved) return;
-      showError(
-        "Verifikasi akses terlalu lama. Periksa koneksi, lalu coba lagi.",
-        {
-          title: "Loading stuck",
-          actionLabel: "Coba lagi",
-          onAction: () => {
-            void checkAdminAccess().then((ok) => {
-              if (!cancelled) {
-                resolved = true;
-                setIsAdmin(ok);
-              }
-            });
-          },
+      showError("Verifikasi akses terlalu lama. Periksa koneksi, lalu coba lagi.", {
+        title: "Loading stuck",
+        actionLabel: "Coba lagi",
+        onAction: () => {
+          void checkAdminAccess().then((ok) => {
+            if (!cancelled) {
+              resolved = true;
+              setIsAdmin(ok);
+            }
+          });
         },
-      );
+      });
     }, LOAD_STUCK_MS);
 
     void checkAdminAccess().then((ok) => {
@@ -145,6 +146,8 @@ export function AdminPage() {
     setSessionEmail(null);
   };
 
+  const defaults = useMemo(() => getDefaultWeddingContent(), []);
+
   const updateDraft = (path: string[], value: unknown) => {
     setDraft((prev) => {
       const next = structuredClone(prev) as Record<string, unknown>;
@@ -155,6 +158,22 @@ export function AdminPage() {
         cursor = cursor[key] as Record<string, unknown>;
       }
       cursor[path[path.length - 1]] = value;
+      return next as SiteContentOverrides;
+    });
+  };
+
+  const clearDraftPath = (path: string[]) => {
+    if (path.length === 0) return;
+    setDraft((prev) => {
+      const next = structuredClone(prev) as Record<string, unknown>;
+      let cursor: Record<string, unknown> = next;
+      for (let i = 0; i < path.length - 1; i++) {
+        const key = path[i];
+        const child = cursor[key];
+        if (!child || typeof child !== "object") return prev;
+        cursor = child as Record<string, unknown>;
+      }
+      delete cursor[path[path.length - 1]!];
       return next as SiteContentOverrides;
     });
   };
@@ -247,7 +266,11 @@ export function AdminPage() {
           <p className="admin-login__subtitle">
             Akun ini tidak terdaftar sebagai admin. Hubungi pengelola undangan.
           </p>
-          <button type="button" className="admin-btn admin-login__submit" onClick={() => void handleLogout()}>
+          <button
+            type="button"
+            className="admin-btn admin-login__submit"
+            onClick={() => void handleLogout()}
+          >
             Keluar
           </button>
         </div>
@@ -276,7 +299,11 @@ export function AdminPage() {
             <a href="/" className="admin-btn admin-btn--ghost" target="_blank" rel="noreferrer">
               Lihat Situs
             </a>
-            <button type="button" className="admin-btn admin-btn--ghost" onClick={() => void handleLogout()}>
+            <button
+              type="button"
+              className="admin-btn admin-btn--ghost"
+              onClick={() => void handleLogout()}
+            >
               Keluar
             </button>
             <button
@@ -305,7 +332,9 @@ export function AdminPage() {
           </nav>
 
           <section className="admin-panel" aria-labelledby="admin-panel-title">
-            <header className={`admin-panel__head${isDenseTab ? " admin-panel__head--compact" : ""}`}>
+            <header
+              className={`admin-panel__head${isDenseTab ? " admin-panel__head--compact" : ""}`}
+            >
               <h2 id="admin-panel-title" className="admin-panel__title">
                 {activeTab?.label}
               </h2>
@@ -316,7 +345,9 @@ export function AdminPage() {
               <AdminTabContent
                 tab={tab}
                 merged={merged}
+                defaults={defaults}
                 updateDraft={updateDraft}
+                clearDraftPath={clearDraftPath}
                 setMessage={setMessage}
               />
             </div>
@@ -325,7 +356,12 @@ export function AdminPage() {
       </div>
 
       <div className="admin-mobile-bar">
-        <a href="/" className="admin-btn admin-btn--ghost admin-mobile-bar__link" target="_blank" rel="noreferrer">
+        <a
+          href="/"
+          className="admin-btn admin-btn--ghost admin-mobile-bar__link"
+          target="_blank"
+          rel="noreferrer"
+        >
           Situs
         </a>
         <button

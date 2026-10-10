@@ -19,7 +19,10 @@ if (existsSync(envPath)) {
     const eq = trimmed.indexOf("=");
     if (eq === -1) continue;
     const key = trimmed.slice(0, eq).trim();
-    const value = trimmed.slice(eq + 1).trim().replace(/^["']|["']$/g, "");
+    const value = trimmed
+      .slice(eq + 1)
+      .trim()
+      .replace(/^["']|["']$/g, "");
     if (!process.env[key]) process.env[key] = value;
   }
 }
@@ -29,7 +32,9 @@ const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const anonKey = process.env.VITE_SUPABASE_ANON_KEY ?? process.env.SUPABASE_ANON_KEY;
 
 if (!url || !key) {
-  console.error("Set SUPABASE_URL (or VITE_SUPABASE_URL in .env.local) and SUPABASE_SERVICE_ROLE_KEY");
+  console.error(
+    "Set SUPABASE_URL (or VITE_SUPABASE_URL in .env.local) and SUPABASE_SERVICE_ROLE_KEY",
+  );
   process.exit(1);
 }
 
@@ -133,7 +138,9 @@ for (const check of checks) {
 
 if (failed > 0) {
   console.error(`\n${failed} check(s) failed. Run: npm run db:apply > pending-migrations.sql`);
-  console.error("Then paste into Supabase SQL Editor, and redeploy: npx supabase functions deploy submit");
+  console.error(
+    "Then paste into Supabase SQL Editor, and redeploy: npx supabase functions deploy submit",
+  );
   process.exit(1);
 }
 

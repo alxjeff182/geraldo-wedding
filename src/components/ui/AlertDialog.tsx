@@ -79,7 +79,11 @@ export function AlertDialog({ alert, onClose }: Props) {
             <div className="alert-dialog__actions">
               {alert.onAction ? (
                 <>
-                  <button type="button" className="alert-dialog__btn alert-dialog__btn--ghost" onClick={onClose}>
+                  <button
+                    type="button"
+                    className="alert-dialog__btn alert-dialog__btn--ghost"
+                    onClick={onClose}
+                  >
                     Tutup
                   </button>
                   <button

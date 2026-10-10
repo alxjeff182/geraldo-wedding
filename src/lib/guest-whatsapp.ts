@@ -18,10 +18,7 @@ function fillTemplate(template: string, vars: Record<string, string>): string {
   return template.replace(/\{(\w+)\}/g, (_, key: string) => vars[key] ?? `{${key}}`);
 }
 
-export function buildRsvpWhatsappMessage(
-  template: string,
-  vars: RsvpWhatsappVars,
-): string {
+export function buildRsvpWhatsappMessage(template: string, vars: RsvpWhatsappVars): string {
   return fillTemplate(template, {
     nama: vars.nama,
     kehadiran: vars.kehadiran,
@@ -31,10 +28,7 @@ export function buildRsvpWhatsappMessage(
   });
 }
 
-export function buildGiftWhatsappMessage(
-  template: string,
-  vars: GiftWhatsappVars,
-): string {
+export function buildGiftWhatsappMessage(template: string, vars: GiftWhatsappVars): string {
   return fillTemplate(template, {
     nama: vars.nama,
     metode: vars.metode,

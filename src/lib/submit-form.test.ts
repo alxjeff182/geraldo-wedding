@@ -43,8 +43,6 @@ describe("submitForm", () => {
     });
 
     expect(result.ok).toBe(true);
-    expect(invokeMock).toHaveBeenCalledWith(
-      expect.objectContaining({ type: "wish" }),
-    );
+    expect(invokeMock).toHaveBeenCalledWith(expect.objectContaining({ type: "wish" }));
   });
 });

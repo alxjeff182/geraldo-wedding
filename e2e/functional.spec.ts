@@ -14,7 +14,10 @@ function loadEnvLocal(): Record<string, string> {
     const eq = trimmed.indexOf("=");
     if (eq === -1) continue;
     const key = trimmed.slice(0, eq).trim();
-    const value = trimmed.slice(eq + 1).trim().replace(/^["']|["']$/g, "");
+    const value = trimmed
+      .slice(eq + 1)
+      .trim()
+      .replace(/^["']|["']$/g, "");
     env[key] = value;
   }
   return env;
@@ -77,14 +80,16 @@ test("rsvp form submits to edge function", async ({ page }) => {
 
   const radiogroup = sheet.getByRole("radiogroup", { name: /kehadiran/i });
   if (!(await radiogroup.isVisible().catch(() => false))) {
-    test.skip(true, "Personal guest slug not found — seed keluarga-tampubolon or open mocked invitation.spec");
+    test.skip(
+      true,
+      "Personal guest slug not found — seed keluarga-tampubolon or open mocked invitation.spec",
+    );
   }
 
   await sheet.getByLabel(/nama/i).fill("Functional Test");
 
   const submitResponse = page.waitForResponse(
-    (resp) =>
-      resp.url().includes("/functions/v1/submit") && resp.request().method() === "POST",
+    (resp) => resp.url().includes("/functions/v1/submit") && resp.request().method() === "POST",
     { timeout: 15_000 },
   );
   await page.getByRole("button", { name: /kirim konfirmasi/i }).click();
@@ -111,8 +116,7 @@ test("guestbook form submits to edge function", async ({ page }) => {
   await page.waitForTimeout(3200);
 
   const submitResponse = page.waitForResponse(
-    (resp) =>
-      resp.url().includes("/functions/v1/submit") && resp.request().method() === "POST",
+    (resp) => resp.url().includes("/functions/v1/submit") && resp.request().method() === "POST",
     { timeout: 15_000 },
   );
   await guestbook.getByRole("button", { name: /kirim/i }).click();

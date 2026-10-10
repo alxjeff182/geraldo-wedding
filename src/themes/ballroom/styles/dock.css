@@ -1,0 +1,263 @@
+/* Floating dock — modern pill + interactive chips */
+.theme-ballroom .float-dock {
+  position: absolute;
+  left: 50%;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 36;
+  transform: translateX(-50%) translateY(140%);
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem;
+  border-radius: var(--r-pill);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(18, 11, 9, 0.45);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform 0.65s var(--ease-out),
+    opacity 0.55s var(--ease-out);
+}
+.theme-ballroom .float-dock[hidden] {
+  display: none !important;
+}
+.theme-ballroom .float-dock.is-visible {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+.theme-ballroom .float-dock.is-visible .float-dock__btn {
+  animation:
+    floatIn 0.55s var(--ease-out) both,
+    btnPulse 2.8s ease-in-out 0.9s infinite;
+}
+.theme-ballroom .float-dock.is-visible .float-dock__btn:nth-child(1) {
+  animation-delay: 0.08s, 0.9s;
+}
+.theme-ballroom .float-dock.is-visible .float-dock__btn:nth-child(2) {
+  animation-delay: 0.16s, 1.15s;
+}
+.theme-ballroom .float-dock.is-visible .float-dock__btn:nth-child(3) {
+  animation-delay: 0.24s, 1.4s;
+}
+@keyframes floatIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes btnPulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 transparent,
+      0 4px 14px rgba(0, 0, 0, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 0 6px var(--gold-a15),
+      0 6px 18px rgba(0, 0, 0, 0.28);
+  }
+}
+.theme-ballroom .float-dock__btn {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  width: 4.35rem;
+  height: 4.35rem;
+  border-radius: 50%;
+  color: var(--gold-soft);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.08), var(--gold-a08));
+  border: 1.5px solid var(--gold-a60);
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  transition:
+    transform 0.22s var(--ease-out),
+    background 0.22s,
+    border-color 0.22s,
+    color 0.22s,
+    box-shadow 0.22s,
+    filter 0.22s;
+}
+.theme-ballroom .float-dock__btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.35), transparent 55%);
+  opacity: 0;
+  transform: scale(0.3);
+  pointer-events: none;
+  transition:
+    opacity 0.35s,
+    transform 0.35s var(--ease-out);
+}
+.theme-ballroom .float-dock__btn.is-pressed::after {
+  opacity: 1;
+  transform: scale(1.2);
+  transition:
+    opacity 0.15s,
+    transform 0.15s;
+}
+.theme-ballroom .float-dock__glow {
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(circle, var(--gold-a40), transparent 65%);
+  opacity: 0.35;
+  transform: scale(0.85);
+  transition:
+    opacity 0.35s,
+    transform 0.45s var(--ease-out);
+  z-index: -1;
+  pointer-events: none;
+}
+.theme-ballroom .float-dock__btn:hover,
+.theme-ballroom .float-dock__btn:focus-visible {
+  animation: none;
+  transform: translateY(-5px) scale(1.08);
+  background: linear-gradient(165deg, var(--gold-a40), rgba(107, 42, 42, 0.35));
+  border-color: rgba(224, 196, 138, 0.95);
+  color: var(--white);
+  box-shadow:
+    0 0 0 4px var(--gold-a15),
+    0 14px 28px rgba(0, 0, 0, 0.35);
+  filter: brightness(1.08);
+}
+.theme-ballroom .float-dock__btn:hover .float-dock__glow,
+.theme-ballroom .float-dock__btn:focus-visible .float-dock__glow {
+  opacity: 1;
+  transform: scale(1.05);
+}
+.theme-ballroom .float-dock__btn:active,
+.theme-ballroom .float-dock__btn.is-pressed {
+  animation: none;
+  transform: translateY(0) scale(0.94);
+  background: linear-gradient(165deg, var(--gold-a40), rgba(107, 42, 42, 0.5));
+  border-color: var(--gold-soft);
+  box-shadow:
+    0 0 0 3px var(--gold-a25),
+    0 4px 12px rgba(0, 0, 0, 0.3);
+}
+.theme-ballroom .float-dock__btn--accent {
+  background: linear-gradient(160deg, var(--gold-a40), rgba(107, 42, 42, 0.42));
+  border-color: rgba(224, 196, 138, 0.8);
+  color: var(--gold-soft);
+  box-shadow:
+    0 0 0 0 var(--gold-a25),
+    0 6px 18px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+.theme-ballroom .float-dock__btn--accent:hover,
+.theme-ballroom .float-dock__btn--accent:focus-visible {
+  background: linear-gradient(160deg, var(--gold-a60), rgba(107, 42, 42, 0.55));
+  color: var(--white);
+}
+.theme-ballroom .float-dock__btn--gift {
+  gap: 0.08rem;
+  padding-top: 0.1rem;
+}
+.theme-ballroom .float-dock__btn--gift .float-dock__icon {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+.theme-ballroom .float-dock__btn--gift .float-dock__icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.theme-ballroom .float-dock__icon {
+  display: grid;
+  place-items: center;
+  color: var(--gold);
+  transition:
+    transform 0.25s var(--ease-out),
+    color 0.2s;
+}
+.theme-ballroom .float-dock__btn:hover .float-dock__icon,
+.theme-ballroom .float-dock__btn:focus-visible .float-dock__icon {
+  transform: scale(1.14) translateY(-1px);
+  color: var(--gold-soft);
+}
+.theme-ballroom .float-dock__btn:active .float-dock__icon,
+.theme-ballroom .float-dock__btn.is-pressed .float-dock__icon {
+  transform: scale(0.95);
+}
+.theme-ballroom .float-dock__label {
+  line-height: 1;
+  font-weight: 500;
+  max-width: 3.7rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  transition:
+    letter-spacing 0.25s,
+    color 0.2s;
+}
+.theme-ballroom .float-dock__label--stack {
+  letter-spacing: 0.04em;
+  line-height: 1.12;
+  text-align: center;
+  font-size: var(--fs-eyebrow);
+  max-width: 3.6rem;
+  white-space: normal;
+}
+.theme-ballroom .float-dock__btn--gift .float-dock__label--stack {
+  color: var(--gold-soft);
+}
+.theme-ballroom .float-dock__btn:hover .float-dock__label {
+  letter-spacing: 0.14em;
+  color: var(--white);
+}
+.theme-ballroom .float-dock__btn:hover .float-dock__label--stack,
+.theme-ballroom .float-dock__btn--gift:hover .float-dock__label--stack {
+  letter-spacing: 0.05em;
+  color: var(--white);
+}
+@media (hover: none) {
+  .theme-ballroom .float-dock.is-visible .float-dock__btn {
+    animation:
+      floatIn 0.55s var(--ease-out) both,
+      btnPulse 2.4s ease-in-out 0.9s infinite;
+  }
+  .theme-ballroom .float-dock__btn:active {
+    background: linear-gradient(165deg, var(--gold-a40), rgba(107, 42, 42, 0.48));
+    border-color: rgba(224, 196, 138, 0.95);
+    color: var(--white);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-ballroom .float-dock.is-visible .float-dock__btn {
+    animation: floatIn 0.4s var(--ease-out) both;
+  }
+}
+.theme-ballroom button.float-dock__btn {
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: inherit;
+  font-size: 0.7rem;
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}

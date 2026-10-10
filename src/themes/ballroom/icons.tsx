@@ -2,7 +2,17 @@ type IconProps = { size?: number; className?: string };
 
 export function IconMail({ size = 20 }: IconProps) {
   return (
-    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <rect x="4.25" y="6.5" width="15.5" height="11.5" rx="1.75" />
       <path d="M5 7.5 12 13l7-5.5" />
     </svg>
@@ -11,7 +21,17 @@ export function IconMail({ size = 20 }: IconProps) {
 
 export function IconPin({ size = 20 }: IconProps) {
   return (
-    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <path d="M12 20.5s-5.75-4.7-5.75-9.1a5.75 5.75 0 1 1 11.5 0c0 4.4-5.75 9.1-5.75 9.1z" />
       <circle cx="12" cy="11.4" r="2" />
     </svg>
@@ -20,7 +40,17 @@ export function IconPin({ size = 20 }: IconProps) {
 
 export function IconGift({ size = 18 }: IconProps) {
   return (
-    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <rect x="4" y="10" width="16" height="10" rx="1.5" />
       <path d="M4 13h16M12 10v10" />
       <path d="M12 10c-1.6-2.4-4.5-2.8-5.5-1.4C5.4 10 6.8 12 12 10c5.2 2 6.6 0 5.5-1.4C16.5 7.2 13.6 7.6 12 10z" />
@@ -30,7 +60,15 @@ export function IconGift({ size = 18 }: IconProps) {
 
 export function IconPinSm({ size = 16 }: IconProps) {
   return (
-    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      aria-hidden="true"
+    >
       <path d="M12 20.5s-5.5-4.5-5.5-8.7a5.5 5.5 0 1 1 11 0c0 4.2-5.5 8.7-5.5 8.7z" />
       <circle cx="12" cy="11.8" r="1.8" />
     </svg>
@@ -57,7 +95,15 @@ export function IconQris({ size = 20 }: IconProps) {
 
 export function IconCopy({ size = 14 }: IconProps) {
   return (
-    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      aria-hidden="true"
+    >
       <rect x="8" y="8" width="11" height="11" rx="1.5" />
       <path d="M5 15V5.5A1.5 1.5 0 0 1 6.5 4H15" />
     </svg>
@@ -74,7 +120,15 @@ export function IconWhatsApp({ size = 18 }: IconProps) {
 
 export function IconCheck({ size = 14 }: IconProps) {
   return (
-    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden="true"
+    >
       <path d="M5 12.5 10 17.5 19 7.5" />
     </svg>
   );
@@ -82,7 +136,15 @@ export function IconCheck({ size = 14 }: IconProps) {
 
 export function IconX({ size = 14 }: IconProps) {
   return (
-    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden="true"
+    >
       <path d="M7 7l10 10M17 7 7 17" />
     </svg>
   );
@@ -90,7 +152,15 @@ export function IconX({ size = 14 }: IconProps) {
 
 export function IconSuccess({ size = 48 }: IconProps) {
   return (
-    <svg viewBox="0 0 48 48" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+    <svg
+      viewBox="0 0 48 48"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      aria-hidden="true"
+    >
       <circle cx="24" cy="24" r="20" />
       <path d="M14.5 24.5 21 31l12.5-14" />
     </svg>
@@ -99,7 +169,15 @@ export function IconSuccess({ size = 48 }: IconProps) {
 
 export function IconChevronLeft({ size = 18 }: IconProps) {
   return (
-    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      aria-hidden="true"
+    >
       <path d="M14.5 5.5 8 12l6.5 6.5" />
     </svg>
   );
@@ -107,7 +185,15 @@ export function IconChevronLeft({ size = 18 }: IconProps) {
 
 export function IconChevronRight({ size = 18 }: IconProps) {
   return (
-    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      aria-hidden="true"
+    >
       <path d="M9.5 5.5 16 12l-6.5 6.5" />
     </svg>
   );
@@ -115,7 +201,17 @@ export function IconChevronRight({ size = 18 }: IconProps) {
 
 export function IconMusic({ size = 20 }: IconProps) {
   return (
-    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <path d="M9 18V6l10-2v12" />
       <circle cx="7" cy="18" r="2.5" />
       <circle cx="17" cy="16" r="2.5" />
@@ -125,7 +221,17 @@ export function IconMusic({ size = 20 }: IconProps) {
 
 export function IconMusicOff({ size = 20 }: IconProps) {
   return (
-    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <path d="M9 18V6l10-2v12" />
       <circle cx="7" cy="18" r="2.5" />
       <circle cx="17" cy="16" r="2.5" />

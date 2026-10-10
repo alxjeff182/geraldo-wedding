@@ -4,7 +4,8 @@ import App from "./App";
 import { WeddingContentProvider } from "./context/WeddingContentContext";
 import "./styles/boot.css";
 
-const isAdminRoute = window.location.pathname === "/admin" || window.location.pathname === "/admin/";
+const isAdminRoute =
+  window.location.pathname === "/admin" || window.location.pathname === "/admin/";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

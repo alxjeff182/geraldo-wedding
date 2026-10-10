@@ -1,6 +1,10 @@
 import type { Page } from "@playwright/test";
 
-export async function mockSupabaseGuest(page: Page, slug: string, guest: { id: string; display_name: string }) {
+export async function mockSupabaseGuest(
+  page: Page,
+  slug: string,
+  guest: { id: string; display_name: string },
+) {
   await page.route(/\/rest\/v1\/rpc\/get_guest_by_slug$/i, async (route) => {
     if (route.request().method() !== "POST") {
       await route.continue();

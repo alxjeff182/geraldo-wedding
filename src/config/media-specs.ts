@@ -173,10 +173,7 @@ export function formatMediaSpec(spec: MediaSpec): string {
   return parts.join(" · ");
 }
 
-export async function validateMediaFile(
-  file: File,
-  spec: MediaSpec,
-): Promise<string | null> {
+export async function validateMediaFile(file: File, spec: MediaSpec): Promise<string | null> {
   if (file.size > spec.maxBytes) {
     return `File terlalu besar (maks. ${spec.maxSize}). Kompres atau gunakan WebP.`;
   }
@@ -200,7 +197,10 @@ export async function validateMediaFile(
     const widthDiff = Math.abs(width - spec.width) / spec.width;
     const heightDiff = Math.abs(height - spec.height) / spec.height;
 
-    if (ratioDiff > DIMENSION_TOLERANCE || (widthDiff > DIMENSION_TOLERANCE && heightDiff > DIMENSION_TOLERANCE)) {
+    if (
+      ratioDiff > DIMENSION_TOLERANCE ||
+      (widthDiff > DIMENSION_TOLERANCE && heightDiff > DIMENSION_TOLERANCE)
+    ) {
       return `Dimensi ${width}×${height}px tidak sesuai rekomendasi ${spec.dimensions} (${spec.ratio}).`;
     }
   } catch {

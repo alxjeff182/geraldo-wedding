@@ -22,16 +22,18 @@ for (const spec of sizes) {
 
   if (spec.maskable) {
     const pad = Math.round(spec.size * 0.1);
-    pipeline = sharp(logo).resize(spec.size - pad * 2, spec.size - pad * 2, {
-      fit: "contain",
-      background: { r: 26, g: 15, b: 12, alpha: 1 },
-    }).extend({
-      top: pad,
-      bottom: pad,
-      left: pad,
-      right: pad,
-      background: { r: 26, g: 15, b: 12, alpha: 1 },
-    });
+    pipeline = sharp(logo)
+      .resize(spec.size - pad * 2, spec.size - pad * 2, {
+        fit: "contain",
+        background: { r: 26, g: 15, b: 12, alpha: 1 },
+      })
+      .extend({
+        top: pad,
+        bottom: pad,
+        left: pad,
+        right: pad,
+        background: { r: 26, g: 15, b: 12, alpha: 1 },
+      });
   }
 
   const dest = resolve(outDir, spec.name);

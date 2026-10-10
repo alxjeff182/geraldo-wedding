@@ -78,7 +78,7 @@ export function WishesModerationPanel({ onNotify }: Props) {
       if (filter === "visible" && row.hidden) return false;
       if (filter === "hidden" && !row.hidden) return false;
       if (!q) return true;
-      const guestName = row.guest_id ? guestsById[row.guest_id]?.display_name ?? "" : "";
+      const guestName = row.guest_id ? (guestsById[row.guest_id]?.display_name ?? "") : "";
       return (
         row.name.toLowerCase().includes(q) ||
         row.message.toLowerCase().includes(q) ||
@@ -97,10 +97,7 @@ export function WishesModerationPanel({ onNotify }: Props) {
     }
 
     const nextHidden = !row.hidden;
-    const { error } = await supabase
-      .from("wishes")
-      .update({ hidden: nextHidden })
-      .eq("id", row.id);
+    const { error } = await supabase.from("wishes").update({ hidden: nextHidden }).eq("id", row.id);
 
     setBusyId(null);
     if (error) {
@@ -178,7 +175,11 @@ export function WishesModerationPanel({ onNotify }: Props) {
               <strong>{stats.hidden}</strong> Disembunyikan
             </span>
           </div>
-          <button type="button" className="admin-btn admin-btn--ghost" onClick={() => void loadData()}>
+          <button
+            type="button"
+            className="admin-btn admin-btn--ghost"
+            onClick={() => void loadData()}
+          >
             Muat Ulang
           </button>
         </div>
@@ -208,7 +209,9 @@ export function WishesModerationPanel({ onNotify }: Props) {
                   <tr key={row.id}>
                     <td className="admin-rsvp-list__date">{formatDate(row.created_at)}</td>
                     <td className="admin-rsvp-list__name">{row.name}</td>
-                    <td style={{ maxWidth: "18rem", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+                    <td
+                      style={{ maxWidth: "18rem", whiteSpace: "pre-wrap", wordBreak: "break-word" }}
+                    >
                       {row.message}
                     </td>
                     <td className="admin-rsvp-list__guest">

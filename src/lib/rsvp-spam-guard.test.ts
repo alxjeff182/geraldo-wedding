@@ -21,7 +21,10 @@ describe("rsvp-spam-guard", () => {
 
   it("allows resubmit after cooldown expires", () => {
     markRsvpSubmitted(null);
-    window.localStorage.setItem("gw-rsvp-submitted:anon", String(Date.now() - RSVP_CLIENT_COOLDOWN_MS - 1));
+    window.localStorage.setItem(
+      "gw-rsvp-submitted:anon",
+      String(Date.now() - RSVP_CLIENT_COOLDOWN_MS - 1),
+    );
     expect(hasRsvpSubmitted(null)).toBe(false);
   });
 

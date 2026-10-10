@@ -76,7 +76,8 @@ export function Hero({
             {groomName} <span>&</span> {brideName}
           </h2>
           <p className="visually-hidden">
-            Menuju {dateLabel.includes(",") ? dateLabel.split(",").slice(1).join(",").trim() : dateLabel}
+            Menuju{" "}
+            {dateLabel.includes(",") ? dateLabel.split(",").slice(1).join(",").trim() : dateLabel}
           </p>
           <div className="hero__countdown" data-reveal="0.22" aria-hidden="true">
             <div className="hero__cd-item">
@@ -106,10 +107,7 @@ export function Hero({
             </div>
           </div>
         </div>
-        <div
-          className={`hero__hint${hintGone ? " is-gone" : ""}`}
-          aria-hidden="true"
-        >
+        <div className={`hero__hint${hintGone ? " is-gone" : ""}`} aria-hidden="true">
           <div className="hero__hint-motion">
             <span className="hero__hint-chevron" />
             <span className="hero__hint-chevron" />

@@ -22,10 +22,7 @@ export function Cover({
   leaving,
 }: Props) {
   return (
-    <section
-      className={`cover${leaving ? " is-leaving" : ""}`}
-      aria-label="Pembuka undangan"
-    >
+    <section className={`cover${leaving ? " is-leaving" : ""}`} aria-label="Pembuka undangan">
       <div className="cover__photo" aria-hidden="true">
         <img src={coverBg} alt="" width={720} height={1280} />
       </div>
@@ -41,12 +38,7 @@ export function Cover({
           </p>
         ) : null}
         <p className="cover__date">{dateLabel}</p>
-        <button
-          type="button"
-          className="cover__cta"
-          onClick={onOpen}
-          aria-label={openAria}
-        >
+        <button type="button" className="cover__cta" onClick={onOpen} aria-label={openAria}>
           <span className="cover__cta-ring" aria-hidden="true" />
           {openLabel}
         </button>

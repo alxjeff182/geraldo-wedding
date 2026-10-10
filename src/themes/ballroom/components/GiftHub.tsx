@@ -1,9 +1,6 @@
 import { useRef, useState, type ReactNode } from "react";
 import type { GiftAccount } from "../../../config/wedding.config";
-import {
-  buildGiftWhatsappMessage,
-  buildGuestWhatsAppUrl,
-} from "../../../lib/guest-whatsapp";
+import { buildGiftWhatsappMessage, buildGuestWhatsAppUrl } from "../../../lib/guest-whatsapp";
 import { IconCopy, IconWhatsApp } from "../icons";
 
 type Props = {

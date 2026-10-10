@@ -163,8 +163,7 @@ export function CoupleStory({
     if (!invitation || !story) return;
     const viewH = invitation.clientHeight || 1;
     const maxScroll = Math.max(1, story.offsetHeight - viewH);
-    const target =
-      story.offsetTop + (i / Math.max(1, people.length - 1)) * maxScroll;
+    const target = story.offsetTop + (i / Math.max(1, people.length - 1)) * maxScroll;
     invitation.scrollTo({ top: target, behavior: "smooth" });
   };
 
@@ -209,12 +208,7 @@ export function CoupleStory({
               >
                 <div className="couple-card__inner">
                   <div className="couple-card__face couple-card__face--front">
-                    <img
-                      src={person.photo}
-                      alt={person.name}
-                      width={720}
-                      height={1280}
-                    />
+                    <img src={person.photo} alt={person.name} width={720} height={1280} />
                     <div className="couple-card__caption">
                       <p className="couple-card__role">{person.role}</p>
                       <h4>{person.name}</h4>

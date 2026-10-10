@@ -1,24 +1,8 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { wedding, type WeddingConfig } from "../config/wedding.config";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { mergeWeddingContent } from "../lib/merge-content";
 import { fetchSiteContentMain, isSupabaseConfigured } from "../lib/supabase-rest";
 import type { SiteContentOverrides } from "../types/site-content";
-
-type WeddingContentContextValue = {
-  content: WeddingConfig;
-  loading: boolean;
-  cmsLoaded: boolean;
-  loadError: string | null;
-  refresh: () => Promise<void>;
-};
-
-const WeddingContentContext = createContext<WeddingContentContextValue>({
-  content: wedding as WeddingConfig,
-  loading: false,
-  cmsLoaded: false,
-  loadError: null,
-  refresh: async () => undefined,
-});
+import { WeddingContentContext } from "./wedding-content-context";
 
 export function WeddingContentProvider({ children }: { children: ReactNode }) {
   const [overrides, setOverrides] = useState<SiteContentOverrides>({});
@@ -66,12 +50,5 @@ export function WeddingContentProvider({ children }: { children: ReactNode }) {
     [content, loading, cmsLoaded, loadError],
   );
 
-  return (
-    <WeddingContentContext.Provider value={value}>{children}</WeddingContentContext.Provider>
-  );
-}
-
-// eslint-disable-next-line react-refresh/only-export-components -- hook colocated with provider
-export function useWeddingContent() {
-  return useContext(WeddingContentContext);
+  return <WeddingContentContext.Provider value={value}>{children}</WeddingContentContext.Provider>;
 }

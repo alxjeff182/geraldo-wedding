@@ -36,9 +36,10 @@ describe("wish-guard", () => {
       allowed: false,
       reason: "no_guest",
     });
-    expect(
-      checkWishClientGuard("guest-1", Date.now(), "Semoga bahagia selalu"),
-    ).toEqual({ allowed: false, reason: "too_fast" });
+    expect(checkWishClientGuard("guest-1", Date.now(), "Semoga bahagia selalu")).toEqual({
+      allowed: false,
+      reason: "too_fast",
+    });
   });
 
   it("flags spammy messages", () => {

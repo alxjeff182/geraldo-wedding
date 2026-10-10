@@ -21,7 +21,9 @@ const files = [
 ];
 
 console.log("-- Run this file in Supabase SQL Editor (safe to re-run idempotent parts)\n");
-console.log("-- Note: 009 resets some CMS copy defaults — review before prod if you customized content.\n");
+console.log(
+  "-- Note: 009 resets some CMS copy defaults — review before prod if you customized content.\n",
+);
 
 for (const file of files) {
   const sql = readFileSync(resolve(root, "supabase/migrations", file), "utf8");

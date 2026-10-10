@@ -16,7 +16,10 @@ export function useAlertDialog() {
   }, []);
 
   const showError = useCallback(
-    (message: string, options?: { title?: string; actionLabel?: string; onAction?: () => void }) => {
+    (
+      message: string,
+      options?: { title?: string; actionLabel?: string; onAction?: () => void },
+    ) => {
       setAlert({
         tone: "error",
         title: options?.title ?? alertTitleForTone("error"),

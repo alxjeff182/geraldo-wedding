@@ -74,6 +74,7 @@ When CMS is empty or offline, the site falls back to `src/config/wedding.config.
 ## Edit Default Content
 
 Fallback defaults live in `src/config/wedding.config.ts`:
+
 - Couple names, dates, events, gallery, gift accounts
 - 3 WhatsApp invite templates in `src/config/invite-templates.ts`
 - Local media paths under `public/assets/`
@@ -92,12 +93,14 @@ npm run preview
 GitHub secrets for deploy: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, `VITE_SITE_URL`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.
 
 Emergency manual deploy:
+
 ```bash
 npx vercel deploy --prod --yes
 npx vercel alias set <deployment-url> geraldo-christin.vercel.app
 ```
 
 Disable Vercel SSO protection for public access (if needed):
+
 ```bash
 npx vercel project protection disable geraldo-wedding --sso
 ```
@@ -125,15 +128,15 @@ CI runs lint → unit tests → coverage → build → Playwright (desktop + mob
 
 ## Troubleshooting
 
-| Issue | Fix |
-|-------|-----|
-| Site redirects to Vercel login | Run `vercel project protection disable geraldo-wedding --sso` |
-| RSVP/guestbook submit fails | Deploy edge function; set `ALLOWED_ORIGIN` to exact site URL |
-| Admin "Akses ditolak" | Add user email to `admin_allowlist` table |
-| Guest list / RSVP admin empty | Run migrations `004`–`006` |
-| Ucapan kosong / moderasi error | Run migration `010`; redeploy `submit` |
-| Form ucapan terkunci di link personal | Run migration `011`; open via `?guest=` / `?to=` |
-| Social preview image missing | Set `VITE_SITE_URL` in Vercel; OG tags use absolute URLs at build |
+| Issue                                 | Fix                                                               |
+| ------------------------------------- | ----------------------------------------------------------------- |
+| Site redirects to Vercel login        | Run `vercel project protection disable geraldo-wedding --sso`     |
+| RSVP/guestbook submit fails           | Deploy edge function; set `ALLOWED_ORIGIN` to exact site URL      |
+| Admin "Akses ditolak"                 | Add user email to `admin_allowlist` table                         |
+| Guest list / RSVP admin empty         | Run migrations `004`–`006`                                        |
+| Ucapan kosong / moderasi error        | Run migration `010`; redeploy `submit`                            |
+| Form ucapan terkunci di link personal | Run migration `011`; open via `?guest=` / `?to=`                  |
+| Social preview image missing          | Set `VITE_SITE_URL` in Vercel; OG tags use absolute URLs at build |
 
 ## Security Notes
 
@@ -170,19 +173,19 @@ e2e/                            # Playwright tests
 
 ## Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start dev server |
-| `npm run build` | Production build (+ sitemap from `VITE_SITE_URL`) |
-| `npm run lint` | ESLint check |
-| `npm run test` | Vitest unit tests |
-| `npm run test:e2e` | Playwright e2e tests |
-| `npm run seed:guests` | Import guest CSV to Supabase |
-| `npm run db:verify` | Verify migrations 004–012 (service role; anon check for 012) |
-| `npm run db:apply` | Print combined SQL for pending migrations |
-| `npm run icons:generate` | PWA icons from logo (sharp) |
-| `npm run test:coverage` | Vitest with V8 coverage |
-| `npm run format:check` | Prettier check |
+| Command                  | Description                                                  |
+| ------------------------ | ------------------------------------------------------------ |
+| `npm run dev`            | Start dev server                                             |
+| `npm run build`          | Production build (+ sitemap from `VITE_SITE_URL`)            |
+| `npm run lint`           | ESLint check                                                 |
+| `npm run test`           | Vitest unit tests                                            |
+| `npm run test:e2e`       | Playwright e2e tests                                         |
+| `npm run seed:guests`    | Import guest CSV to Supabase                                 |
+| `npm run db:verify`      | Verify migrations 004–012 (service role; anon check for 012) |
+| `npm run db:apply`       | Print combined SQL for pending migrations                    |
+| `npm run icons:generate` | PWA icons from logo (sharp)                                  |
+| `npm run test:coverage`  | Vitest with V8 coverage                                      |
+| `npm run format:check`   | Prettier check                                               |
 
 ## Legacy Assets
 
