@@ -5,6 +5,7 @@ import { usePageMeta } from "./hooks/usePageMeta";
 import { useAlertDialog } from "./hooks/useAlertDialog";
 import { AlertDialog } from "./components/ui/AlertDialog";
 import { BootScreen } from "./components/BootScreen";
+import { RotateNotice } from "./components/RotateNotice";
 
 const AdminPage = lazy(() => import("./pages/AdminPage").then((m) => ({ default: m.AdminPage })));
 
@@ -64,16 +65,22 @@ export default function App({ adminMode = false }: AppProps) {
 
   if (guestLoading || contentLoading) {
     return (
-      <BootScreen logoSrc={logoSrc} label="Memuat undangan…">
-        <AlertDialog alert={alert} onClose={hideAlert} />
-      </BootScreen>
+      <>
+        <BootScreen logoSrc={logoSrc} label="Memuat undangan…">
+          <AlertDialog alert={alert} onClose={hideAlert} />
+        </BootScreen>
+        <RotateNotice logoSrc={logoSrc} />
+      </>
     );
   }
 
   return (
-    <Suspense fallback={<BootScreen logoSrc={logoSrc} label="Memuat undangan…" />}>
-      <BallroomApp guestName={guestName} guestId={guestId} />
-      <AlertDialog alert={alert} onClose={hideAlert} />
-    </Suspense>
+    <>
+      <Suspense fallback={<BootScreen logoSrc={logoSrc} label="Memuat undangan…" />}>
+        <BallroomApp guestName={guestName} guestId={guestId} />
+        <AlertDialog alert={alert} onClose={hideAlert} />
+      </Suspense>
+      <RotateNotice logoSrc={logoSrc} />
+    </>
   );
 }
