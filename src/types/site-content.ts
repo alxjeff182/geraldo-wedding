@@ -244,9 +244,12 @@ export type SiteContentOverrides = {
     ogImage?: string;
     logo?: string;
     openingVideo?: string;
-    heroFramesBase?: string;
-    heroFrameCount?: number;
+    heroVideo?: string;
     heroPoster?: string;
+    /** @deprecated use heroVideo */
+    heroFramesBase?: string;
+    /** @deprecated use heroVideo */
+    heroFrameCount?: number;
   };
   rsvp?: RsvpContent;
   guestbook?: GuestbookContent;

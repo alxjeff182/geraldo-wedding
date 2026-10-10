@@ -185,9 +185,11 @@ export const wedding = {
     ogImage: "/assets/ballroom/og-image.jpg",
     logo: "/assets/ballroom/logo.png",
     openingVideo: "/assets/ballroom/opening.mp4",
+    heroVideo: "/assets/ballroom/hero.mp4",
+    heroPoster: "/assets/ballroom/hero-poster.jpg",
+    /** @deprecated canvas frame scrub replaced by heroVideo */
     heroFramesBase: "/assets/ballroom/hero-frames",
     heroFrameCount: 24,
-    heroPoster: "/assets/ballroom/hero-poster.jpg",
   },
 
   rsvp: {

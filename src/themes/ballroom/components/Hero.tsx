@@ -1,17 +1,15 @@
-import { useCallback, useRef, useState, type RefObject } from "react";
-import { useHeroFrames } from "../hooks/useHeroFrames";
+import { useCallback, useRef, useState } from "react";
+import { useHeroVideo } from "../hooks/useHeroVideo";
 import { useCountdown } from "../../../hooks/useCountdown";
 
 type Props = {
-  scrollRootRef: RefObject<HTMLElement | null>;
   eyebrow: string;
   groomName: string;
   brideName: string;
   weddingDate: string;
   dateLabel: string;
   labels: { days: string; hours: string; minutes: string; seconds: string };
-  framesBase: string;
-  frameCount: number;
+  videoSrc: string;
   posterSrc?: string;
   enabled?: boolean;
   onProgress?: (progress: number) => void;
@@ -20,21 +18,19 @@ type Props = {
 const HINT_HIDE_AT = 0.04;
 
 export function Hero({
-  scrollRootRef,
   eyebrow,
   groomName,
   brideName,
   weddingDate,
   dateLabel,
   labels,
-  framesBase,
-  frameCount,
+  videoSrc,
   posterSrc,
   enabled = true,
   onProgress,
 }: Props) {
   const heroRef = useRef<HTMLElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [hintGone, setHintGone] = useState(false);
   const cd = useCountdown(weddingDate);
 
@@ -46,12 +42,8 @@ export function Hero({
     [onProgress],
   );
 
-  useHeroFrames({
-    basePath: framesBase,
-    frameCount,
-    posterSrc,
-    canvasRef,
-    scrollRootRef,
+  useHeroVideo({
+    videoRef,
     heroRef,
     enabled,
     onProgress: handleProgress,
@@ -60,11 +52,14 @@ export function Hero({
   return (
     <section id="hero" ref={heroRef} className="hero" aria-label={eyebrow}>
       <div className="hero__pin">
-        <canvas
-          ref={canvasRef}
+        <video
+          ref={videoRef}
           className="hero__video"
-          width={720}
-          height={1280}
+          src={videoSrc}
+          poster={posterSrc}
+          muted
+          playsInline
+          preload="auto"
           aria-hidden="true"
         />
         <div className="hero__veil" aria-hidden="true" />

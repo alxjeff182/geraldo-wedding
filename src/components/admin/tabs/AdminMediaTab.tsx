@@ -37,31 +37,20 @@ export function AdminMediaTab({ merged, defaults, updateDraft, clearDraftPath }:
         onChange={(url) => updateDraft(["media", "openingVideo"], url)}
       />
       <ImageUploader
+        label="Video Hero"
+        folder="media"
+        accept="video/mp4,video/webm"
+        spec={MEDIA_SPECS.heroVideo}
+        value={merged.media.heroVideo ?? ""}
+        onChange={(url) => updateDraft(["media", "heroVideo"], url)}
+      />
+      <ImageUploader
         label="Hero Poster"
         folder="media"
         spec={MEDIA_SPECS.heroPoster}
         value={merged.media.heroPoster ?? ""}
         onChange={(url) => updateDraft(["media", "heroPoster"], url)}
       />
-      <label className="admin-field">
-        <span className="admin-label">Hero Frames Base Path</span>
-        <input
-          className="admin-input"
-          value={merged.media.heroFramesBase}
-          onChange={(e) => updateDraft(["media", "heroFramesBase"], e.target.value)}
-        />
-      </label>
-      <label className="admin-field">
-        <span className="admin-label">Jumlah Hero Frames</span>
-        <input
-          className="admin-input"
-          type="number"
-          min={1}
-          max={60}
-          value={merged.media.heroFrameCount}
-          onChange={(e) => updateDraft(["media", "heroFrameCount"], Number(e.target.value) || 24)}
-        />
-      </label>
       <AdminOverrideMediaField
         label="Audio"
         value={merged.media.audio}

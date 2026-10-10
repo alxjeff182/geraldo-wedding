@@ -153,15 +153,13 @@ export function BallroomApp({ guestName, guestId }: Props) {
           hidden={!revealed}
         >
           <Hero
-            scrollRootRef={inviteRef}
             eyebrow={content.hero.eyebrow}
             groomName={content.hero.groomName?.trim() || content.couple.groom.shortName}
             brideName={content.hero.brideName?.trim() || content.couple.bride.shortName}
             weddingDate={content.date}
             dateLabel={content.dateLabel}
             labels={content.countdown.labels}
-            framesBase={content.media.heroFramesBase}
-            frameCount={content.media.heroFrameCount}
+            videoSrc={content.media.heroVideo || "/assets/ballroom/hero.mp4"}
             posterSrc={content.media.heroPoster}
             enabled={revealed}
             onProgress={setHeroProgress}
