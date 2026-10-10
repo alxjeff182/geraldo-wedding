@@ -1330,6 +1330,9 @@ body:has(.theme-ballroom) {
   animation: galleryLbIn 0.35s var(--ease-out);
 }.theme-ballroom .gallery-lightbox[hidden]{
   display: none;
+}.theme-ballroom .gallery-lightbox.is-dragging{
+  transition: none;
+  touch-action: none;
 }@keyframes galleryLbIn{
   from {
     opacity: 0;
@@ -1769,6 +1772,7 @@ body:has(.theme-ballroom) {
   transform: translateY(0);
 }.theme-ballroom .sheet.is-dragging{
   transition: none;
+  touch-action: none;
 }.theme-ballroom .sheet__handle{
   width: 36px;
   height: 4px;

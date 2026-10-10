@@ -1,4 +1,4 @@
-import type { RefObject } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import { IconChevronLeft, IconChevronRight } from "../icons";
 import { useGalleryRing } from "../hooks/useGalleryRing";
 
@@ -12,6 +12,8 @@ type Props = {
   enabled?: boolean;
 };
 
+const SWIPE_CLOSE_PX = 88;
+
 export function Gallery3D({
   eyebrow,
   title,
@@ -20,6 +22,7 @@ export function Gallery3D({
   enabled = true,
 }: Props) {
   const n = images.length;
+  const lightboxRef = useRef<HTMLDivElement | null>(null);
   const {
     sectionRef,
     stageRef,
@@ -36,6 +39,86 @@ export function Gallery3D({
   });
 
   const current = images[activeIndex] ?? images[0];
+
+  useEffect(() => {
+    if (!lightbox) return;
+    const el = lightboxRef.current;
+    if (!el) return;
+
+    let startX = 0;
+    let startY = 0;
+    let tracking = false;
+    let axis: "x" | "y" | null = null;
+    let pointerId: number | null = null;
+
+    const clearDrag = () => {
+      el.classList.remove("is-dragging");
+      el.style.transform = "";
+      el.style.opacity = "";
+      tracking = false;
+      axis = null;
+      pointerId = null;
+    };
+
+    const onPointerDown = (e: PointerEvent) => {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      const target = e.target as HTMLElement | null;
+      if (target?.closest("button")) return;
+      startX = e.clientX;
+      startY = e.clientY;
+      tracking = true;
+      axis = null;
+      pointerId = e.pointerId;
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (!tracking || pointerId !== e.pointerId) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      if (!axis) {
+        if (Math.abs(dx) < 12 && Math.abs(dy) < 12) return;
+        if (Math.abs(dx) > Math.abs(dy) && dx < 0) {
+          axis = "x";
+          el.classList.add("is-dragging");
+          try {
+            el.setPointerCapture(e.pointerId);
+          } catch {
+            /* ignore */
+          }
+        } else {
+          tracking = false;
+          return;
+        }
+      }
+      if (axis !== "x") return;
+      e.preventDefault();
+      const tx = Math.min(0, dx);
+      el.style.transform = `translate3d(${tx}px, 0, 0)`;
+      el.style.opacity = String(Math.max(0.35, 1 + tx / 280));
+    };
+
+    const onPointerUp = (e: PointerEvent) => {
+      if (pointerId !== e.pointerId) return;
+      if (axis === "x" && e.clientX - startX <= -SWIPE_CLOSE_PX) {
+        clearDrag();
+        closeLightbox();
+        return;
+      }
+      clearDrag();
+    };
+
+    el.addEventListener("pointerdown", onPointerDown);
+    el.addEventListener("pointermove", onPointerMove, { passive: false });
+    el.addEventListener("pointerup", onPointerUp);
+    el.addEventListener("pointercancel", onPointerUp);
+    return () => {
+      clearDrag();
+      el.removeEventListener("pointerdown", onPointerDown);
+      el.removeEventListener("pointermove", onPointerMove);
+      el.removeEventListener("pointerup", onPointerUp);
+      el.removeEventListener("pointercancel", onPointerUp);
+    };
+  }, [lightbox, closeLightbox]);
 
   if (!n) return null;
 
@@ -150,6 +233,7 @@ export function Gallery3D({
       </footer>
 
       <div
+        ref={lightboxRef}
         className="gallery-lightbox"
         hidden={!lightbox}
         onClick={(e) => {

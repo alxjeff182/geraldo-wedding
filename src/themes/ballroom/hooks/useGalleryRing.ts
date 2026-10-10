@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
+import { useHistoryDismiss } from "./useHistoryDismiss";
 
 type Options = {
   count: number;
@@ -14,6 +15,7 @@ export function useGalleryRing({ count, scrollRootRef, enabled = true }: Options
   const sectionRef = useRef<HTMLElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const ringRef = useRef<HTMLDivElement | null>(null);
+  const lightboxOpenRef = useRef(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [lightbox, setLightbox] = useState<{ src: string; alt: string; caption: string } | null>(
     null,
@@ -23,6 +25,13 @@ export function useGalleryRing({ count, scrollRootRef, enabled = true }: Options
     snapTo: (index: number) => void;
     openActive: () => void;
   } | null>(null);
+
+  const closeLightbox = useCallback(() => {
+    lightboxOpenRef.current = false;
+    setLightbox(null);
+  }, []);
+
+  useHistoryDismiss(Boolean(lightbox), closeLightbox);
 
   useEffect(() => {
     if (!enabled || count < 1) return;
@@ -118,7 +127,7 @@ export function useGalleryRing({ count, scrollRootRef, enabled = true }: Options
       autoSpin = false;
       window.clearTimeout(idleTimer);
       idleTimer = window.setTimeout(() => {
-        if (!visible || dragging || lightboxOpen) return;
+        if (!visible || dragging || lightboxOpenRef.current) return;
         autoSpin = true;
         target = null;
         velocity = 0;
@@ -126,7 +135,7 @@ export function useGalleryRing({ count, scrollRootRef, enabled = true }: Options
       }, 1500);
     };
 
-    let lightboxOpen = false;
+    lightboxOpenRef.current = false;
 
     const snapTo = (index: number, animate = true) => {
       const desired = -index * step;
@@ -158,7 +167,7 @@ export function useGalleryRing({ count, scrollRootRef, enabled = true }: Options
         el.querySelector(".gallery-plane__num")?.textContent?.trim() ||
         String(index + 1).padStart(2, "0");
       if (!img) return;
-      lightboxOpen = true;
+      lightboxOpenRef.current = true;
       autoSpin = false;
       window.clearTimeout(idleTimer);
       setLightbox({
@@ -296,9 +305,9 @@ export function useGalleryRing({ count, scrollRootRef, enabled = true }: Options
 
     const onKey = (e: KeyboardEvent) => {
       if (!visible) return;
-      if (lightboxOpen) {
+      if (lightboxOpenRef.current) {
         if (e.key === "Escape") {
-          lightboxOpen = false;
+          lightboxOpenRef.current = false;
           setLightbox(null);
           resetIdle();
         }
@@ -362,8 +371,6 @@ export function useGalleryRing({ count, scrollRootRef, enabled = true }: Options
       apiRef.current = null;
     };
   }, [count, scrollRootRef, enabled]);
-
-  const closeLightbox = () => setLightbox(null);
 
   return {
     sectionRef,

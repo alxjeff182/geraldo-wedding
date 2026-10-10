@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useHistoryDismiss } from "./useHistoryDismiss";
 
 export type SheetId = "rsvp" | "location" | "gift" | null;
 
 type UseSheetOptions = {
   inertTargets?: Array<HTMLElement | null>;
 };
+
+const SWIPE_CLOSE_PX = 88;
 
 export function useSheet({ inertTargets = [] }: UseSheetOptions = {}) {
   const [activeId, setActiveId] = useState<SheetId>(null);
@@ -55,6 +58,8 @@ export function useSheet({ inertTargets = [] }: UseSheetOptions = {}) {
     [setBackgroundInert],
   );
 
+  useHistoryDismiss(Boolean(activeId), close);
+
   useEffect(() => {
     if (!activeId) return;
 
@@ -82,6 +87,102 @@ export function useSheet({ inertTargets = [] }: UseSheetOptions = {}) {
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
+  }, [activeId, close]);
+
+  // Swipe left to dismiss (vertical scroll in the body still wins).
+  useEffect(() => {
+    if (!activeId) return;
+    const sheet = sheetRefs.current[activeId];
+    if (!sheet) return;
+
+    let startX = 0;
+    let startY = 0;
+    let tracking = false;
+    let axis: "x" | "y" | null = null;
+    let pointerId: number | null = null;
+
+    const clearDrag = () => {
+      sheet.classList.remove("is-dragging");
+      sheet.style.transform = "";
+      tracking = false;
+      axis = null;
+      pointerId = null;
+    };
+
+    const onPointerDown = (e: PointerEvent) => {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      if (target.closest("input, textarea, select, iframe, a, button")) return;
+      startX = e.clientX;
+      startY = e.clientY;
+      tracking = true;
+      axis = null;
+      pointerId = e.pointerId;
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (!tracking || pointerId !== e.pointerId) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+
+      if (!axis) {
+        if (Math.abs(dx) < 12 && Math.abs(dy) < 12) return;
+        if (Math.abs(dx) > Math.abs(dy) && dx < 0) {
+          axis = "x";
+          sheet.classList.add("is-dragging");
+          try {
+            sheet.setPointerCapture(e.pointerId);
+          } catch {
+            /* ignore */
+          }
+        } else {
+          tracking = false;
+          axis = null;
+          return;
+        }
+      }
+
+      if (axis !== "x") return;
+      e.preventDefault();
+      const tx = Math.min(0, dx);
+      sheet.style.transform = `translate3d(${tx}px, 0, 0)`;
+    };
+
+    const onPointerUp = (e: PointerEvent) => {
+      if (pointerId !== e.pointerId) return;
+      if (axis === "x") {
+        const dx = e.clientX - startX;
+        if (dx <= -SWIPE_CLOSE_PX) {
+          sheet.classList.remove("is-dragging");
+          sheet.style.transition = "transform 0.18s var(--ease-out, ease-out)";
+          sheet.style.transform = "translate3d(-110%, 0, 0)";
+          window.setTimeout(() => {
+            sheet.style.transition = "";
+            clearDrag();
+            close();
+          }, 160);
+          tracking = false;
+          axis = null;
+          pointerId = null;
+          return;
+        }
+      }
+      clearDrag();
+    };
+
+    sheet.addEventListener("pointerdown", onPointerDown);
+    sheet.addEventListener("pointermove", onPointerMove, { passive: false });
+    sheet.addEventListener("pointerup", onPointerUp);
+    sheet.addEventListener("pointercancel", onPointerUp);
+
+    return () => {
+      clearDrag();
+      sheet.removeEventListener("pointerdown", onPointerDown);
+      sheet.removeEventListener("pointermove", onPointerMove);
+      sheet.removeEventListener("pointerup", onPointerUp);
+      sheet.removeEventListener("pointercancel", onPointerUp);
+    };
   }, [activeId, close]);
 
   return { activeId, open, close, setSheetRef, isOpen: Boolean(activeId) };
