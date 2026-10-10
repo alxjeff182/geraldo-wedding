@@ -50,6 +50,7 @@ export function Gallery3D({
     let tracking = false;
     let axis: "x" | "y" | null = null;
     let pointerId: number | null = null;
+    let suppressClick = false;
 
     const clearDrag = () => {
       el.classList.remove("is-dragging");
@@ -60,10 +61,24 @@ export function Gallery3D({
       pointerId = null;
     };
 
+    const blockNextClick = () => {
+      suppressClick = true;
+      const onClick = (e: Event) => {
+        e.preventDefault();
+        e.stopPropagation();
+        suppressClick = false;
+        el.removeEventListener("click", onClick, true);
+      };
+      el.addEventListener("click", onClick, true);
+      window.setTimeout(() => {
+        if (!suppressClick) return;
+        suppressClick = false;
+        el.removeEventListener("click", onClick, true);
+      }, 400);
+    };
+
     const onPointerDown = (e: PointerEvent) => {
       if (e.pointerType === "mouse" && e.button !== 0) return;
-      const target = e.target as HTMLElement | null;
-      if (target?.closest("button")) return;
       startX = e.clientX;
       startY = e.clientY;
       tracking = true;
@@ -77,7 +92,7 @@ export function Gallery3D({
       const dy = e.clientY - startY;
       if (!axis) {
         if (Math.abs(dx) < 12 && Math.abs(dy) < 12) return;
-        if (Math.abs(dx) > Math.abs(dy) && dx < 0) {
+        if (Math.abs(dx) > Math.abs(dy)) {
           axis = "x";
           el.classList.add("is-dragging");
           try {
@@ -92,17 +107,20 @@ export function Gallery3D({
       }
       if (axis !== "x") return;
       e.preventDefault();
-      const tx = Math.min(0, dx);
-      el.style.transform = `translate3d(${tx}px, 0, 0)`;
-      el.style.opacity = String(Math.max(0.35, 1 + tx / 280));
+      el.style.transform = `translate3d(${dx}px, 0, 0)`;
+      el.style.opacity = String(Math.max(0.35, 1 - Math.abs(dx) / 280));
     };
 
     const onPointerUp = (e: PointerEvent) => {
       if (pointerId !== e.pointerId) return;
-      if (axis === "x" && e.clientX - startX <= -SWIPE_CLOSE_PX) {
-        clearDrag();
-        closeLightbox();
-        return;
+      if (axis === "x") {
+        const dx = e.clientX - startX;
+        if (Math.abs(dx) >= SWIPE_CLOSE_PX) {
+          blockNextClick();
+          clearDrag();
+          closeLightbox();
+          return;
+        }
       }
       clearDrag();
     };

@@ -1328,11 +1328,11 @@ body:has(.theme-ballroom) {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   animation: galleryLbIn 0.35s var(--ease-out);
+  touch-action: pan-y;
 }.theme-ballroom .gallery-lightbox[hidden]{
   display: none;
 }.theme-ballroom .gallery-lightbox.is-dragging{
   transition: none;
-  touch-action: none;
 }@keyframes galleryLbIn{
   from {
     opacity: 0;
@@ -1768,11 +1768,11 @@ body:has(.theme-ballroom) {
   transition: transform 0.45s var(--ease-out);
   color: var(--cream);
   overscroll-behavior: contain;
+  touch-action: pan-y;
 }.theme-ballroom .sheet.is-open{
   transform: translateY(0);
 }.theme-ballroom .sheet.is-dragging{
   transition: none;
-  touch-action: none;
 }.theme-ballroom .sheet__handle{
   width: 36px;
   height: 4px;

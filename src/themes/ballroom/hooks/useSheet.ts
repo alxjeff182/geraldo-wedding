@@ -89,7 +89,7 @@ export function useSheet({ inertTargets = [] }: UseSheetOptions = {}) {
     return () => window.removeEventListener("keydown", onKey);
   }, [activeId, close]);
 
-  // Swipe left to dismiss (vertical scroll in the body still wins).
+  // Horizontal swipe dismiss (vertical scroll still wins via touch-action: pan-y).
   useEffect(() => {
     if (!activeId) return;
     const sheet = sheetRefs.current[activeId];
@@ -100,20 +100,38 @@ export function useSheet({ inertTargets = [] }: UseSheetOptions = {}) {
     let tracking = false;
     let axis: "x" | "y" | null = null;
     let pointerId: number | null = null;
+    let suppressClick = false;
 
     const clearDrag = () => {
       sheet.classList.remove("is-dragging");
       sheet.style.transform = "";
+      sheet.style.transition = "";
       tracking = false;
       axis = null;
       pointerId = null;
+    };
+
+    const blockNextClick = () => {
+      suppressClick = true;
+      const onClick = (e: Event) => {
+        e.preventDefault();
+        e.stopPropagation();
+        suppressClick = false;
+        sheet.removeEventListener("click", onClick, true);
+      };
+      sheet.addEventListener("click", onClick, true);
+      window.setTimeout(() => {
+        if (!suppressClick) return;
+        suppressClick = false;
+        sheet.removeEventListener("click", onClick, true);
+      }, 400);
     };
 
     const onPointerDown = (e: PointerEvent) => {
       if (e.pointerType === "mouse" && e.button !== 0) return;
       const target = e.target as HTMLElement | null;
       if (!target) return;
-      if (target.closest("input, textarea, select, iframe, a, button")) return;
+      if (target.closest("input, textarea, select, iframe")) return;
       startX = e.clientX;
       startY = e.clientY;
       tracking = true;
@@ -128,7 +146,7 @@ export function useSheet({ inertTargets = [] }: UseSheetOptions = {}) {
 
       if (!axis) {
         if (Math.abs(dx) < 12 && Math.abs(dy) < 12) return;
-        if (Math.abs(dx) > Math.abs(dy) && dx < 0) {
+        if (Math.abs(dx) > Math.abs(dy)) {
           axis = "x";
           sheet.classList.add("is-dragging");
           try {
@@ -145,26 +163,30 @@ export function useSheet({ inertTargets = [] }: UseSheetOptions = {}) {
 
       if (axis !== "x") return;
       e.preventDefault();
-      const tx = Math.min(0, dx);
-      sheet.style.transform = `translate3d(${tx}px, 0, 0)`;
+      sheet.style.transform = `translate3d(${dx}px, 0, 0)`;
+    };
+
+    const finishClose = (dx: number) => {
+      const dir = dx < 0 ? -1 : 1;
+      sheet.classList.remove("is-dragging");
+      sheet.style.transition = "transform 0.18s var(--ease-out, ease-out)";
+      sheet.style.transform = `translate3d(${dir * 110}%, 0, 0)`;
+      blockNextClick();
+      window.setTimeout(() => {
+        clearDrag();
+        close();
+      }, 160);
+      tracking = false;
+      axis = null;
+      pointerId = null;
     };
 
     const onPointerUp = (e: PointerEvent) => {
       if (pointerId !== e.pointerId) return;
       if (axis === "x") {
         const dx = e.clientX - startX;
-        if (dx <= -SWIPE_CLOSE_PX) {
-          sheet.classList.remove("is-dragging");
-          sheet.style.transition = "transform 0.18s var(--ease-out, ease-out)";
-          sheet.style.transform = "translate3d(-110%, 0, 0)";
-          window.setTimeout(() => {
-            sheet.style.transition = "";
-            clearDrag();
-            close();
-          }, 160);
-          tracking = false;
-          axis = null;
-          pointerId = null;
+        if (Math.abs(dx) >= SWIPE_CLOSE_PX) {
+          finishClose(dx);
           return;
         }
       }
