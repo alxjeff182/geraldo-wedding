@@ -33,8 +33,23 @@ export default defineConfig({
   },
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
-    { name: "iphone-se", use: { ...devices["iPhone SE"] } },
-    { name: "pixel-7", use: { ...devices["Pixel 7"] } },
+    // Viewport-only mobile projects (Chromium) so CI need not install WebKit/Firefox.
+    {
+      name: "iphone-se",
+      use: {
+        ...devices["iPhone SE"],
+        browserName: "chromium",
+        defaultBrowserType: "chromium",
+      },
+    },
+    {
+      name: "pixel-7",
+      use: {
+        ...devices["Pixel 7"],
+        browserName: "chromium",
+        defaultBrowserType: "chromium",
+      },
+    },
   ],
   webServer: {
     command: "npm run dev",
