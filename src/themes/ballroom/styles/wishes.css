@@ -402,6 +402,7 @@
   position: relative;
   width: 11rem;
   aspect-ratio: 9 / 16;
+  padding: 0;
   overflow: hidden;
   border-radius: 1.15rem;
   border: 1px solid var(--gold-a40);
@@ -410,9 +411,14 @@
     0 14px 36px rgba(0, 0, 0, 0.45),
     0 0 28px var(--gold-a15);
   background: #1a0f0c;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  font: inherit;
+  color: inherit;
 }
 
-.theme-ballroom .hashtag-mod__phone-bg,
+.theme-ballroom .hashtag-mod__phone-cam,
 .theme-ballroom .hashtag-mod__phone-overlay {
   position: absolute;
   inset: 0;
@@ -422,8 +428,36 @@
   object-fit: cover;
 }
 
+.theme-ballroom .hashtag-mod__phone-cam {
+  transform: scaleX(-1);
+  background: #120c0a;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.theme-ballroom .hashtag-mod__phone-cam.is-live {
+  opacity: 1;
+}
+
 .theme-ballroom .hashtag-mod__phone-overlay {
   object-fit: fill;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.theme-ballroom .hashtag-mod__phone-waiting {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  padding: 0 0.75rem;
+  width: 100%;
+  text-align: center;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--cream-dim);
   pointer-events: none;
 }
 

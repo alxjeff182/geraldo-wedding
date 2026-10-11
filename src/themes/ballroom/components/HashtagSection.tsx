@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useWeddingContent } from "../../../context/use-wedding-content";
 import { hashtagExploreUrl } from "../../../lib/hashtag-url";
 import { IconInstagram } from "../icons";
@@ -13,6 +13,10 @@ type Props = {
   onBoothClose?: () => void;
 };
 
+function stopStream(stream: MediaStream | null) {
+  stream?.getTracks().forEach((t) => t.stop());
+}
+
 export function HashtagSection({
   title,
   tag,
@@ -23,20 +27,137 @@ export function HashtagSection({
 }: Props) {
   const { content } = useWeddingContent();
   const [boothOpen, setBoothOpen] = useState(false);
-  if (!tag.trim()) return null;
+  const [camReady, setCamReady] = useState(false);
+  const phoneRef = useRef<HTMLButtonElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const inViewRef = useRef(false);
+  const boothOpenRef = useRef(false);
 
   const display = tag.startsWith("#") ? tag : `#${tag}`;
-  const explore = hashtagExploreUrl(tag);
   const template = storyTemplate?.trim() || content.hashtag.storyTemplate?.trim() || "";
-  const previewBg = content.hashtag.storyPreviewBg?.trim() || "/assets/ballroom/gallery/01.webp";
   const boothLabel = content.hashtag.boothButton || "Rekam Video Story";
   const storyHint =
     content.hashtag.storyHint || "Rekam video dengan bingkai kami, lalu pilih Instagram → Story";
   const lead = content.hashtag.lead || "Abadikan momen bersama kami di Instagram Story";
   const maxSeconds = content.hashtag.boothMaxSeconds ?? 15;
+  const explore = hashtagExploreUrl(tag);
+
+  useEffect(() => {
+    boothOpenRef.current = boothOpen;
+  }, [boothOpen]);
+
+  useEffect(() => {
+    if (!template || !tag.trim()) return;
+
+    const releasePreview = () => {
+      stopStream(streamRef.current);
+      streamRef.current = null;
+      const video = videoRef.current;
+      if (video) video.srcObject = null;
+      setCamReady(false);
+    };
+
+    const startPreview = async () => {
+      if (boothOpenRef.current || streamRef.current) return;
+      if (!navigator.mediaDevices?.getUserMedia) return;
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: {
+            facingMode: { ideal: "user" },
+            width: { ideal: 720 },
+            height: { ideal: 1280 },
+          },
+        });
+        if (boothOpenRef.current || !inViewRef.current) {
+          stopStream(stream);
+          return;
+        }
+        streamRef.current = stream;
+        const video = videoRef.current;
+        if (video) {
+          video.srcObject = stream;
+          video.muted = true;
+          video.playsInline = true;
+          await video.play().catch(() => undefined);
+        }
+        setCamReady(true);
+      } catch {
+        setCamReady(false);
+      }
+    };
+
+    const el = phoneRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") {
+      inViewRef.current = true;
+      void startPreview();
+      return () => releasePreview();
+    }
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        inViewRef.current = Boolean(entry?.isIntersecting);
+        if (entry?.isIntersecting && !boothOpenRef.current) void startPreview();
+        else if (!boothOpenRef.current) releasePreview();
+      },
+      { threshold: 0.35 },
+    );
+    io.observe(el);
+
+    return () => {
+      io.disconnect();
+      releasePreview();
+    };
+  }, [template, tag]);
+
+  useEffect(() => {
+    if (!template) return;
+    if (boothOpen) {
+      stopStream(streamRef.current);
+      streamRef.current = null;
+      const video = videoRef.current;
+      if (video) video.srcObject = null;
+      setCamReady(false);
+      return;
+    }
+    if (inViewRef.current && !streamRef.current && navigator.mediaDevices?.getUserMedia) {
+      void navigator.mediaDevices
+        .getUserMedia({
+          audio: false,
+          video: {
+            facingMode: { ideal: "user" },
+            width: { ideal: 720 },
+            height: { ideal: 1280 },
+          },
+        })
+        .then(async (stream) => {
+          if (boothOpenRef.current || !inViewRef.current) {
+            stopStream(stream);
+            return;
+          }
+          streamRef.current = stream;
+          const video = videoRef.current;
+          if (video) {
+            video.srcObject = stream;
+            video.muted = true;
+            video.playsInline = true;
+            await video.play().catch(() => undefined);
+          }
+          setCamReady(true);
+        })
+        .catch(() => setCamReady(false));
+    }
+  }, [boothOpen, template]);
+
+  if (!tag.trim()) return null;
 
   const openBooth = () => {
     if (!template) return;
+    stopStream(streamRef.current);
+    streamRef.current = null;
+    if (videoRef.current) videoRef.current.srcObject = null;
+    setCamReady(false);
     onBoothOpen?.();
     setBoothOpen(true);
   };
@@ -55,15 +176,19 @@ export function HashtagSection({
       <p className="hashtag-mod__lead">{lead}</p>
       {template ? (
         <div className="hashtag-mod__story">
-          <div className="hashtag-mod__phone" aria-hidden="true">
-            <img
-              className="hashtag-mod__phone-bg"
-              src={previewBg}
-              alt=""
-              width={270}
-              height={480}
-              loading="lazy"
-              decoding="async"
+          <button
+            ref={phoneRef}
+            type="button"
+            className="hashtag-mod__phone"
+            onClick={openBooth}
+            aria-label={boothLabel}
+          >
+            <video
+              ref={videoRef}
+              className={`hashtag-mod__phone-cam${camReady ? " is-live" : ""}`}
+              playsInline
+              muted
+              autoPlay
             />
             <img
               className="hashtag-mod__phone-overlay"
@@ -74,7 +199,10 @@ export function HashtagSection({
               loading="lazy"
               decoding="async"
             />
-          </div>
+            {!camReady ? (
+              <span className="hashtag-mod__phone-waiting">Menyiapkan kamera…</span>
+            ) : null}
+          </button>
           <button
             type="button"
             className="btn hashtag-mod__story-btn"
