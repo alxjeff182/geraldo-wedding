@@ -88,8 +88,9 @@ function resolveSiteUrl(mode: string, env: Record<string, string>): string {
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const siteUrl = resolveSiteUrl(mode, env);
+  const gitSha = process.env.VERCEL_GIT_COMMIT_SHA?.trim();
   const cacheVersion =
-    process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 12) ??
+    (gitSha && gitSha.slice(0, 12)) ||
     createHash("sha256").update(`${siteUrl}-${Date.now()}`).digest("hex").slice(0, 12);
 
   return {
