@@ -215,6 +215,15 @@ export function BallroomApp({ guestName, guestId }: Props) {
             events={[...content.events]}
             calendarLabel={content.eventsSection.calendarGoogleButton}
           />
+          {content.story.enabled ? (
+            <StorySection
+              subtitle={content.story.subtitle}
+              title={content.story.title}
+              milestones={[...content.story.milestones]}
+              scrollRootRef={inviteRef}
+              enabled={revealed}
+            />
+          ) : null}
           <section id="quote" className="quote" aria-label="Ayat">
             <blockquote className="quote__card">
               <span className="quote__mark" aria-hidden="true">
@@ -253,15 +262,6 @@ export function BallroomApp({ guestName, guestId }: Props) {
             coupleTitle={coupleTitle}
             onToast={show}
           />
-          {content.story.enabled ? (
-            <StorySection
-              subtitle={content.story.subtitle}
-              title={content.story.title}
-              milestones={[...content.story.milestones]}
-              scrollRootRef={inviteRef}
-              enabled={revealed}
-            />
-          ) : null}
           {content.guestbook.enabled ? (
             <Wishes guestId={guestId} guestName={guestName} onToast={show} />
           ) : null}
