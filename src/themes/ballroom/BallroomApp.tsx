@@ -187,6 +187,13 @@ export function BallroomApp({ guestName, guestId }: Props) {
             enabled={revealed}
           />
           <IntroSection text={content.intro} />
+          <EventCard
+            eyebrow="Mark Your Calendar"
+            title="Simpan Tanggalnya"
+            events={[...content.events]}
+            calendarLabel={content.eventsSection.calendarGoogleButton}
+            calendarIcsLabel={content.eventsSection.calendarIcsButton}
+          />
           <section id="quote" className="quote" aria-label="Ayat">
             <blockquote className="quote__card">
               <span className="quote__mark" aria-hidden="true">
@@ -201,14 +208,6 @@ export function BallroomApp({ guestName, guestId }: Props) {
               <cite>{content.bibleReference}</cite>
             </blockquote>
           </section>
-          <EventCard
-            eyebrow="Save the Date"
-            title={content.eventsSection.titleEmbedded}
-            events={[...content.events]}
-            mapsLabel={content.eventsSection.mapsButton}
-            calendarLabel={content.eventsSection.calendarGoogleButton}
-            calendarIcsLabel={content.eventsSection.calendarIcsButton}
-          />
           <Gallery3D
             eyebrow="Moments"
             title={content.gallery.title}

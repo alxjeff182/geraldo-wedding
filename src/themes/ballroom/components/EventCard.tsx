@@ -6,13 +6,12 @@ import {
   openCalendarForEvents,
   type CalendarEventInput,
 } from "../../../lib/calendar-links";
-import { IconPinSm } from "../icons";
+import { IconCalendar } from "../icons";
 
 type Props = {
   eyebrow: string;
   title: string;
   events: WeddingEvent[];
-  mapsLabel: string;
   calendarLabel: string;
   calendarIcsLabel?: string;
 };
@@ -27,112 +26,90 @@ function toCalendarInput(event: WeddingEvent, siteTitle: string): CalendarEventI
   };
 }
 
+function formatTimeRange(events: WeddingEvent[]): string {
+  if (!events.length) return "";
+  const start = new Date(events[0].startsAt);
+  const end = new Date(events[events.length - 1].endsAt);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return "";
+  const fmt = (d: Date) =>
+    d.toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      timeZone: "Asia/Jakarta",
+    });
+  return `${fmt(start)} – ${fmt(end)} WIB`;
+}
+
 export function EventCard({
   eyebrow,
   title,
   events,
-  mapsLabel,
   calendarLabel,
   calendarIcsLabel = "Unduh .ics",
 }: Props) {
   const { content } = useWeddingContent();
-  const saveAllLabel = content.eventsSection.calendarSaveAll;
+  const saveAllLabel = content.eventsSection.calendarSaveAll || calendarLabel;
   const first = events[0];
-  const day = first ? new Date(first.startsAt).getDate() : "";
-  const month = first
-    ? new Date(first.startsAt).toLocaleDateString("id-ID", { month: "long" })
-    : "";
-  const year = first ? new Date(first.startsAt).getFullYear() : "";
-  const weekday = first
-    ? new Date(first.startsAt).toLocaleDateString("id-ID", { weekday: "long" })
-    : "";
+  const startDate = first ? new Date(first.startsAt) : null;
+  const day = startDate && !Number.isNaN(startDate.getTime()) ? startDate.getDate() : "";
+  const month =
+    startDate && !Number.isNaN(startDate.getTime())
+      ? startDate.toLocaleDateString("id-ID", { month: "long" })
+      : "";
+  const year = startDate && !Number.isNaN(startDate.getTime()) ? startDate.getFullYear() : "";
+  const weekday =
+    startDate && !Number.isNaN(startDate.getTime())
+      ? startDate.toLocaleDateString("id-ID", { weekday: "long" })
+      : "";
+  const timeRange = formatTimeRange(events);
 
-  const calendarEvents = events.map((event) => toCalendarInput(event, title));
+  const calendarEvents = events.map((event) => toCalendarInput(event, content.site.title || title));
 
   const saveAll = () => {
-    openCalendarForEvents(calendarEvents, title, "wedding-events.ics");
+    openCalendarForEvents(calendarEvents, content.site.title || title, "wedding-events.ics");
   };
 
   const downloadIcs = () => {
-    const ics = buildIcsCalendar(calendarEvents, title);
+    const ics = buildIcsCalendar(calendarEvents, content.site.title || title);
     if (ics) downloadIcsFile("wedding-events.ics", ics);
   };
 
   return (
-    <section id="event" className="event-mod" aria-label={title}>
+    <section id="event" className="event-mod event-mod--calendar" aria-label={title}>
       <div className="event-mod__head">
         <p className="eyebrow">{eyebrow}</p>
         <h3>{title}</h3>
         <div className="ornament" aria-hidden="true" />
       </div>
-      <article className="event-card" data-event>
-        <div className="event-card__glow" aria-hidden="true" />
-        <div className="event-card__date">
-          <span className="event-card__day">{day}</span>
-          <span className="event-card__rule" aria-hidden="true" />
-          <span className="event-card__meta">
-            <small>{weekday}</small>
-            <strong>{month}</strong>
-            <span>{year}</span>
-          </span>
-        </div>
-        <div className="event-card__divider" aria-hidden="true" />
-        <ol className="event-timeline">
-          {events.map((event) => (
-            <li key={event.name} className="event-timeline__item">
-              <p className="event-timeline__time">{event.time}</p>
-              <p className="event-timeline__name">{event.name}</p>
-              <p className="event-timeline__note">{event.venue}</p>
-              <div className="event-card__venue event-card__venue--inline">
-                <span className="event-card__icon" aria-hidden="true">
-                  <IconPinSm />
-                </span>
-                <div>
-                  <strong>{event.venue}</strong>
-                  <small>{event.address}</small>
-                </div>
-              </div>
-              <div className="event-card__actions event-card__actions--inline">
-                {event.mapsUrl ? (
-                  <a
-                    className="event-card__btn"
-                    href={event.mapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {mapsLabel}
-                  </a>
-                ) : null}
-                <button
-                  type="button"
-                  className="event-card__btn event-card__btn--ghost"
-                  onClick={() =>
-                    openCalendarForEvents(
-                      [toCalendarInput(event, title)],
-                      `${title} — ${event.name}`,
-                      `${event.name.toLowerCase().replace(/\s+/g, "-")}.ics`,
-                    )
-                  }
-                >
-                  {calendarLabel}
-                </button>
-              </div>
-            </li>
-          ))}
-        </ol>
-        <div className="event-card__divider" aria-hidden="true" />
-        <div className="event-card__actions">
-          <button type="button" className="event-card__btn" onClick={saveAll}>
-            {saveAllLabel}
+      <article className="cal-card" data-event>
+        <div className="cal-card__glow" aria-hidden="true" />
+        <div className="cal-card__frame" aria-hidden="true" />
+        <p className="cal-card__weekday">
+          <span className="cal-card__rule" aria-hidden="true" />
+          <span>{weekday}</span>
+          <span className="cal-card__rule" aria-hidden="true" />
+        </p>
+        <p className="cal-card__day">{day}</p>
+        <p className="cal-card__month">
+          {month} {year}
+        </p>
+        {timeRange ? <p className="cal-card__time">{timeRange}</p> : null}
+        <div className="cal-card__divider" aria-hidden="true" />
+        <div className="cal-card__actions">
+          <button type="button" className="cal-card__btn" onClick={saveAll}>
+            <IconCalendar size={16} />
+            <span>{saveAllLabel}</span>
           </button>
           <button
             type="button"
-            className="event-card__btn event-card__btn--ghost"
+            className="cal-card__btn cal-card__btn--ghost"
             onClick={downloadIcs}
           >
             {calendarIcsLabel}
           </button>
         </div>
+        <p className="cal-card__note">Detail lokasi & tata acara ada di menu Lokasi</p>
       </article>
     </section>
   );
