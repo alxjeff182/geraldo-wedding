@@ -3,7 +3,7 @@ update site_content
 set content = jsonb_set(
   content,
   '{media,ogImage}',
-  to_jsonb('/og-v3.jpg'::text)
+  to_jsonb('/assets/ballroom/og-v3.jpg'::text)
 )
 where id = 'main'
   and (

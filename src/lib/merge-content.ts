@@ -298,12 +298,14 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
   const cmsOg = String(merged.media.ogImage ?? "").trim();
   const legacyOg =
     !cmsOg ||
-    cmsOg.endsWith("/og.jpg") ||
-    cmsOg.endsWith("/og-v2.jpg") ||
+    cmsOg === "/og.jpg" ||
+    cmsOg === "/og-v2.jpg" ||
+    cmsOg === "/og-v3.jpg" ||
     cmsOg.endsWith("/og-image.jpg") ||
     cmsOg.endsWith("/og-share.jpg") ||
     cmsOg.includes("/assets/ballroom/og-image.jpg") ||
-    cmsOg.includes("/assets/ballroom/og-share.jpg");
+    cmsOg.includes("/assets/ballroom/og-share.jpg") ||
+    cmsOg === "/assets/ballroom/og-share.jpg";
   const media = legacyOg ? { ...merged.media, ogImage: wedding.media.ogImage } : merged.media;
 
   // One-time: CMS still has previous bride number, empty groom number, wrong holder, or old QRIS.
