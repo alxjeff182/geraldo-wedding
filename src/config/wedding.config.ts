@@ -423,6 +423,20 @@ export const wedding = {
     markWaUnsent: "Tandai belum",
     waMarkedSent: "Ditandai sudah dikirim WA",
     waMarkedUnsent: "Status WA dikembalikan ke belum",
+    waExportButton: "Batch pesan WA",
+    waExportTitle: "Batch pesan WhatsApp",
+    waExportSubtitle:
+      "Semua pesan sudah terisi nama & link. Salin / buka WA satu per satu, atau unduh .txt. Filter/cari di daftar ikut dipakai.",
+    waExportCopyAll: "Salin semua",
+    waExportDownload: "Unduh .txt",
+    waExportCopyMessage: "Salin pesan",
+    waExportOpenWa: "Buka WA",
+    waExportClose: "Tutup",
+    waExportCopied: "Pesan disalin",
+    waExportAllCopied: "Semua pesan disalin",
+    waExportDownloaded: "File .txt berhasil diunduh",
+    waExportEmpty: "Tidak ada tamu di filter ini.",
+    waExportNoPhone: "Tanpa nomor WA",
   },
 } as const;
 

@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { INVITE_MESSAGE_TEMPLATES } from "../config/invite-templates";
+import {
+  DEFAULT_INVITE_TEMPLATE_ID,
+  INVITE_MESSAGE_TEMPLATES,
+} from "../config/invite-templates";
 
 describe("invite-templates", () => {
   it("ships 3 default WhatsApp templates", () => {
@@ -9,12 +12,11 @@ describe("invite-templates", () => {
     );
   });
 
-  it("uses the formal invite as the default guest-list template", () => {
-    const def = INVITE_MESSAGE_TEMPLATES[0];
-    expect(def.message).toContain("Kepada Yth.");
-    expect(def.message).toContain("*{nama}*");
-    expect(def.message).toContain("PESTA PERNIKAHAN {pasangan}");
-    expect(def.message).toContain("{link}");
-    expect(def.message).toContain("Salam hormat,");
+  it("defaults guest-list sends to 3. Singkat & Sopan", () => {
+    expect(DEFAULT_INVITE_TEMPLATE_ID).toBe("singkat-sopan");
+    const def = INVITE_MESSAGE_TEMPLATES.find((t) => t.id === DEFAULT_INVITE_TEMPLATE_ID);
+    expect(def?.name).toMatch(/Singkat/i);
+    expect(def?.message).toContain("{nama}");
+    expect(def?.message).toContain("{link}");
   });
 });

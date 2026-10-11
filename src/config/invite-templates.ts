@@ -61,7 +61,8 @@ Tuhan memberkati, sampai jumpa!`,
   },
 ];
 
-export const DEFAULT_INVITE_TEMPLATE_ID = INVITE_MESSAGE_TEMPLATES[0].id;
+/** Default guest-list template: 3. Singkat & Sopan */
+export const DEFAULT_INVITE_TEMPLATE_ID: string = "singkat-sopan";
 
 export function resolveInviteTemplates(
   templates: InviteMessageTemplate[] | undefined,

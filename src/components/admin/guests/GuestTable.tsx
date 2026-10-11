@@ -1,10 +1,11 @@
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import type { InviteMessageTemplate } from "../../../config/invite-templates";
 import { getInviteTemplateById } from "../../../config/invite-templates";
 import { buildGuestInviteUrl, buildWhatsAppUrl } from "../../../lib/invite-links";
 import type { Guest } from "../../../lib/supabase";
 import { GuestBulkImport } from "./GuestBulkImport";
 import { GuestRowCompactActions, GuestRowDetailActions } from "./GuestRowActions";
+import { GuestWaExport } from "./GuestWaExport";
 import { formatGuestDate, PAGE_SIZES, truncate } from "./guest-invite-utils";
 import type { GuestsController } from "./useGuests";
 
@@ -14,6 +15,7 @@ type Props = {
 
 export function GuestTable({ guests: g }: Props) {
   const { invite, templates } = g;
+  const [exportOpen, setExportOpen] = useState(false);
 
   return (
     <div className="admin-invite__main">
@@ -42,6 +44,14 @@ export function GuestTable({ guests: g }: Props) {
 
         <button type="button" className="admin-btn" onClick={g.sendNextUnsent}>
           Kirim berikutnya
+        </button>
+
+        <button
+          type="button"
+          className="admin-btn admin-btn--primary"
+          onClick={() => setExportOpen(true)}
+        >
+          {invite.waExportButton}
         </button>
 
         <div className="admin-invite__stats" aria-label="Ringkasan tamu">
@@ -221,6 +231,17 @@ export function GuestTable({ guests: g }: Props) {
           </table>
         </div>
       )}
+
+      <GuestWaExport
+        open={exportOpen}
+        onClose={() => setExportOpen(false)}
+        invite={invite}
+        guests={g.filteredGuests}
+        buildMessage={g.buildMessage}
+        getGuestTemplateId={g.getGuestTemplateId}
+        onOpenWhatsApp={g.openWhatsAppAndMark}
+        onNotify={(message) => g.onNotify(message)}
+      />
     </div>
   );
 }

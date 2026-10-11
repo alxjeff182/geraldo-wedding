@@ -571,6 +571,7 @@ export function useGuests({
     toggleExpand,
     setPage,
     siteUrl,
+    onNotify,
   };
 }
 

@@ -255,11 +255,16 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
     };
   });
 
-  const defaultTemplateId = whatsappTemplates.some(
-    (item) => item.id === merged.invite.defaultTemplateId,
-  )
-    ? merged.invite.defaultTemplateId
-    : (whatsappTemplates[0]?.id ?? "");
+  const preferredDefaultId = wedding.invite.defaultTemplateId;
+  const cmsDefaultId = merged.invite.defaultTemplateId;
+  // Prefer shipped default (Singkat & Sopan) when CMS still points at the old formal default.
+  const resolvedDefaultId =
+    cmsDefaultId === "formal-kristen" ? preferredDefaultId : cmsDefaultId;
+  const defaultTemplateId = whatsappTemplates.some((item) => item.id === resolvedDefaultId)
+    ? resolvedDefaultId
+    : whatsappTemplates.some((item) => item.id === preferredDefaultId)
+      ? preferredDefaultId
+      : (whatsappTemplates[0]?.id ?? "");
 
   // CMS events arrays replace defaults wholesale — restore lat/lng/mapsCid from shipped
   // defaults when the CMS row is missing them (needed for native maps + embed place card).
