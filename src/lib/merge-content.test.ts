@@ -69,11 +69,11 @@ describe("mergeWeddingContent", () => {
     expect("desktopBg" in merged.media).toBe(false);
   });
 
-  it("keeps story, guestGuide and guestbook on by default", () => {
+  it("keeps story and guestbook on by default", () => {
     const merged = mergeWeddingContent({});
     expect(merged.story.enabled).toBe(true);
-    expect(merged.guestGuide.enabled).toBe(true);
     expect(merged.guestbook.enabled).toBe(true);
+    expect("guestGuide" in merged).toBe(false);
     expect(merged.rsvp.deadline).toContain("2026-10-17");
     expect(merged.rsvp.guestCountOptions).toEqual(["1", "2", "3"]);
   });

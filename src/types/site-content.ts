@@ -157,15 +157,6 @@ export type SiteContentOverrides = {
     subtitle?: string;
     paragraphs?: string[];
   };
-  guestGuide?: {
-    enabled?: boolean;
-    title?: string;
-    subtitle?: string;
-    dressCodeTitle?: string;
-    dressCode?: string;
-    tipsTitle?: string;
-    tips?: string;
-  };
   gallery?: {
     title?: string;
     subtitle?: string;

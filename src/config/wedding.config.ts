@@ -130,17 +130,6 @@ export const wedding = {
     ],
   },
 
-  guestGuide: {
-    enabled: true,
-    title: "Info untuk Tamu",
-    subtitle: "Dress code dan tip lokasi agar kehadiran Anda lebih nyaman.",
-    dressCodeTitle: "Dress Code",
-    dressCode:
-      "Formal / Elegant dengan nuansa maroon & gold. Untuk tamu keluarga adat, ulos dipersilakan sesuai kebiasaan keluarga masing-masing.",
-    tipsTitle: "Parkir & Akomodasi",
-    tips: "Parkir tersedia di area Gedung Gorga untuk resepsi.\nTamu dari luar kota dapat menginap di sekitar Kebon Jeruk / Grogol (akses mudah ke kedua venue).",
-  },
-
   gallery: {
     title: "Galeri",
     subtitle: "Constantly, consistently,\ncontinually, You.",

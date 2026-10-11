@@ -39,25 +39,31 @@ export function isOverridden(current: unknown, defaultValue: unknown): boolean {
   return JSON.stringify(current) !== JSON.stringify(defaultValue);
 }
 
-/** Strip obsolete Batak media keys from CMS overrides before save. */
+/** Strip obsolete CMS keys before save / load. */
 export function stripLockedMedia(overrides: SiteContentOverrides): SiteContentOverrides {
-  if (!overrides.media) return overrides;
-  const media = { ...overrides.media } as Record<string, unknown>;
-  for (const key of [
-    "desktopBg",
-    "paperBg",
-    "rumahBolon",
-    "bunga",
-    "divider",
-    "closing",
-    "ulos",
-    "heroPhoto",
-    "portrait",
-    "video",
-  ]) {
-    delete media[key];
+  const next = { ...overrides } as SiteContentOverrides & { guestGuide?: unknown };
+  delete next.guestGuide;
+
+  if (next.media) {
+    const media = { ...next.media } as Record<string, unknown>;
+    for (const key of [
+      "desktopBg",
+      "paperBg",
+      "rumahBolon",
+      "bunga",
+      "divider",
+      "closing",
+      "ulos",
+      "heroPhoto",
+      "portrait",
+      "video",
+    ]) {
+      delete media[key];
+    }
+    next.media = media as SiteContentOverrides["media"];
   }
-  return { ...overrides, media: media as SiteContentOverrides["media"] };
+
+  return next;
 }
 
 export function mergeWeddingContent(overrides: SiteContentOverrides = {}): WeddingConfig {
@@ -75,6 +81,7 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
   if (normalized.site && "theme" in normalized.site) {
     delete (normalized.site as { theme?: unknown }).theme;
   }
+  delete (normalized as SiteContentOverrides & { guestGuide?: unknown }).guestGuide;
   if (normalized.media) {
     const cleaned = stripLockedMedia({ media: normalized.media }).media;
     normalized.media = cleaned;

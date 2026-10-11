@@ -11,7 +11,6 @@ import { Hero } from "./components/Hero";
 import { CoupleStory } from "./components/CoupleStory";
 import { StorySection } from "./components/StorySection";
 import { EventCard } from "./components/EventCard";
-import { GuestGuideSection } from "./components/GuestGuideSection";
 import { Gallery3D } from "./components/Gallery3D";
 import { GiftHub } from "./components/GiftHub";
 import { IntroSection } from "./components/IntroSection";
@@ -259,16 +258,6 @@ export function BallroomApp({ guestName, guestId }: Props) {
               subtitle={content.story.subtitle}
               title={content.story.title}
               paragraphs={[...content.story.paragraphs]}
-            />
-          ) : null}
-          {content.guestGuide.enabled ? (
-            <GuestGuideSection
-              subtitle={content.guestGuide.subtitle}
-              title={content.guestGuide.title}
-              dressCodeTitle={content.guestGuide.dressCodeTitle}
-              dressCode={content.guestGuide.dressCode}
-              tipsTitle={content.guestGuide.tipsTitle}
-              tips={content.guestGuide.tips}
             />
           ) : null}
           {content.guestbook.enabled ? (
