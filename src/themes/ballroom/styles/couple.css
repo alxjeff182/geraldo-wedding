@@ -259,7 +259,9 @@
   }
 } /* Quote */
 .theme-ballroom .quote {
-  padding: 3.5rem 1.25rem;
+  /* Pull toward couple pin trailing space; keep a short breathing gap */
+  margin-top: -2.5rem;
+  padding: 1.25rem 1.25rem 2.75rem;
   text-align: center;
   background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(107, 42, 42, 0.22), transparent 70%);
 }
