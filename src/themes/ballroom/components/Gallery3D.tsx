@@ -34,7 +34,6 @@ export function Gallery3D({ eyebrow, title, images, scrollRootRef, enabled = tru
     enabled: enabled && n > 0,
   });
 
-  const current = images[activeIndex] ?? images[0];
   const countLabel = `${String(activeIndex + 1).padStart(2, "0")} / ${String(n).padStart(2, "0")}`;
 
   useEffect(() => {
@@ -200,9 +199,8 @@ export function Gallery3D({ eyebrow, title, images, scrollRootRef, enabled = tru
                     loading="lazy"
                   />
                 )}
-                <figcaption>
-                  <span className="gallery-plane__num">{String(i + 1).padStart(2, "0")}</span>
-                  <span className="gallery-plane__title">{img.alt}</span>
+                <figcaption className="visually-hidden">
+                  {String(i + 1).padStart(2, "0")}
                 </figcaption>
               </div>
             </figure>
@@ -213,7 +211,6 @@ export function Gallery3D({ eyebrow, title, images, scrollRootRef, enabled = tru
       <footer className="gallery-canvas__ui">
         <div className="gallery-canvas__caption" key={activeIndex}>
           <span className="gallery-canvas__count">{countLabel}</span>
-          <span className="gallery-canvas__title">{current?.alt}</span>
         </div>
         <div className="gallery-canvas__dots" role="tablist" aria-label="Navigasi galeri">
           {images.map((_, i) => (
@@ -249,8 +246,7 @@ export function Gallery3D({ eyebrow, title, images, scrollRootRef, enabled = tru
         </button>
         {lightbox ? (
           <figure className="gallery-lightbox__figure">
-            <MediaImage src={lightbox.src} alt={lightbox.alt} loading="eager" />
-            <figcaption>{lightbox.caption}</figcaption>
+            <MediaImage src={lightbox.src} alt={lightbox.alt || "Foto galeri"} loading="eager" />
           </figure>
         ) : null}
       </div>
