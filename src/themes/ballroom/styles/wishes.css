@@ -6,6 +6,14 @@
   position: relative;
 }
 
+.theme-ballroom .story-mod {
+  padding-top: 1.75rem;
+}
+
+.theme-ballroom .story-mod .section__head {
+  margin-bottom: 1.75rem;
+}
+
 .theme-ballroom .intro-mod {
   position: relative;
   z-index: 1;

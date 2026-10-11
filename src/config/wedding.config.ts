@@ -130,8 +130,8 @@ export const wedding = {
 
   story: {
     enabled: true,
-    title: "Our Story",
-    subtitle: "Constantly, consistently, continually, You.",
+    title: "Kisah Kami",
+    subtitle: "Our Story",
     milestones: [
       {
         date: "2019",
