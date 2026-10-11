@@ -26,35 +26,45 @@ export function detectPlatform(
   return "desktop";
 }
 
-function launchHref(href: string, { newTab = false } = {}) {
+/** Prefer location.assign for native schemes — Chrome honors the user gesture better. */
+function launchNative(href: string) {
+  window.location.assign(href);
+}
+
+function launchNewTab(href: string) {
   const anchor = document.createElement("a");
   anchor.href = href;
   anchor.rel = "noopener noreferrer";
-  if (newTab) anchor.target = "_blank";
+  anchor.target = "_blank";
   anchor.style.display = "none";
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();
 }
 
-/** Android Chrome intent → Google Maps app, with web fallback. */
-export function buildAndroidMapsIntent(mapsUrl: string): string | null {
-  const trimmed = mapsUrl.trim();
-  if (!trimmed) return null;
+function mapsQuery(input: MapsOpenInput): string {
+  return (input.address || input.venue || "").trim();
+}
 
-  let url: URL;
-  try {
-    url = new URL(trimmed);
-  } catch {
-    return null;
-  }
+/**
+ * geo: URI — Android routes this straight to the installed Maps app
+ * (or the system chooser), without loading maps.app.goo.gl in Chrome first.
+ */
+export function buildAndroidGeoUrl(query: string): string | null {
+  const q = query.trim();
+  if (!q) return null;
+  return `geo:0,0?q=${encodeURIComponent(q)}`;
+}
 
-  const path = `${url.host}${url.pathname}${url.search}${url.hash}`;
-  const fallback = encodeURIComponent(trimmed);
-  return (
-    `intent://${path}#Intent;scheme=${url.protocol.replace(":", "")};` +
-    `package=com.google.android.apps.maps;S.browser_fallback_url=${fallback};end`
-  );
+/**
+ * Intent into Google Maps with a search query (not a goo.gl short link).
+ * No browser_fallback_url — that field is what forces Chrome to open the web.
+ */
+export function buildAndroidMapsIntent(query: string): string | null {
+  const q = query.trim();
+  if (!q) return null;
+  const path = `maps.google.com/maps?q=${encodeURIComponent(q)}`;
+  return `intent://${path}#Intent;scheme=https;package=com.google.android.apps.maps;end`;
 }
 
 /** iOS deep link into the Google Maps app. */
@@ -62,13 +72,20 @@ export function buildIosGoogleMapsUrl(query: string): string {
   return `comgooglemaps://?q=${encodeURIComponent(query.trim())}`;
 }
 
-function mapsQuery(input: MapsOpenInput): string {
-  return (input.address || input.venue || input.mapsUrl).trim();
+function openWithAppThenWebFallback(nativeHref: string, webHref: string, delayMs = 1500) {
+  const started = Date.now();
+  launchNative(nativeHref);
+  window.setTimeout(() => {
+    // App took over → tab is hidden/backgrounded. Only fall back if still here.
+    if (document.visibilityState !== "visible") return;
+    if (Date.now() - started < delayMs - 100) return;
+    launchNewTab(webHref);
+  }, delayMs);
 }
 
 /**
  * Open the right maps target for the guest's OS:
- * - Android → Google Maps app intent (web fallback)
+ * - Android → geo: / Google Maps intent (app first; web only if still on page)
  * - iOS → comgooglemaps://, then web mapsUrl if the app isn't installed
  * - Mac / desktop → mapsUrl in a new tab
  */
@@ -77,33 +94,32 @@ export function openMaps(input: MapsOpenInput, userAgent = currentUserAgent()): 
   if (!mapsUrl) return false;
 
   const platform = detectPlatform(userAgent);
+  const query = mapsQuery(input);
 
   if (platform === "android") {
-    const intent = buildAndroidMapsIntent(mapsUrl);
-    if (intent) {
-      launchHref(intent);
+    const geo = buildAndroidGeoUrl(query);
+    if (geo) {
+      openWithAppThenWebFallback(geo, mapsUrl);
       return true;
     }
-    launchHref(mapsUrl, { newTab: true });
+    const intent = buildAndroidMapsIntent(query || mapsUrl);
+    if (intent) {
+      openWithAppThenWebFallback(intent, mapsUrl);
+      return true;
+    }
+    launchNewTab(mapsUrl);
     return true;
   }
 
   if (platform === "ios") {
-    const query = mapsQuery(input);
     if (query) {
-      const deepLink = buildIosGoogleMapsUrl(query);
-      launchHref(deepLink);
-      window.setTimeout(() => {
-        if (document.visibilityState === "visible") {
-          launchHref(mapsUrl, { newTab: true });
-        }
-      }, 1200);
+      openWithAppThenWebFallback(buildIosGoogleMapsUrl(query), mapsUrl, 1200);
       return true;
     }
-    launchHref(mapsUrl, { newTab: true });
+    launchNewTab(mapsUrl);
     return true;
   }
 
-  launchHref(mapsUrl, { newTab: true });
+  launchNewTab(mapsUrl);
   return true;
 }

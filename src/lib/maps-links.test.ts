@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  buildAndroidGeoUrl,
   buildAndroidMapsIntent,
   buildIosGoogleMapsUrl,
   detectPlatform,
@@ -41,13 +42,17 @@ describe("maps-links", () => {
     ).toBe("desktop");
   });
 
-  it("builds Android Google Maps intent with web fallback", () => {
-    const intent = buildAndroidMapsIntent(mapsUrl);
-    expect(intent).toContain("intent://maps.app.goo.gl/CTqpxvQrfmLgQpsb8");
+  it("builds Android geo URI from address (app-first, not goo.gl web)", () => {
+    expect(buildAndroidGeoUrl(address)).toBe(`geo:0,0?q=${encodeURIComponent(address)}`);
+    expect(buildAndroidGeoUrl("")).toBeNull();
+  });
+
+  it("builds Android Google Maps intent from query without web fallback", () => {
+    const intent = buildAndroidMapsIntent(address);
+    expect(intent).toContain("intent://maps.google.com/maps?q=");
     expect(intent).toContain("package=com.google.android.apps.maps");
-    expect(intent).toContain("scheme=https");
-    expect(intent).toContain(`S.browser_fallback_url=${encodeURIComponent(mapsUrl)}`);
-    expect(buildAndroidMapsIntent("not-a-url")).toBeNull();
+    expect(intent).not.toContain("browser_fallback_url");
+    expect(buildAndroidMapsIntent("")).toBeNull();
   });
 
   it("builds iOS Google Maps deep link", () => {
@@ -56,28 +61,16 @@ describe("maps-links", () => {
     );
   });
 
-  it("openMaps launches Android intent", () => {
-    let href = "";
-    const createEl = document.createElement.bind(document);
-    vi.spyOn(document, "createElement").mockImplementation((tag: string) => {
-      const el = createEl(tag);
-      if (tag === "a") {
-        Object.defineProperty(el, "click", {
-          value() {
-            href = (this as HTMLAnchorElement).href;
-          },
-        });
-      }
-      return el;
-    });
+  it("openMaps launches Android geo URI via location.assign", () => {
+    const assign = vi.fn();
+    vi.stubGlobal("location", { assign, href: "https://example.com" });
 
     const ok = openMaps(
       { mapsUrl, address },
       "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/120.0.0.0 Mobile Safari/537.36",
     );
     expect(ok).toBe(true);
-    expect(href).toContain("intent://maps.app.goo.gl/");
-    expect(href).toContain("package=com.google.android.apps.maps");
+    expect(assign).toHaveBeenCalledWith(`geo:0,0?q=${encodeURIComponent(address)}`);
   });
 
   it("openMaps opens desktop mapsUrl in new tab", () => {

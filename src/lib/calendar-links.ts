@@ -161,71 +161,72 @@ export function isAndroid(
   return /Android/i.test(userAgent);
 }
 
-/** Force Google Calendar app (com.google.android.calendar) with prefilled event. */
+/**
+ * INSERT intent for any calendar app (no package lock, no browser_fallback_url).
+ * Locking to com.google.android.calendar + browser_fallback_url is what made Chrome
+ * open Google Calendar *web* when the app wasn't the default handler.
+ */
 export function buildAndroidInsertIntent(event: CalendarEventInput): string | null {
   const begin = new Date(event.startsAt).getTime();
   const end = new Date(event.endsAt).getTime();
   if (Number.isNaN(begin) || Number.isNaN(end)) return null;
 
-  const googleUrl = buildGoogleCalendarUrl(event);
-  const fallback = googleUrl ? encodeURIComponent(googleUrl) : "";
-
   const parts = [
     "action=android.intent.action.INSERT",
     "type=vnd.android.cursor.item/event",
-    "package=com.google.android.calendar",
     `S.title=${encodeURIComponent(event.title)}`,
     event.details?.trim() ? `S.description=${encodeURIComponent(event.details.trim())}` : null,
     event.location?.trim() ? `S.eventLocation=${encodeURIComponent(event.location.trim())}` : null,
     `l.beginTime=${begin}`,
     `l.endTime=${end}`,
-    fallback ? `S.browser_fallback_url=${fallback}` : null,
     "end",
   ].filter(Boolean);
 
   return `intent://#Intent;${parts.join(";")}`;
 }
 
-/** Deep-link intent into Google Calendar's event template screen. */
+/** Prefer Google Calendar app specifically (still no web fallback baked into the intent). */
 export function buildAndroidGoogleCalendarIntent(event: CalendarEventInput): string | null {
-  const googleUrl = buildGoogleCalendarUrl(event);
-  if (!googleUrl) return null;
-  const path = googleUrl.replace(/^https:\/\//i, "");
-  const fallback = encodeURIComponent(googleUrl);
-  return (
-    `intent://${path}#Intent;scheme=https;package=com.google.android.calendar;` +
-    `S.browser_fallback_url=${fallback};end`
-  );
+  const insert = buildAndroidInsertIntent(event);
+  if (!insert) return null;
+  return insert.replace("#Intent;", "#Intent;package=com.google.android.calendar;");
 }
 
-function launchAndroidHref(href: string) {
-  // <a>.click() keeps the user-gesture chain — more reliable than location.assign for intents.
-  const anchor = document.createElement("a");
-  anchor.href = href;
-  anchor.rel = "noopener";
-  anchor.style.display = "none";
-  document.body.appendChild(anchor);
-  anchor.click();
-  anchor.remove();
+function launchAndroidNative(href: string) {
+  // location.assign keeps the user-gesture chain for intent:/geo: on Android Chrome.
+  window.location.assign(href);
 }
 
-/** Android browser → open Google Calendar app directly with event prefilled. */
+function openAndroidWithWebFallback(nativeHref: string, webHref: string | null, delayMs = 1500) {
+  const started = Date.now();
+  launchAndroidNative(nativeHref);
+  if (!webHref) return;
+  window.setTimeout(() => {
+    if (document.visibilityState !== "visible") return;
+    if (Date.now() - started < delayMs - 100) return;
+    window.open(webHref, "_blank", "noopener,noreferrer");
+  }, delayMs);
+}
+
+/** Android browser → open a calendar app with the event prefilled. */
 export function openAndroidCalendar(event: CalendarEventInput): boolean {
+  const googleUrl = buildGoogleCalendarUrl(event);
+
+  // Prefer any installed calendar app via INSERT (Samsung Calendar, Google Calendar, etc.).
   const insertIntent = buildAndroidInsertIntent(event);
   if (insertIntent) {
-    launchAndroidHref(insertIntent);
+    openAndroidWithWebFallback(insertIntent, googleUrl);
     return true;
   }
 
   const gcalIntent = buildAndroidGoogleCalendarIntent(event);
   if (gcalIntent) {
-    launchAndroidHref(gcalIntent);
+    openAndroidWithWebFallback(gcalIntent, googleUrl);
     return true;
   }
 
-  const googleUrl = buildGoogleCalendarUrl(event);
   if (!googleUrl) return false;
-  launchAndroidHref(googleUrl);
+  window.open(googleUrl, "_blank", "noopener,noreferrer");
   return true;
 }
 

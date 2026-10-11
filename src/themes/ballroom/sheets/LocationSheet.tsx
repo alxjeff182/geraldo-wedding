@@ -1,4 +1,4 @@
-import { useEffect, useState, type MouseEvent } from "react";
+import { useEffect, useState } from "react";
 import type { WeddingEvent } from "../../../config/wedding.config";
 import { openCalendarForEvent } from "../../../lib/calendar-links";
 import { openMaps } from "../../../lib/maps-links";
@@ -45,9 +45,8 @@ export function LocationSheet({
     }
   };
 
-  const openEventMaps = (e: MouseEvent<HTMLAnchorElement>) => {
+  const openEventMaps = () => {
     if (!event?.mapsUrl) return;
-    e.preventDefault();
     openMaps({
       mapsUrl: event.mapsUrl,
       address: event.address,
@@ -159,9 +158,9 @@ export function LocationSheet({
       </div>
       <footer className="sheet__foot sheet__foot--row">
         {event?.mapsUrl ? (
-          <a className="btn sheet__cta" href={event.mapsUrl} onClick={openEventMaps}>
+          <button type="button" className="btn sheet__cta" onClick={openEventMaps}>
             {mapsLabel}
-          </a>
+          </button>
         ) : null}
         {event ? (
           <button type="button" className="btn btn--ghost sheet__cta" onClick={saveEventCalendar}>
