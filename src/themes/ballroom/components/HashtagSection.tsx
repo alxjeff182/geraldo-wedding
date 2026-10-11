@@ -38,9 +38,12 @@ export function HashtagSection({
   const template = storyTemplate?.trim() || content.hashtag.storyTemplate?.trim() || "";
   const boothLabel = content.hashtag.boothButton || "Rekam Video Story";
   const storyHint =
-    content.hashtag.storyHint || "Rekam video dengan bingkai kami, lalu pilih Instagram → Story";
-  const subtitle = content.hashtag.subtitle || "Share Your Moment";
-  const lead = content.hashtag.lead || "Abadikan momen bersama kami di Instagram Story";
+    content.hashtag.storyHint ||
+    "Klik rekam video story, lalu bagikan pilih Instagram → Story.";
+  const subtitle = content.hashtag.subtitle || "feel free to use our template";
+  const lead =
+    content.hashtag.lead ||
+    "Panduan: klik rekam video story, lalu bagikan pilih Instagram → Story.";
   const maxSeconds = content.hashtag.boothMaxSeconds ?? 15;
   const explore = hashtagExploreUrl(tag);
 
@@ -175,7 +178,7 @@ export function HashtagSection({
         {subtitle ? <p className="hashtag-mod__subtitle">{subtitle}</p> : null}
         <div className="ornament" aria-hidden="true" />
       </div>
-      <p className="hashtag-mod__lead">{lead}</p>
+      {lead ? <p className="hashtag-mod__lead">{lead}</p> : null}
       {template ? (
         <div className="hashtag-mod__story">
           <button

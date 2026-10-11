@@ -214,10 +214,10 @@ export const wedding = {
   },
 
   hashtag: {
-    title: "Photobooth",
-    subtitle: "Share Your Moment",
+    title: "Abadikan Momenmu",
+    subtitle: "feel free to use our template",
     tag: "#GeralDOanythingforChristine",
-    lead: "Abadikan momen bersama kami di Instagram Story",
+    lead: "Panduan: klik rekam video story, lalu bagikan pilih Instagram → Story.",
     storyTemplate: "/assets/ballroom/story-template.png",
     storyPreviewBg: "/assets/ballroom/gallery/01.webp",
     boothButton: "Rekam Video Story",
@@ -226,7 +226,7 @@ export const wedding = {
     boothRetry: "Ulangi",
     boothDenied: "Kamera tidak tersedia. Bagikan foto template saja.",
     storyButton: "Bagikan Foto",
-    storyHint: "Rekam video dengan bingkai kami, lalu pilih Instagram → Story",
+    storyHint: "Klik rekam video story, lalu bagikan pilih Instagram → Story.",
     storyFallbackToast: "Tersimpan, buka Instagram lalu pilih dari galeri",
     copySuccess: "Hashtag disalin",
     instagramButton: "Lihat di Instagram",
