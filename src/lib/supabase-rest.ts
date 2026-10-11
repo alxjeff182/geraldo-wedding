@@ -168,7 +168,7 @@ export async function invokeSubmitFunction(body: SubmitBody): Promise<InvokeSubm
 
   // Public share links: wishes without guest invite go through RPC (no edge token needed).
   if (body.type === "wish" && !body.payload.guest_id) {
-    return invokePublicWishRpc(body.payload);
+    return invokePublicWishRpc(body.payload as WishInsert);
   }
 
   try {
