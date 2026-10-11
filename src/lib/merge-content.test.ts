@@ -169,9 +169,11 @@ Dengan penuh sukacita dan mengucap syukur kepada Tuhan Yesus Kristus, kami mengu
     expect(merged.media.ogImage).toBe("/assets/ballroom/og-wa-v7.jpg");
   });
 
-  it("migrates legacy invite location away from Tangerang", () => {
-    const merged = mergeWeddingContent({ location: "Tangerang" });
-    expect(merged.location).toBe("HKBP Kebon Jeruk, Jakarta Barat");
+  it("migrates legacy invite location to Jakarta Barat", () => {
+    expect(mergeWeddingContent({ location: "Tangerang" }).location).toBe("Jakarta Barat");
+    expect(mergeWeddingContent({ location: "HKBP Kebon Jeruk, Jakarta Barat" }).location).toBe(
+      "Jakarta Barat",
+    );
   });
 
   it("migrates legacy story.paragraphs into milestones", () => {
