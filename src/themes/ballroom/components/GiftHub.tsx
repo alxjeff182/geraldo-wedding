@@ -167,7 +167,7 @@ export function GiftHub({
                 src={qrisImgSrc}
                 alt={`QRIS a.n. ${accountHolder}`}
                 width={280}
-                height={396}
+                height={280}
                 decoding="async"
                 onError={() => {
                   if (qrisImgSrc !== QRIS_FALLBACK) {

@@ -615,9 +615,9 @@
   display: grid;
   place-items: center;
   width: min(100%, 14rem);
-  aspect-ratio: 723 / 1024;
+  aspect-ratio: 1 / 1;
   margin-inline: auto;
-  padding: 0.45rem;
+  padding: 0.55rem;
   border-radius: var(--r-md);
   background: #fff;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
@@ -629,6 +629,7 @@
   object-fit: contain;
   object-position: center;
   display: block;
+  border-radius: 0.35rem;
 }
 .theme-ballroom .qris-fallback {
   position: absolute;
