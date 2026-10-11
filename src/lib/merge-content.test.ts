@@ -71,30 +71,25 @@ describe("mergeWeddingContent", () => {
 
   it("strips dead CMS keys but keeps contact and invite", () => {
     const merged = mergeWeddingContent({
-      // @ts-expect-error obsolete top-level keys
       quote: { text: "old" },
-      // @ts-expect-error obsolete top-level keys
       closing: { paragraphs: ["bye"] },
       contact: { whatsappNumber: "6281111111111" },
       invite: { salutation: "Yth. Bapak/Ibu" },
       cover: {
         salutation: "Kepada Yth.",
-        // @ts-expect-error obsolete nested key
         eyebrow: "legacy",
       },
       guestbook: {
         title: "Ucapan",
-        // @ts-expect-error obsolete nested key
         pagerPrev: "Sebelumnya",
       },
       couple: {
         groom: {
           shortName: "G",
-          // @ts-expect-error obsolete nested key
           instagram: "https://instagram.com/x",
         },
       },
-    });
+    } as Parameters<typeof mergeWeddingContent>[0]);
     expect("quote" in merged).toBe(false);
     expect("closing" in merged).toBe(false);
     expect(merged.contact.whatsappNumber).toBe("6281111111111");
