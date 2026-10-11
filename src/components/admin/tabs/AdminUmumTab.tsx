@@ -64,6 +64,13 @@ export function AdminUmumTab({ merged, defaults, updateDraft, clearDraftPath }: 
         />
       </label>
       <AdminOverrideTextField
+        label="Lokasi singkat (tag {lokasi} di pesan WA)"
+        value={merged.location}
+        defaultValue={defaults.location}
+        onReset={() => clearDraftPath(["location"])}
+        onChange={(value) => updateDraft(["location"], value)}
+      />
+      <AdminOverrideTextField
         label="Intro Mempelai"
         wide
         rows={4}

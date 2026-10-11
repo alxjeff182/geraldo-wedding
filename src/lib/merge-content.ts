@@ -368,6 +368,11 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
   };
   delete (story as { paragraphs?: string[] }).paragraphs;
 
+  // One-time: CMS still has placeholder city for invite {lokasi}.
+  const cmsLocation = String(merged.location ?? "").trim();
+  const location =
+    !cmsLocation || cmsLocation === "Tangerang" ? wedding.location : cmsLocation;
+
   return {
     ...merged,
     site,
@@ -377,6 +382,7 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
     bibleQuote,
     bibleReference,
     gift,
+    location,
     invite: {
       ...merged.invite,
       whatsappTemplates,

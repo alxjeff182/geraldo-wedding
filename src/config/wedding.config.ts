@@ -79,7 +79,7 @@ export const wedding = {
   date: "2026-10-24T08:00:00+07:00",
   dateLabel: "Sabtu, 24 Oktober 2026",
   dateShort: "24 . 10 . 2026",
-  location: "Tangerang",
+  location: "HKBP Kebon Jeruk, Jakarta Barat" as string,
 
   hero: {
     eyebrow: "The Wedding Of",
