@@ -33,7 +33,7 @@ export const MEDIA_SPECS = {
     maxSize: "300 KB",
     maxBytes: 320 * 1024,
     formats: "JPG / WebP",
-    notes: "Preview share WA/FB. Foto opening + panel tanggal (aman dari crop WA).",
+    notes: "Preview share WA/FB. Foto opening full-bleed, teks THE WEDDING OF–tanggal di atas.",
   },
   couplePhoto: {
     dimensions: "640 × 800 px",
