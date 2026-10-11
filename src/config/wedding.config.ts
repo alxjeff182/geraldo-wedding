@@ -88,9 +88,8 @@ export const wedding = {
 
   quote: "Constantly, consistently, continually, You.",
 
-  bibleQuote:
-    "Demikianlah mereka bukan lagi dua, melainkan satu. Karena itu, apa yang telah dipersatukan Allah, tidak boleh diceraikan manusia.",
-  bibleReference: "Matius 19:6",
+  bibleQuote: "Kekasihku kepunyaanku, dan aku kepunyaan dia.",
+  bibleReference: "Kidung Agung 2:16",
 
   events: [
     {
