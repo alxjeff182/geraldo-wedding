@@ -1,5 +1,5 @@
 import { useRef, useState, type ReactNode } from "react";
-import type { GiftAccount } from "../../../config/wedding.config";
+import type { GiftAccount, GiftSide } from "../../../config/wedding.config";
 import { buildGiftWhatsappMessage, buildGuestWhatsAppUrl } from "../../../lib/guest-whatsapp";
 import { IconCopy, IconWhatsApp } from "../icons";
 
@@ -8,6 +8,10 @@ type Props = {
   description: string;
   accounts: GiftAccount[];
   qris?: string;
+  qrisBride?: string;
+  qrisGroom?: string;
+  brideName: string;
+  groomName: string;
   physicalAddress?: string;
   physicalGiftTitle?: string;
   copyAddressButton?: string;
@@ -26,11 +30,27 @@ type Props = {
 
 const QRIS_FALLBACK = "/assets/ballroom/qris-dummy.svg";
 
+function resolveQris(
+  side: GiftSide,
+  qrisBride?: string,
+  qrisGroom?: string,
+  legacyQris?: string,
+): string {
+  const bride = qrisBride?.trim() || legacyQris?.trim() || "";
+  const groom = qrisGroom?.trim() || "";
+  if (side === "bride") return bride || QRIS_FALLBACK;
+  return groom || bride || QRIS_FALLBACK;
+}
+
 export function GiftHub({
   title,
   description,
   accounts,
   qris,
+  qrisBride,
+  qrisGroom,
+  brideName,
+  groomName,
   physicalAddress,
   physicalGiftTitle = "Alamat kirim",
   copyAddressButton = "Salin Alamat",
@@ -45,11 +65,19 @@ export function GiftHub({
   embedded = false,
   onTabChange,
 }: Props) {
-  const qrisSrc = qris?.trim() || QRIS_FALLBACK;
-  const isDummy = !qris?.trim() || /qris-dummy/i.test(qris);
   const [tab, setTab] = useState<"qris" | "bank">("qris");
+  const [side, setSide] = useState<GiftSide>("bride");
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const timerRef = useRef(0);
+
+  const qrisSrc = resolveQris(side, qrisBride, qrisGroom, qris);
+  const isDummy = /qris-dummy/i.test(qrisSrc);
+  const sideName = side === "bride" ? brideName : groomName;
+  const sideAccounts = accounts.filter((account) => {
+    if (!account.number?.trim()) return false;
+    if (!account.side) return side === "bride";
+    return account.side === side;
+  });
 
   const selectTab = (next: "qris" | "bank") => {
     setTab(next);
@@ -72,9 +100,32 @@ export function GiftHub({
     waNumber,
     buildGiftWhatsappMessage(waTemplate, {
       nama: guestName || "Tamu",
-      metode: tab === "qris" ? "QRIS" : "Transfer Bank",
+      metode: tab === "qris" ? `QRIS (${sideName})` : `Transfer Bank (${sideName})`,
       pasangan: coupleTitle,
     }),
+  );
+
+  const personSeg = (
+    <div className="seg seg--person" role="tablist" aria-label="Pilih mempelai">
+      <button
+        type="button"
+        className={`seg__btn${side === "bride" ? " is-active" : ""}`}
+        role="tab"
+        aria-selected={side === "bride"}
+        onClick={() => setSide("bride")}
+      >
+        Mempelai Wanita
+      </button>
+      <button
+        type="button"
+        className={`seg__btn${side === "groom" ? " is-active" : ""}`}
+        role="tab"
+        aria-selected={side === "groom"}
+        onClick={() => setSide("groom")}
+      >
+        Mempelai Pria
+      </button>
+    </div>
   );
 
   const panels: ReactNode = (
@@ -100,12 +151,14 @@ export function GiftHub({
         </button>
       </div>
 
+      {personSeg}
+
       {tab === "qris" ? (
         <div className="gift-panel is-active" role="tabpanel">
           <div className="qris-frame">
-            <img src={qrisSrc} alt="Kode QRIS" width={280} height={280} />
+            <img src={qrisSrc} alt={`Kode QRIS ${sideName}`} width={280} height={280} />
           </div>
-          <p className="qris-name">a.n. {coupleTitle}</p>
+          <p className="qris-name">a.n. {sideName}</p>
           {isDummy ? (
             <p className="qris-dummy-note">QRIS sementara — ganti lewat CMS (tab Gift)</p>
           ) : (
@@ -116,27 +169,33 @@ export function GiftHub({
         </div>
       ) : (
         <div className="gift-panel is-active" role="tabpanel">
-          {accounts.map((account) => {
-            const key = `${account.bank}-${account.number}`;
-            const isCopied = copiedKey === key;
-            return (
-              <article key={key} className="bank-card">
-                <p className="bank-card__bank">{account.bank}</p>
-                <p className="bank-card__number num">{account.number}</p>
-                <div className="bank-card__bottom">
-                  <p className="bank-card__name">a.n. {account.holder}</p>
-                  <button
-                    type="button"
-                    className={`copy-btn${isCopied ? " is-copied" : ""}`}
-                    onClick={() => void copy(account.number.replace(/\s/g, ""), key)}
-                  >
-                    <IconCopy />
-                    <span>{isCopied ? "Tersalin" : "Salin"}</span>
-                  </button>
-                </div>
-              </article>
-            );
-          })}
+          {sideAccounts.length === 0 ? (
+            <p className="qris-dummy-note">
+              Rekening {sideName} belum diisi — lengkapi lewat CMS (tab Gift).
+            </p>
+          ) : (
+            sideAccounts.map((account) => {
+              const key = `${account.side ?? "bride"}-${account.bank}-${account.number}`;
+              const isCopied = copiedKey === key;
+              return (
+                <article key={key} className="bank-card">
+                  <p className="bank-card__bank">{account.bank}</p>
+                  <p className="bank-card__number num">{account.number}</p>
+                  <div className="bank-card__bottom">
+                    <p className="bank-card__name">a.n. {account.holder}</p>
+                    <button
+                      type="button"
+                      className={`copy-btn${isCopied ? " is-copied" : ""}`}
+                      onClick={() => void copy(account.number.replace(/\s/g, ""), key)}
+                    >
+                      <IconCopy />
+                      <span>{isCopied ? "Tersalin" : "Salin"}</span>
+                    </button>
+                  </div>
+                </article>
+              );
+            })
+          )}
           {physicalAddress ? (
             <div className="gift-address">
               <span className="gift-address__label">{physicalGiftTitle}</span>

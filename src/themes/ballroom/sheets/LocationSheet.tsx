@@ -100,16 +100,16 @@ export function LocationSheet({
         ) : null}
         {event ? (
           <>
-            <div className="sheet__map">
-              <iframe
-                title={`Peta ${event.venue}`}
-                src={embedSrc}
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                allowFullScreen
-              />
-              <div className="sheet__map-fade" aria-hidden="true" />
-              <span className="sheet__map-chip">{event.venue}</span>
+            <div className="sheet-timeline-block">
+              <p className="sheet-timeline-block__label">Tata Acara</p>
+              <ol className="sheet-timeline">
+                {events.map((item) => (
+                  <li key={item.name}>
+                    <span className="sheet-timeline__name">{item.name}</span>
+                    <strong className="num">{item.time}</strong>
+                  </li>
+                ))}
+              </ol>
             </div>
             <div className="sheet-venue-card">
               <span className="sheet-venue-card__icon" aria-hidden="true">
@@ -128,14 +128,17 @@ export function LocationSheet({
                 <IconCopy />
               </button>
             </div>
-            <ol className="sheet-timeline">
-              {events.map((item) => (
-                <li key={item.name}>
-                  <span className="sheet-timeline__name">{item.name}</span>
-                  <strong className="num">{item.time}</strong>
-                </li>
-              ))}
-            </ol>
+            <div className="sheet__map">
+              <iframe
+                title={`Peta ${event.venue}`}
+                src={embedSrc}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+              />
+              <div className="sheet__map-fade" aria-hidden="true" />
+              <span className="sheet__map-chip">{event.venue}</span>
+            </div>
           </>
         ) : null}
       </div>

@@ -176,6 +176,8 @@ export type SiteContentOverrides = {
     description?: string;
     physicalAddress?: string;
     qris?: string;
+    qrisBride?: string;
+    qrisGroom?: string;
     accounts?: GiftAccount[];
   };
   giftUi?: {

@@ -565,6 +565,25 @@
 .theme-ballroom #sheet-gift .seg {
   width: 100%;
 }
+.theme-ballroom .seg--person {
+  margin-top: 0.15rem;
+}
+.theme-ballroom .seg--person .seg__btn {
+  letter-spacing: 0.08em;
+  font-size: 0.62rem;
+}
+.theme-ballroom .sheet-timeline-block {
+  width: 100%;
+  display: grid;
+  gap: 0.45rem;
+}
+.theme-ballroom .sheet-timeline-block__label {
+  margin: 0;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+}
 .theme-ballroom .qris-frame {
   position: relative;
   width: min(100%, 11rem);

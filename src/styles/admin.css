@@ -724,6 +724,12 @@ textarea.admin-input {
   min-height: 1.85rem;
 }
 
+.admin-inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
 .admin-error {
   color: #ffb4b4;
   font-size: 0.75rem;

@@ -221,6 +221,10 @@ export function BallroomApp({ guestName, guestId }: Props) {
             description={content.gift.description}
             accounts={[...content.gift.accounts]}
             qris={content.gift.qris}
+            qrisBride={content.gift.qrisBride}
+            qrisGroom={content.gift.qrisGroom}
+            brideName={content.couple.bride.fullName || content.couple.bride.shortName}
+            groomName={content.couple.groom.fullName || content.couple.groom.shortName}
             physicalAddress={content.gift.physicalAddress}
             physicalGiftTitle={content.giftUi.physicalGiftTitle}
             copyAddressButton={content.giftUi.copyAddressButton}

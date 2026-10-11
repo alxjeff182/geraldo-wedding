@@ -1,14 +1,15 @@
 import { AdminOverrideMediaField, AdminTextField } from "../AdminFields";
 import { ImageUploader } from "../ImageUploader";
 import { MEDIA_SPECS } from "../../../config/media-specs";
-import type { GiftAccount } from "../../../config/wedding.config";
+import type { GiftAccount, GiftSide } from "../../../config/wedding.config";
 import type { AdminTabProps } from "../types";
 
-const emptyAccount = (): GiftAccount => ({
+const emptyAccount = (side: GiftSide = "bride"): GiftAccount => ({
   bank: "",
   number: "",
   holder: "",
   logo: "",
+  side,
 });
 
 export function AdminGiftTab({ merged, defaults, updateDraft, clearDraftPath }: AdminTabProps) {
@@ -42,23 +43,65 @@ export function AdminGiftTab({ merged, defaults, updateDraft, clearDraftPath }: 
         />
       </label>
       <AdminOverrideMediaField
-        label="QRIS (kosong = tamu hanya lihat transfer bank)"
-        value={merged.gift.qris}
-        defaultValue={defaults.gift.qris}
-        onReset={() => clearDraftPath(["gift", "qris"])}
+        label="QRIS Mempelai Wanita"
+        value={merged.gift.qrisBride || merged.gift.qris}
+        defaultValue={defaults.gift.qrisBride || defaults.gift.qris}
+        onReset={() => {
+          clearDraftPath(["gift", "qrisBride"]);
+          clearDraftPath(["gift", "qris"]);
+        }}
       >
         <ImageUploader
           label=""
           folder="gift"
           spec={MEDIA_SPECS.qris}
-          value={merged.gift.qris}
-          onChange={(url) => updateDraft(["gift", "qris"], url)}
+          value={merged.gift.qrisBride || merged.gift.qris}
+          onChange={(url) => {
+            updateDraft(["gift", "qrisBride"], url);
+            updateDraft(["gift", "qris"], url);
+          }}
+        />
+      </AdminOverrideMediaField>
+      <AdminOverrideMediaField
+        label="QRIS Mempelai Pria"
+        value={merged.gift.qrisGroom ?? ""}
+        defaultValue={defaults.gift.qrisGroom ?? ""}
+        onReset={() => clearDraftPath(["gift", "qrisGroom"])}
+      >
+        <ImageUploader
+          label=""
+          folder="gift"
+          spec={MEDIA_SPECS.qris}
+          value={merged.gift.qrisGroom ?? ""}
+          onChange={(url) => updateDraft(["gift", "qrisGroom"], url)}
         />
       </AdminOverrideMediaField>
       {accounts.map((account, index) => (
         <fieldset key={index} className="admin-fieldset">
-          <legend>Rekening Bank {index + 1}</legend>
+          <legend>
+            Rekening Bank {index + 1}
+            {account.side === "groom"
+              ? " — Mempelai Pria"
+              : account.side === "bride"
+                ? " — Mempelai Wanita"
+                : ""}
+          </legend>
           <div className="admin-form-grid">
+            <label className="admin-field">
+              <span className="admin-label">Untuk</span>
+              <select
+                className="admin-input"
+                value={account.side ?? "bride"}
+                onChange={(e) => {
+                  const next = [...accounts];
+                  next[index] = { ...next[index], side: e.target.value as GiftSide };
+                  setAccounts(next);
+                }}
+              >
+                <option value="bride">Mempelai Wanita</option>
+                <option value="groom">Mempelai Pria</option>
+              </select>
+            </label>
             <label className="admin-field">
               <span className="admin-label">Bank</span>
               <input
@@ -118,13 +161,22 @@ export function AdminGiftTab({ merged, defaults, updateDraft, clearDraftPath }: 
           ) : null}
         </fieldset>
       ))}
-      <button
-        type="button"
-        className="admin-btn admin-btn--ghost admin-btn--sm"
-        onClick={() => setAccounts([...accounts, emptyAccount()])}
-      >
-        Tambah rekening
-      </button>
+      <div className="admin-inline-actions">
+        <button
+          type="button"
+          className="admin-btn admin-btn--ghost admin-btn--sm"
+          onClick={() => setAccounts([...accounts, emptyAccount("bride")])}
+        >
+          Tambah rekening wanita
+        </button>
+        <button
+          type="button"
+          className="admin-btn admin-btn--ghost admin-btn--sm"
+          onClick={() => setAccounts([...accounts, emptyAccount("groom")])}
+        >
+          Tambah rekening pria
+        </button>
+      </div>
       <fieldset className="admin-fieldset">
         <legend>Caption & Tombol</legend>
         <div className="admin-form-grid">

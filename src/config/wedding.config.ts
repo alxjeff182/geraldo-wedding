@@ -13,11 +13,15 @@ export type WeddingEvent = {
   endsAt: string;
 };
 
+export type GiftSide = "groom" | "bride";
+
 export type GiftAccount = {
   bank: string;
   number: string;
   holder: string;
   logo: string;
+  /** Which spouse this account belongs to */
+  side?: GiftSide;
 };
 
 export const wedding = {
@@ -87,9 +91,9 @@ export const wedding = {
       name: "Pemberkatan",
       dateLabel: "Sabtu\n24 . 10 . 2026",
       time: "08.00 WIB",
-      venue: "GPI Pondok Arum",
-      address: "Perum. Pondok Arum, Blok J No. 26, Kel. Pabuaran Tumpeng, Kec. Karawaci, Tangerang",
-      mapsUrl: "https://share.google/grqB2yx9JoR0Cdkdq",
+      venue: "Gereja HKBP Ress. Kebon Jeruk",
+      address: "Gereja HKBP Ress. Kebon Jeruk, Jakarta Barat",
+      mapsUrl: "https://maps.app.goo.gl/CTqpxvQrfmLgQpsb8",
       startsAt: "2026-10-24T08:00:00+07:00",
       endsAt: "2026-10-24T10:00:00+07:00",
     },
@@ -97,9 +101,9 @@ export const wedding = {
       name: "Resepsi & Adat",
       dateLabel: "Sabtu\n24 . 10 . 2026",
       time: "11.00 WIB",
-      venue: "UFIT HALL GK",
-      address: "Jl. Palem Raja Raya No.31, Panunggangan Bar., Kec. Cibodas, Kab. Tangerang",
-      mapsUrl: "https://share.google/xxDvbeTIhjN0hvbBg",
+      venue: "Gedung Gorga",
+      address: "Gedung Gorga, Jakarta",
+      mapsUrl: "https://maps.app.goo.gl/WSsX9X17dp7qSwqh6",
       startsAt: "2026-10-24T11:00:00+07:00",
       endsAt: "2026-10-24T15:00:00+07:00",
     },
@@ -123,7 +127,7 @@ export const wedding = {
     dressCode:
       "Formal / Elegant dengan nuansa maroon & gold. Untuk tamu keluarga adat, ulos dipersilakan sesuai kebiasaan keluarga masing-masing.",
     tipsTitle: "Parkir & Akomodasi",
-    tips: "Parkir tersedia di area UFIT HALL GK untuk resepsi.\nTamu dari luar kota dapat menginap di sekitar Karawaci / Cibodas (akses mudah ke kedua venue).",
+    tips: "Parkir tersedia di area Gedung Gorga untuk resepsi.\nTamu dari luar kota dapat menginap di sekitar Kebon Jeruk / Grogol (akses mudah ke kedua venue).",
   },
 
   gallery: {
@@ -147,13 +151,24 @@ export const wedding = {
       "Doa restu Anda sudah lebih dari cukup. Bila ingin berbagi kebahagiaan, kami sediakan cara mudah di bawah ini.",
     physicalAddress:
       "Perum. Taman Danau Indah Blok J No. 26, Kel. Pabuaran Tumpeng, Kec. Karawaci, Tangerang",
+    /** @deprecated prefer qrisBride / qrisGroom */
     qris: "/assets/ballroom/qris-dummy.svg",
+    qrisBride: "/assets/ballroom/qris-dummy.svg",
+    qrisGroom: "/assets/ballroom/qris-dummy.svg",
     accounts: [
       {
         bank: "BCA",
         number: "6705188657",
         holder: "Christin Samosir, S.M.",
         logo: "/assets/ballroom/bca-logo.png",
+        side: "bride",
+      },
+      {
+        bank: "BCA",
+        number: "",
+        holder: "Geraldo Gracedo Sudena Tampubolon",
+        logo: "/assets/ballroom/bca-logo.png",
+        side: "groom",
       },
     ] satisfies GiftAccount[],
   },

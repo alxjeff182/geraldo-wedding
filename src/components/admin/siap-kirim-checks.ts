@@ -20,7 +20,13 @@ export function buildChecks(
   const wa = content.contact.whatsappNumber?.trim() ?? "";
   const waPlaceholder = defaults.contact.whatsappNumber;
 
-  const qris = content.gift.qris ?? "";
+  const qrisBride = content.gift.qrisBride || content.gift.qris || "";
+  const qrisGroom = content.gift.qrisGroom || "";
+  const qrisOk =
+    Boolean(qrisBride) &&
+    !qrisBride.includes("qris-dummy") &&
+    Boolean(qrisGroom) &&
+    !qrisGroom.includes("qris-dummy");
   const audio = content.media.audio?.trim() ?? "";
   const storyText = (content.story.paragraphs ?? []).join(" ");
   const creatorSite =
@@ -36,9 +42,9 @@ export function buildChecks(
     },
     {
       id: "qris",
-      label: "QRIS (bukan dummy)",
-      ok: Boolean(qris) && !qris.includes("qris-dummy"),
-      hint: "Upload QRIS di tab Gift / Media.",
+      label: "QRIS pria & wanita (bukan dummy)",
+      ok: qrisOk,
+      hint: "Upload QRIS mempelai pria dan wanita di tab Gift.",
     },
     {
       id: "audio",

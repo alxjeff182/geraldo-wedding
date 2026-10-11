@@ -12,7 +12,7 @@ describe("calendar-links", () => {
   const event = {
     title: "Pemberkatan - Geraldo & Christin",
     details: "Undangan pernikahan",
-    location: "GPI Pondok Arum, Tangerang",
+    location: "Gereja HKBP Ress. Kebon Jeruk, Jakarta Barat",
     startsAt: "2026-10-24T08:00:00+07:00",
     endsAt: "2026-10-24T10:00:00+07:00",
   };
@@ -20,7 +20,7 @@ describe("calendar-links", () => {
   const reception = {
     title: "Resepsi & Adat - Geraldo & Christin",
     details: "Resepsi",
-    location: "UFIT HALL GK, Tangerang",
+    location: "Gedung Gorga, Jakarta",
     startsAt: "2026-10-24T11:00:00+07:00",
     endsAt: "2026-10-24T15:00:00+07:00",
   };
