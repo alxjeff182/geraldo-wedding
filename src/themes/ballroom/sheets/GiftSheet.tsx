@@ -77,8 +77,8 @@ export function GiftSheet({ open, guestName, onClose, setSheetRef, onToast }: Pr
             target="_blank"
             rel="noopener noreferrer"
           >
-            <IconWhatsApp />
-            <span>Konfirmasi via WhatsApp</span>
+            <IconWhatsApp size={18} />
+            <span>Konfirmasi WhatsApp</span>
           </a>
         </footer>
       ) : null}

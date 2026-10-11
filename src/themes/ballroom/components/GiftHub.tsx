@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { GiftAccount, GiftSide } from "../../../config/wedding.config";
 import { buildGiftWhatsappMessage, buildGuestWhatsAppUrl } from "../../../lib/guest-whatsapp";
 import { IconCopy, IconWhatsApp } from "../icons";
@@ -60,10 +60,17 @@ export function GiftHub({
   const [tab, setTab] = useState<"qris" | "bank">("qris");
   const [side, setSide] = useState<GiftSide>("bride");
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [qrisImgSrc, setQrisImgSrc] = useState(QRIS_FALLBACK);
+  const [qrisPlaceholder, setQrisPlaceholder] = useState(false);
   const timerRef = useRef(0);
 
   const qrisSrc = resolveQris(side, qrisBride, qrisGroom, qris);
-  const isDummy = /qris-dummy/i.test(qrisSrc);
+  const isDummy = qrisPlaceholder || /qris-dummy/i.test(qrisImgSrc);
+
+  useEffect(() => {
+    setQrisImgSrc(qrisSrc || QRIS_FALLBACK);
+    setQrisPlaceholder(false);
+  }, [qrisSrc]);
   const sideName = side === "bride" ? brideName : groomName;
   const sideAccounts = accounts.filter((account) => {
     if (!account.number?.trim()) return false;
@@ -148,7 +155,27 @@ export function GiftHub({
       {tab === "qris" ? (
         <div className="gift-panel is-active" role="tabpanel">
           <div className="qris-frame">
-            <img src={qrisSrc} alt={`Kode QRIS ${sideName}`} width={280} height={280} />
+            {qrisPlaceholder ? (
+              <div className="qris-fallback">
+                <p>QRIS</p>
+                <span>Belum tersedia</span>
+              </div>
+            ) : (
+              <img
+                src={qrisImgSrc}
+                alt={`Kode QRIS ${sideName}`}
+                width={280}
+                height={280}
+                decoding="async"
+                onError={() => {
+                  if (qrisImgSrc !== QRIS_FALLBACK) {
+                    setQrisImgSrc(QRIS_FALLBACK);
+                    return;
+                  }
+                  setQrisPlaceholder(true);
+                }}
+              />
+            )}
           </div>
           <p className="qris-name">a.n. {sideName}</p>
           {isDummy ? (
@@ -211,8 +238,8 @@ export function GiftHub({
         <div className="gift-confirm">
           {waHref ? (
             <a className="btn btn--wa" href={waHref} target="_blank" rel="noopener noreferrer">
-              <IconWhatsApp />
-              <span>Konfirmasi via WhatsApp</span>
+              <IconWhatsApp size={18} />
+              <span>Konfirmasi WhatsApp</span>
             </a>
           ) : null}
         </div>

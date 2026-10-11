@@ -59,25 +59,51 @@
   width: 100%;
 }
 .theme-ballroom .btn--wa {
-  display: inline-flex;
+  display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 0.6rem;
+  gap: 0.45rem;
   width: 100%;
+  box-sizing: border-box;
   min-height: var(--ctl-h);
+  height: auto;
+  padding: 0.8rem 1rem;
   border-radius: var(--r-pill);
   background: var(--gold);
   border-color: var(--gold);
   color: var(--ink);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  line-height: 1.15;
+  white-space: nowrap;
+  text-decoration: none;
 }
 .theme-ballroom .btn--wa svg {
-  flex-shrink: 0;
-  width: 1.2rem;
-  height: 1.2rem;
+  display: block;
+  flex: 0 0 auto;
+  width: 1.15rem;
+  height: 1.15rem;
+  overflow: visible;
+}
+.theme-ballroom .btn--wa > span {
+  display: block;
+  flex: 0 1 auto;
+  min-width: 0;
+  line-height: 1.15;
+  text-align: center;
 }
 .theme-ballroom .btn--wa:hover {
   background: transparent;
   color: var(--gold-soft);
+}
+@media (max-width: 360px) {
+  .theme-ballroom .btn--wa {
+    font-size: 0.6rem;
+    letter-spacing: 0.06em;
+    gap: 0.35rem;
+    padding: 0.8rem 0.75rem;
+  }
 }
 .theme-ballroom .bank-card .copy-btn {
   display: inline-flex;

@@ -160,8 +160,8 @@ export function RsvpSheet({ open, guestId, guestName, onClose, setSheetRef, onTo
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <IconWhatsApp />
-                <span>Kirim juga via WhatsApp</span>
+                <IconWhatsApp size={18} />
+                <span>Kirim via WhatsApp</span>
               </a>
             ) : null}
             <button type="button" className="btn btn--ghost sheet__cta" onClick={onClose}>
