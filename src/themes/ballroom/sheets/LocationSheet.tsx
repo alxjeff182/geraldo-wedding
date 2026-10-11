@@ -73,8 +73,8 @@ export function LocationSheet({
         <span className="sheet__badge" aria-hidden="true">
           <IconPin size={18} />
         </span>
-        <p className="eyebrow">Tempat Acara</p>
-        <h3 id="sheetLocTitle">Lokasi</h3>
+        <p className="eyebrow">Lokasi</p>
+        <h3 id="sheetLocTitle">Tempat Acara</h3>
         <p className="sheet__sub">
           {sameVenue
             ? "Satu venue untuk pemberkatan dan resepsi"
