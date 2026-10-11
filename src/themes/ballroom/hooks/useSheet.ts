@@ -146,7 +146,7 @@ export function useSheet({ inertTargets = [] }: UseSheetOptions = {}) {
       if (target.closest("input, textarea, select, iframe, button, a")) return;
 
       const body = sheet.querySelector<HTMLElement>(".sheet__body");
-      const onChrome = Boolean(target.closest(".sheet__handle, .sheet__head"));
+      const onChrome = Boolean(target.closest(".sheet__handle, .sheet__head, .sheet__tabs"));
       const bodyAtTop = !body || body.scrollTop <= 0;
       canDragDown = onChrome || bodyAtTop;
 

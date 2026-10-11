@@ -78,8 +78,8 @@ export function LocationSheet({ open, events, mapsLabel, onClose, setSheetRef, o
             : "Pilih venue untuk melihat peta"}
         </p>
       </header>
-      <div className="sheet__body">
-        {events.length > 1 && !sameVenue ? (
+      {events.length > 1 && !sameVenue ? (
+        <div className="sheet__tabs">
           <div className="seg" role="tablist" aria-label="Venue">
             {events.map((item, i) => (
               <button
@@ -94,7 +94,9 @@ export function LocationSheet({ open, events, mapsLabel, onClose, setSheetRef, o
               </button>
             ))}
           </div>
-        ) : null}
+        </div>
+      ) : null}
+      <div className="sheet__body">
         {event ? (
           <>
             <div className="sheet-timeline-block">

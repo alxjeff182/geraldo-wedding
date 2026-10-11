@@ -114,6 +114,13 @@
   color: var(--cream-dim);
   line-height: 1.4;
 }
+.theme-ballroom .sheet__tabs {
+  flex-shrink: 0;
+  z-index: 2;
+  padding: 0.85rem 1.25rem 0.75rem;
+  background: #1a0f0c;
+  border-bottom: 1px solid var(--gold-a15);
+}
 .theme-ballroom .sheet__body {
   display: grid;
   gap: 1rem;
