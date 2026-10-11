@@ -15,8 +15,11 @@ function htmlMetaPlugin(siteUrl: string): Plugin {
     transformIndexHtml(html) {
       let out = html
         .replace(/content="\/assets/g, `content="${base}/assets`)
+        .replace(/content="\/og\.jpg"/g, `content="${base}/og.jpg"`)
         .replace(/"image": "\/assets/g, `"image": "${base}/assets`)
+        .replace(/"image": "\/og\.jpg"/g, `"image": "${base}/og.jpg"`)
         .replace(/"url": "\/assets/g, `"url": "${base}/assets`)
+        .replace(/"url": "\/og\.jpg"/g, `"url": "${base}/og.jpg"`)
         .replace(/"@id": "\/#/g, `"@id": "${base}/#`)
         .replace(/"url": "\/"/g, `"url": "${base}/"`)
         .replace(/"@id": "\/"/g, `"@id": "${base}/"`)
