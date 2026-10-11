@@ -1,10 +1,16 @@
 #!/usr/bin/env node
 /**
- * Keys the checkerboard background out of the designer JPG and writes a
- * transparent 1080×1920 Instagram Story overlay PNG.
+ * Build a crisp transparent 1080×1920 Instagram Story overlay.
  *
- * Source: assets/source/story-template-src.jpg (gitignored)
+ * Composites the high-res GC logo (downscaled, never upscaled) plus a
+ * vector-rendered hashtag — avoids keying + upscaling a small JPEG.
+ *
+ * Usage:
+ *   node scripts/generate-story-template.mjs
+ *   node scripts/generate-story-template.mjs "#GeralDOanythingforChristine"
+ *
  * Output: public/assets/ballroom/story-template.png
+ * Verify: assets/source/story-template-on-{black,white}.jpg (gitignored)
  */
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -12,99 +18,120 @@ import { existsSync } from "node:fs";
 import sharp from "sharp";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const src = resolve(root, "assets/source/story-template-src.jpg");
+const logoPath = resolve(root, "public/assets/ballroom/logo.png");
 const outPng = resolve(root, "public/assets/ballroom/story-template.png");
+const verifyDir = resolve(root, "assets/source");
+
 const OUT_W = 1080;
 const OUT_H = 1920;
+const LOGO_W = 220;
+const LOGO_TOP = 1488;
+const TAG_TOP = 1768;
+const TAG_COLOR = "#8a6f66";
+const TAG_FONT_SIZE = 46;
+const DEFAULT_TAG = "#GeralDOanythingforChristine";
 
-if (!existsSync(src)) {
-  console.error("Missing source:", src);
+/** Prefer Georgia (macOS Supplemental); fall back to Times New Roman. */
+const FONT_CANDIDATES = [
+  "/System/Library/Fonts/Supplemental/Georgia.ttf",
+  "/System/Library/Fonts/Supplemental/Times New Roman.ttf",
+  "/Library/Fonts/Georgia.ttf",
+];
+
+const hashtag = (process.argv[2] || DEFAULT_TAG).trim() || DEFAULT_TAG;
+const tagText = hashtag.startsWith("#") ? hashtag : `#${hashtag}`;
+
+if (!existsSync(logoPath)) {
+  console.error("Missing logo:", logoPath);
   process.exit(1);
 }
 
-const { data, info } = await sharp(src).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
-const { width, height, channels } = info;
-const rgba = Buffer.alloc(width * height * 4);
-
-for (let i = 0; i < width * height; i++) {
-  const o = i * channels;
-  const r = data[o];
-  const g = data[o + 1];
-  const b = data[o + 2];
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const sat = max - min;
-  const brightness = (r + g + b) / 3;
-
-  // Checkerboard is near-neutral and bright. Logo is rose-gold (sat ≥ 26).
-  // Hashtag text is dark (bri ≲ 120). Soft ramp only for mid-edge pixels.
-  let alpha = 255;
-  if (sat < 20 && brightness > 130) {
-    alpha = 0;
-  } else if (sat < 28 && brightness > 150) {
-    const t = Math.max((sat - 18) / 10, (180 - brightness) / 30);
-    alpha = Math.round(255 * Math.min(1, Math.max(0, t)));
-  }
-
-  const d = i * 4;
-  if (alpha < 8) {
-    rgba[d] = 0;
-    rgba[d + 1] = 0;
-    rgba[d + 2] = 0;
-    rgba[d + 3] = 0;
-  } else {
-    rgba[d] = r;
-    rgba[d + 1] = g;
-    rgba[d + 2] = b;
-    rgba[d + 3] = alpha;
-  }
+const fontfile = FONT_CANDIDATES.find((p) => existsSync(p));
+if (!fontfile) {
+  console.error("No serif TTF found. Install Georgia or Times New Roman.");
+  process.exit(1);
 }
 
-// Drop isolated speckles left by JPEG noise (keep only if a neighbor has content).
-const cleaned = Buffer.from(rgba);
-for (let y = 1; y < height - 1; y++) {
-  for (let x = 1; x < width - 1; x++) {
-    const i = (y * width + x) * 4;
-    if (rgba[i + 3] === 0) continue;
-    if (rgba[i + 3] > 40) continue;
-    let neighbors = 0;
-    for (let dy = -1; dy <= 1; dy++) {
-      for (let dx = -1; dx <= 1; dx++) {
-        if (dx === 0 && dy === 0) continue;
-        const n = ((y + dy) * width + (x + dx)) * 4;
-        if (rgba[n + 3] > 40) neighbors++;
+// Trim transparent padding, then downscale — never upscale the logo.
+const logoBuf = await sharp(logoPath)
+  .trim({ threshold: 8 })
+  .resize({ width: LOGO_W, withoutEnlargement: true, kernel: "lanczos3" })
+  .png()
+  .toBuffer();
+
+const logoMeta = await sharp(logoBuf).metadata();
+const logoLeft = Math.round((OUT_W - (logoMeta.width ?? LOGO_W)) / 2);
+
+// Vector text via SVG + embedded @font-face (librsvg).
+const tagSvg = Buffer.from(`<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="${OUT_W}" height="88">
+  <defs>
+    <style>
+      @font-face {
+        font-family: "StorySerif";
+        src: url("file://${fontfile}");
       }
-    }
-    if (neighbors < 2) {
-      cleaned[i] = 0;
-      cleaned[i + 1] = 0;
-      cleaned[i + 2] = 0;
-      cleaned[i + 3] = 0;
-    }
-  }
-}
+    </style>
+  </defs>
+  <text
+    x="50%"
+    y="58"
+    text-anchor="middle"
+    font-family="StorySerif, Georgia, serif"
+    font-size="${TAG_FONT_SIZE}"
+    fill="${TAG_COLOR}"
+  >${escapeXml(tagText)}</text>
+</svg>`);
 
-await sharp(cleaned, { raw: { width, height, channels: 4 } })
-  .resize(OUT_W, OUT_H, { fit: "fill", kernel: "lanczos3" })
+const tagBuf = await sharp(tagSvg).png().toBuffer();
+
+await sharp({
+  create: {
+    width: OUT_W,
+    height: OUT_H,
+    channels: 4,
+    background: { r: 0, g: 0, b: 0, alpha: 0 },
+  },
+})
+  .composite([
+    { input: logoBuf, left: logoLeft, top: LOGO_TOP },
+    { input: tagBuf, left: 0, top: TAG_TOP },
+  ])
   .png({ compressionLevel: 9 })
   .toFile(outPng);
 
 console.log("Wrote", outPng);
+console.log("Hashtag:", tagText);
+console.log("Font:", fontfile);
+console.log("Logo:", logoMeta.width, "x", logoMeta.height, "at", logoLeft, LOGO_TOP);
 
-const verifyDir = resolve(root, "assets/source");
 await sharp({
   create: { width: OUT_W, height: OUT_H, channels: 3, background: { r: 0, g: 0, b: 0 } },
 })
   .composite([{ input: outPng, blend: "over" }])
-  .jpeg({ quality: 90 })
+  .jpeg({ quality: 92 })
   .toFile(resolve(verifyDir, "story-template-on-black.jpg"));
+
 await sharp({
-  create: { width: OUT_W, height: OUT_H, channels: 3, background: { r: 255, g: 255, b: 255 } },
+  create: {
+    width: OUT_W,
+    height: OUT_H,
+    channels: 3,
+    background: { r: 255, g: 255, b: 255 },
+  },
 })
   .composite([{ input: outPng, blend: "over" }])
-  .jpeg({ quality: 90 })
+  .jpeg({ quality: 92 })
   .toFile(resolve(verifyDir, "story-template-on-white.jpg"));
 
 const meta = await sharp(outPng).metadata();
 console.log("meta", meta.width, meta.height, meta.hasAlpha, meta.format);
 console.log("Wrote verify composites in assets/source/");
+
+function escapeXml(s) {
+  return s
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
