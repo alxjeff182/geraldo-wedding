@@ -1,70 +1,114 @@
-/* Footer — closing composition */
+/* Footer — minimal closing composition */
 .theme-ballroom .footer {
   position: relative;
   isolation: isolate;
-  padding: 2.75rem 1.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem 1.75rem calc(2.5rem + env(safe-area-inset-bottom));
   text-align: center;
   overflow: visible;
   border-top: 1px solid var(--gold-a15);
-  background:
-    radial-gradient(ellipse 70% 45% at 50% 0%, rgba(107, 42, 42, 0.22), transparent 62%),
-    radial-gradient(ellipse 45% 30% at 50% 100%, var(--gold-a08), transparent 55%);
+  background: transparent;
   color: var(--cream-dim);
 }
+
 .theme-ballroom .footer__glow {
   position: absolute;
-  inset: -10% auto auto 50%;
-  width: 60%;
-  height: 40%;
+  inset: -8% auto auto 50%;
+  width: 55%;
+  height: 36%;
   transform: translateX(-50%);
   background: radial-gradient(circle, var(--gold-a15), transparent 68%);
   pointer-events: none;
   z-index: -1;
 }
+
 .theme-ballroom .footer__logo {
   display: block;
   width: 4.5rem;
   height: auto;
-  margin: 0 auto 0.85rem;
+  margin: 0 auto 1.15rem;
   filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.35));
 }
-.theme-ballroom .footer .eyebrow {
-  margin-bottom: 0.4rem;
+
+.theme-ballroom .footer__caption {
+  max-width: 17rem;
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 300;
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+  color: var(--cream-dim);
+  text-wrap: balance;
 }
+
 .theme-ballroom .footer__names {
+  margin: 0.65rem 0 0;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(1.7rem, 6.5cqi, 2.15rem);
+  font-size: clamp(1.85rem, 7cqi, 2.35rem);
   color: var(--white);
   line-height: 1.15;
-  margin: 0;
 }
+
 .theme-ballroom .footer .ornament {
-  margin-top: 0.75rem;
-  margin-bottom: 0.75rem;
+  margin-top: 1.15rem;
+  margin-bottom: 1.5rem;
 }
-.theme-ballroom .footer__msg {
-  max-width: 18rem;
-  margin: 0 auto;
-  font-size: 0.9rem;
-  line-height: 1.55;
-  color: var(--cream);
-}
-.theme-ballroom .footer__msg + .footer__msg {
-  margin-top: 0.55rem;
-}
-.theme-ballroom .footer__date {
-  margin-top: 0.95rem;
+
+.theme-ballroom .footer__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.7rem 2rem;
+  border: 1px solid var(--gold-a60);
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--gold-soft);
+  font-family: var(--font-body);
   font-size: 0.72rem;
-  letter-spacing: 0.16em;
+  font-weight: 400;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--gold);
-  font-variant-numeric: lining-nums tabular-nums;
+  cursor: pointer;
+  transition:
+    background 0.25s,
+    border-color 0.25s,
+    color 0.25s,
+    transform 0.2s;
 }
-.theme-ballroom .footer__copy {
-  margin: 0;
-  font-size: 0.65rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+
+.theme-ballroom .footer__close:hover,
+.theme-ballroom .footer__close:focus-visible {
+  background: var(--gold-a15);
+  border-color: var(--gold-soft);
+  color: var(--white);
+}
+
+.theme-ballroom .footer__close:active {
+  transform: scale(0.98);
+}
+
+.theme-ballroom .footer__porto {
+  display: inline-block;
+  margin-top: 2rem;
   color: rgba(212, 196, 176, 0.55);
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-bottom: 1px solid var(--gold-a25);
+  transition:
+    color 0.2s,
+    border-color 0.2s;
+}
+
+.theme-ballroom .footer__porto:hover,
+.theme-ballroom .footer__porto:focus-visible {
+  color: var(--gold-soft);
+  border-bottom-color: var(--gold-a60);
 }

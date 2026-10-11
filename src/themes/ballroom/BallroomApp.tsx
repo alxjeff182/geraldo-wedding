@@ -123,12 +123,19 @@ export function BallroomApp({ guestName, guestId }: Props) {
     setLeaving(true);
   }, []);
 
+  const closeInvitation = useCallback(() => {
+    sheet.close();
+    pause();
+    inviteRef.current?.scrollTo({ top: 0 });
+    setHeroProgress(0);
+    setInFirstSection(true);
+    setOpening(false);
+    setLeaving(false);
+    setRevealed(false);
+  }, [pause, sheet.close]);
+
   const coupleTitle = `${content.couple.groom.shortName} & ${content.couple.bride.shortName}`;
   const dockVisible = revealed && inFirstSection && heroProgress >= DOCK_AT && !sheet.isOpen;
-
-  const dateFooter = content.dateLabel.includes("·")
-    ? content.dateLabel
-    : content.dateLabel.replace(", ", " · ");
 
   return (
     <div className={`theme-ballroom${!revealed ? " is-locked" : ""}`}>
@@ -290,30 +297,28 @@ export function BallroomApp({ guestName, guestId }: Props) {
               height={562}
               loading="lazy"
             />
-            <p className="eyebrow">Dengan penuh kasih</p>
+            <p className="footer__caption">Dengan penuh kasih, kami menantikan kehadiranmu</p>
             <p className="footer__names">{content.site.title}</p>
-            {content.quote?.trim() ? <p className="footer__quote">{content.quote}</p> : null}
             <div className="ornament" aria-hidden="true" />
-            {content.closing.paragraphs.map((p) => (
-              <p key={p.slice(0, 24)} className="footer__msg">
-                {p}
-              </p>
-            ))}
-            <p className="footer__date">{dateFooter}</p>
-            <div className="footer__credits">
-              <p className="footer__copy">{content.footer.creditPrefix}</p>
-              {content.site.creator.websiteUrl || content.site.creator.url ? (
-                <a
-                  className="footer__porto"
-                  href={content.site.creator.websiteUrl || content.site.creator.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={content.footer.websiteAriaLabel}
-                >
-                  {content.footer.portfolioLinkLabel}
-                </a>
-              ) : null}
-            </div>
+            <button
+              type="button"
+              className="footer__close"
+              onClick={closeInvitation}
+              aria-label="Tutup undangan"
+            >
+              Tutup Undangan
+            </button>
+            {content.site.creator.websiteUrl || content.site.creator.url ? (
+              <a
+                className="footer__porto"
+                href={content.site.creator.websiteUrl || content.site.creator.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={content.footer.websiteAriaLabel}
+              >
+                {content.footer.portfolioLinkLabel}
+              </a>
+            ) : null}
           </footer>
         </main>
 
