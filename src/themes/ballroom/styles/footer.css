@@ -5,7 +5,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 4rem 1.75rem calc(2.5rem + env(safe-area-inset-bottom));
+  padding: 4rem 1.75rem 2.75rem;
   text-align: center;
   overflow: visible;
   border-top: 1px solid var(--gold-a15);
@@ -91,24 +91,50 @@
   transform: scale(0.98);
 }
 
-.theme-ballroom .footer__porto {
+/* Quiet credit strip under the closing footer */
+.theme-ballroom .site-credit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 1.6rem 1.5rem calc(1.75rem + env(safe-area-inset-bottom));
+  border-top: 1px solid rgba(140, 126, 111, 0.18);
+  background: #120d0d;
+  text-align: center;
+}
+
+.theme-ballroom .site-credit__porto {
   display: inline-block;
-  margin-top: 2rem;
-  color: rgba(212, 196, 176, 0.55);
+  margin: 0;
+  padding: 0 0 0.2rem;
+  border: 0;
+  border-bottom: 1px solid #8c7e6f;
+  background: transparent;
+  color: #8c7e6f;
   font-family: var(--font-body);
-  font-size: 0.62rem;
-  font-weight: 400;
-  letter-spacing: 0.18em;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
   text-transform: uppercase;
   text-decoration: none;
-  border-bottom: 1px solid var(--gold-a25);
   transition:
     color 0.2s,
     border-color 0.2s;
 }
 
-.theme-ballroom .footer__porto:hover,
-.theme-ballroom .footer__porto:focus-visible {
-  color: var(--gold-soft);
-  border-bottom-color: var(--gold-a60);
+.theme-ballroom .site-credit__porto:hover,
+.theme-ballroom .site-credit__porto:focus-visible {
+  color: var(--cream-dim);
+  border-bottom-color: var(--cream-dim);
+}
+
+.theme-ballroom .site-credit__copy {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(140, 126, 111, 0.72);
 }

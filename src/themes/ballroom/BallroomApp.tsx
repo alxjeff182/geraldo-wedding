@@ -308,9 +308,11 @@ export function BallroomApp({ guestName, guestId }: Props) {
             >
               Tutup Undangan
             </button>
+          </footer>
+          <div className="site-credit">
             {content.site.creator.websiteUrl || content.site.creator.url ? (
               <a
-                className="footer__porto"
+                className="site-credit__porto"
                 href={content.site.creator.websiteUrl || content.site.creator.url}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -319,7 +321,8 @@ export function BallroomApp({ guestName, guestId }: Props) {
                 {content.footer.portfolioLinkLabel}
               </a>
             ) : null}
-          </footer>
+            <p className="site-credit__copy">{content.footer.creditPrefix}</p>
+          </div>
         </main>
 
         {revealed && (pullRefresh.pull > 0 || pullRefresh.refreshing) ? (
