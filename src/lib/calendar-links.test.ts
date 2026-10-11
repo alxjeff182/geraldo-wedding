@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildAndroidGoogleCalendarIntent,
   buildAndroidInsertIntent,
+  buildCalendarApiUrl,
   buildGoogleCalendarUrl,
   buildIcsCalendar,
   buildIcsContent,
@@ -84,6 +85,14 @@ describe("calendar-links", () => {
     expect(buildGoogleCalendarUrl({ ...event, startsAt: "bad" })).toBeNull();
     expect(buildIcsContent({ ...event, endsAt: "" })).toBeNull();
     expect(buildAndroidInsertIntent({ ...event, startsAt: "bad" })).toBeNull();
+  });
+
+  it("builds a same-origin calendar API URL for iOS/Mac ICS handoff", () => {
+    const ics = buildIcsContent(event);
+    expect(ics).toBeTruthy();
+    const url = buildCalendarApiUrl(ics!, "https://geraldo-christin.vercel.app");
+    expect(url.startsWith("https://geraldo-christin.vercel.app/api/calendar?ics=")).toBe(true);
+    expect(url).not.toContain("data:text/calendar");
   });
 
   it("detects Apple calendar clients including Mac Chrome", () => {

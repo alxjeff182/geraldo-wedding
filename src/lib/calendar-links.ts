@@ -124,9 +124,26 @@ function toBase64Url(text: string): string {
   return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
+export function buildCalendarApiUrl(content: string, origin = window.location.origin): string {
+  const encoded = toBase64Url(content);
+  return `${origin}/api/calendar?ics=${encoded}`;
+}
+
+function launchCalendarHref(href: string) {
+  // Anchor click keeps the user-gesture chain on iOS better than location.assign alone.
+  const anchor = document.createElement("a");
+  anchor.href = href;
+  anchor.rel = "noopener";
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+}
+
 /**
  * Open ICS in Calendar.app / iOS Calendar with event titles prefilled.
- * Mac desktop must use webcal:// — https:// makes Chrome/Safari download the .ics.
+ * iOS: serve via /api/calendar (https) — Safari shows "Add to Calendar".
+ *       data:text/calendar is silently ignored by modern iOS Safari/Chrome.
+ * Mac: webcal:// opens Calendar.app (https would only download the file).
  */
 export function openAppleCalendarIcs(content: string, filename = "wedding.ics") {
   void filename;
@@ -137,13 +154,19 @@ export function openAppleCalendarIcs(content: string, filename = "wedding.ics") 
       navigator.platform === "MacIntel" &&
       navigator.maxTouchPoints > 1);
 
+  const httpsUrl = buildCalendarApiUrl(content);
+
   if (iOS) {
-    window.location.assign(`data:text/calendar;charset=utf-8,${encodeURIComponent(content)}`);
+    launchCalendarHref(httpsUrl);
+    // Fallback if the sheet didn't take over (in-app browsers, etc.)
+    window.setTimeout(() => {
+      if (document.visibilityState !== "visible") return;
+      const webcalUrl = httpsUrl.replace(/^https:/i, "webcal:").replace(/^http:/i, "webcal:");
+      window.location.assign(webcalUrl);
+    }, 1200);
     return;
   }
 
-  const encoded = toBase64Url(content);
-  const httpsUrl = `${window.location.origin}/api/calendar?ics=${encoded}`;
   const webcalUrl = httpsUrl.replace(/^https:/i, "webcal:").replace(/^http:/i, "webcal:");
   window.location.assign(webcalUrl);
 }
