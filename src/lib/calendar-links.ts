@@ -185,40 +185,49 @@ export function buildAndroidInsertIntent(event: CalendarEventInput): string | nu
   return `intent://#Intent;${parts.join(";")}`;
 }
 
-/** Prefer Google Calendar app specifically (still no web fallback baked into the intent). */
+/**
+ * Chrome only launches intents whose target accepts CATEGORY_BROWSABLE, so the
+ * INSERT intent above is silently dropped. The Google Calendar app does register
+ * BROWSABLE links for www.google.com/calendar/event, which opens its event editor.
+ */
 export function buildAndroidGoogleCalendarIntent(event: CalendarEventInput): string | null {
-  const insert = buildAndroidInsertIntent(event);
-  if (!insert) return null;
-  return insert.replace("#Intent;", "#Intent;package=com.google.android.calendar;");
+  const googleUrl = buildGoogleCalendarUrl(event);
+  if (!googleUrl) return null;
+  const query = googleUrl.split("?")[1] ?? "";
+  return (
+    `intent://www.google.com/calendar/event?${query}` +
+    "#Intent;scheme=https;package=com.google.android.calendar;end"
+  );
 }
 
-function launchAndroidNative(href: string) {
-  // location.assign keeps the user-gesture chain for intent:/geo: on Android Chrome.
-  window.location.assign(href);
-}
+function openAndroidWithWebFallback(nativeHref: string, webHref: string | null, delayMs = 2500) {
+  let leftPage = false;
+  const markLeft = () => {
+    leftPage = true;
+  };
+  window.addEventListener("blur", markLeft, { once: true });
+  window.addEventListener("pagehide", markLeft, { once: true });
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+      if (document.visibilityState === "hidden") markLeft();
+    },
+    { once: true },
+  );
 
-function openAndroidWithWebFallback(nativeHref: string, webHref: string | null, delayMs = 1500) {
-  const started = Date.now();
-  launchAndroidNative(nativeHref);
+  window.location.assign(nativeHref);
   if (!webHref) return;
   window.setTimeout(() => {
-    if (document.visibilityState !== "visible") return;
-    if (Date.now() - started < delayMs - 100) return;
+    window.removeEventListener("blur", markLeft);
+    window.removeEventListener("pagehide", markLeft);
+    if (leftPage || document.visibilityState !== "visible") return;
     window.open(webHref, "_blank", "noopener,noreferrer");
   }, delayMs);
 }
 
-/** Android browser → open a calendar app with the event prefilled. */
+/** Android browser → open the Google Calendar app's event editor, prefilled. */
 export function openAndroidCalendar(event: CalendarEventInput): boolean {
   const googleUrl = buildGoogleCalendarUrl(event);
-
-  // Prefer any installed calendar app via INSERT (Samsung Calendar, Google Calendar, etc.).
-  const insertIntent = buildAndroidInsertIntent(event);
-  if (insertIntent) {
-    openAndroidWithWebFallback(insertIntent, googleUrl);
-    return true;
-  }
-
   const gcalIntent = buildAndroidGoogleCalendarIntent(event);
   if (gcalIntent) {
     openAndroidWithWebFallback(gcalIntent, googleUrl);

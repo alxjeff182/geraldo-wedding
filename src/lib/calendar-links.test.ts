@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildAndroidGoogleCalendarIntent,
   buildAndroidInsertIntent,
   buildGoogleCalendarUrl,
   buildIcsCalendar,
@@ -60,6 +61,14 @@ describe("calendar-links", () => {
     expect(intent).toContain(encodeURIComponent("Pemberkatan - Geraldo & Christin"));
     expect(intent).toContain("l.beginTime=");
     expect(intent).toContain("l.endTime=");
+  });
+
+  it("builds Android Google Calendar app intent from the browsable event URL", () => {
+    const intent = buildAndroidGoogleCalendarIntent(event);
+    expect(intent).toContain("intent://www.google.com/calendar/event?action=TEMPLATE");
+    expect(intent).toContain("dates=20261024T010000Z%2F20261024T030000Z");
+    expect(intent).toContain("scheme=https;package=com.google.android.calendar;end");
+    expect(intent).not.toContain("browser_fallback_url");
   });
 
   it("detects Android", () => {
