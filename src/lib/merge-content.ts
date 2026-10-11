@@ -89,17 +89,20 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
     ? merged.invite.defaultTemplateId
     : (whatsappTemplates[0]?.id ?? "");
 
-  // CMS events arrays replace defaults wholesale — restore lat/lng from shipped defaults
-  // when the CMS row is missing them (needed for native maps directions).
+  // CMS events arrays replace defaults wholesale — restore lat/lng/mapsCid from shipped
+  // defaults when the CMS row is missing them (needed for native maps + embed place card).
   const events = merged.events.map((event) => {
-    if (typeof event.lat === "number" && typeof event.lng === "number") return event;
     const fallback = wedding.events.find(
       (item) => item.name === event.name || item.mapsUrl === event.mapsUrl,
     );
-    if (!fallback || typeof fallback.lat !== "number" || typeof fallback.lng !== "number") {
-      return event;
-    }
-    return { ...event, lat: fallback.lat, lng: fallback.lng };
+    if (!fallback) return event;
+    const hasCoords = typeof event.lat === "number" && typeof event.lng === "number";
+    return {
+      ...event,
+      lat: hasCoords ? event.lat : fallback.lat,
+      lng: hasCoords ? event.lng : fallback.lng,
+      mapsCid: event.mapsCid || fallback.mapsCid,
+    };
   });
 
   return {

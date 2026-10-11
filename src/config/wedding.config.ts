@@ -11,6 +11,8 @@ export type WeddingEvent = {
   lat?: number;
   /** WGS84 longitude — used for precise native maps / directions */
   lng?: number;
+  /** Google Maps place CID (decimal) — embed shows the place card instead of raw coordinates */
+  mapsCid?: string;
   /** ISO datetime for calendar export */
   startsAt: string;
   /** ISO datetime for calendar export */
@@ -100,6 +102,7 @@ export const wedding = {
       mapsUrl: "https://maps.app.goo.gl/CTqpxvQrfmLgQpsb8",
       lat: -6.1839709,
       lng: 106.7553829,
+      mapsCid: "14120004088073944725",
       startsAt: "2026-10-24T08:00:00+07:00",
       endsAt: "2026-10-24T10:00:00+07:00",
     },
@@ -112,6 +115,7 @@ export const wedding = {
       mapsUrl: "https://maps.app.goo.gl/WSsX9X17dp7qSwqh6",
       lat: -6.1806164,
       lng: 106.7798582,
+      mapsCid: "3244947555986001362",
       startsAt: "2026-10-24T11:00:00+07:00",
       endsAt: "2026-10-24T15:00:00+07:00",
     },

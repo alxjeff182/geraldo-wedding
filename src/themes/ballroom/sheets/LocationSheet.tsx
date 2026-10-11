@@ -21,11 +21,13 @@ export function LocationSheet({ open, events, mapsLabel, onClose, setSheetRef, o
     if (open) setTab(0);
   }, [open]);
 
-  // Name@lat,lng keeps the pin precise and shows the venue title if guests tap the embed.
+  // Keyless embeds drop any name paired with raw coordinates; cid renders the real place card.
   const embedSrc = event
-    ? hasCoords(event)
-      ? `https://maps.google.com/maps?q=${encodeURIComponent(event.venue)}@${event.lat},${event.lng}&z=16&output=embed`
-      : `https://maps.google.com/maps?q=${encodeURIComponent(event.address || event.venue)}&z=15&output=embed`
+    ? event.mapsCid
+      ? `https://maps.google.com/maps?cid=${event.mapsCid}&z=16&output=embed`
+      : hasCoords(event)
+        ? `https://maps.google.com/maps?q=${encodeURIComponent(event.venue)}&ll=${event.lat},${event.lng}&z=16&output=embed`
+        : `https://maps.google.com/maps?q=${encodeURIComponent(event.address || event.venue)}&z=15&output=embed`
     : "";
 
   const copyAddress = async () => {
