@@ -37,28 +37,6 @@
   letter-spacing: 0.04em;
 }
 
-.theme-ballroom .gift-address {
-  width: 100%;
-  margin: 0;
-  padding: 0.85rem 1rem;
-  border-radius: var(--r-md);
-  border: 1px dashed var(--gold-a25);
-  background: rgba(0, 0, 0, 0.15);
-  color: var(--cream-dim);
-  font-size: 0.82rem;
-  line-height: 1.5;
-  text-align: left;
-}
-
-.theme-ballroom .gift-address__label {
-  display: block;
-  margin-bottom: 0.35rem;
-  font-size: 0.62rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--gold);
-}
-
 .theme-ballroom .qris-dummy-note {
   margin: 0;
   font-size: 0.7rem;
@@ -277,11 +255,6 @@
   border-color: var(--gold-soft);
   background: var(--gold-a15);
   transform: translateY(-2px);
-}
-
-.theme-ballroom .gift-address__text {
-  margin: 0 0 0.65rem;
-  white-space: pre-wrap;
 }
 
 .theme-ballroom .footer__quote {

@@ -149,8 +149,6 @@ export const wedding = {
     title: "Kirim Tanda Kasih",
     description:
       "Doa restu Anda sudah lebih dari cukup. Bila ingin berbagi kebahagiaan, kami sediakan cara mudah di bawah ini.",
-    physicalAddress:
-      "Perum. Taman Danau Indah Blok J No. 26, Kel. Pabuaran Tumpeng, Kec. Karawaci, Tangerang",
     /** @deprecated prefer qrisBride / qrisGroom */
     qris: "/assets/ballroom/qris-dummy.svg",
     qrisBride: "/assets/ballroom/qris-dummy.svg",
@@ -333,10 +331,7 @@ export const wedding = {
     accountNumberLabel: "No. Rekening —",
     accountHolderPrefix: "a.n",
     copyAccountButton: "Salin Nomor Rekening",
-    physicalGiftTitle: "Kirim Kado",
-    copyAddressButton: "Salin Alamat",
     copyAccountSuccess: "Nomor rekening tersalin",
-    copyAddressSuccess: "Alamat berhasil disalin",
     copyError: "Gagal menyalin",
   },
 

@@ -58,10 +58,6 @@ export function GiftSheet({ open, guestName, onClose, setSheetRef, onToast }: Pr
           qrisGroom={content.gift.qrisGroom}
           brideName={content.couple.bride.fullName || content.couple.bride.shortName}
           groomName={content.couple.groom.fullName || content.couple.groom.shortName}
-          physicalAddress={content.gift.physicalAddress}
-          physicalGiftTitle={content.giftUi.physicalGiftTitle}
-          copyAddressButton={content.giftUi.copyAddressButton}
-          copyAddressSuccess={content.giftUi.copyAddressSuccess}
           copySuccess={content.giftUi.copyAccountSuccess}
           copyError={content.giftUi.copyError}
           waNumber={content.contact.whatsappNumber}

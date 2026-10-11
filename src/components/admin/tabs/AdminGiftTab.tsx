@@ -33,15 +33,6 @@ export function AdminGiftTab({ merged, defaults, updateDraft, clearDraftPath }: 
         onChange={(value) => updateDraft(["gift", "description"], value)}
         rows={3}
       />
-      <label className="admin-field">
-        <span className="admin-label">Alamat Kado Fisik</span>
-        <textarea
-          className="admin-input"
-          rows={2}
-          value={merged.gift.physicalAddress}
-          onChange={(e) => updateDraft(["gift", "physicalAddress"], e.target.value)}
-        />
-      </label>
       <AdminOverrideMediaField
         label="QRIS Mempelai Wanita"
         value={merged.gift.qrisBride || merged.gift.qris}
@@ -206,24 +197,9 @@ export function AdminGiftTab({ merged, defaults, updateDraft, clearDraftPath }: 
             onChange={(value) => updateDraft(["giftUi", "copyAccountButton"], value)}
           />
           <AdminTextField
-            label="Judul Kado Fisik"
-            value={merged.giftUi.physicalGiftTitle}
-            onChange={(value) => updateDraft(["giftUi", "physicalGiftTitle"], value)}
-          />
-          <AdminTextField
-            label="Tombol Salin Alamat"
-            value={merged.giftUi.copyAddressButton}
-            onChange={(value) => updateDraft(["giftUi", "copyAddressButton"], value)}
-          />
-          <AdminTextField
             label="Toast Salin Rekening"
             value={merged.giftUi.copyAccountSuccess}
             onChange={(value) => updateDraft(["giftUi", "copyAccountSuccess"], value)}
-          />
-          <AdminTextField
-            label="Toast Salin Alamat"
-            value={merged.giftUi.copyAddressSuccess}
-            onChange={(value) => updateDraft(["giftUi", "copyAddressSuccess"], value)}
           />
           <AdminTextField
             label="Toast Gagal Salin"

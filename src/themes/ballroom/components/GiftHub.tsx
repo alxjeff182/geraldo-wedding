@@ -12,10 +12,6 @@ type Props = {
   qrisGroom?: string;
   brideName: string;
   groomName: string;
-  physicalAddress?: string;
-  physicalGiftTitle?: string;
-  copyAddressButton?: string;
-  copyAddressSuccess?: string;
   copySuccess: string;
   copyError: string;
   waNumber: string;
@@ -51,10 +47,6 @@ export function GiftHub({
   qrisGroom,
   brideName,
   groomName,
-  physicalAddress,
-  physicalGiftTitle = "Alamat kirim",
-  copyAddressButton = "Salin Alamat",
-  copyAddressSuccess,
   copySuccess,
   copyError,
   waNumber,
@@ -196,22 +188,6 @@ export function GiftHub({
               );
             })
           )}
-          {physicalAddress ? (
-            <div className="gift-address">
-              <span className="gift-address__label">{physicalGiftTitle}</span>
-              <p className="gift-address__text">{physicalAddress}</p>
-              <button
-                type="button"
-                className={`copy-btn${copiedKey === "address" ? " is-copied" : ""}`}
-                onClick={() =>
-                  void copy(physicalAddress, "address", copyAddressSuccess ?? copySuccess)
-                }
-              >
-                <IconCopy />
-                <span>{copiedKey === "address" ? "Tersalin" : copyAddressButton}</span>
-              </button>
-            </div>
-          ) : null}
         </div>
       )}
     </>
