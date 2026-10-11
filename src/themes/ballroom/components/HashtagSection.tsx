@@ -22,6 +22,7 @@ export function HashtagSection({ title, tag, photo, storyTemplate, onToast }: Pr
   const explore = hashtagExploreUrl(tag);
   const template = storyTemplate?.trim() || content.hashtag.storyTemplate?.trim() || "";
   const storyLabel = content.hashtag.storyButton || "Bagikan ke Story";
+  const storyHint = content.hashtag.storyHint || "Pilih Instagram → Story";
 
   const copyTag = async () => {
     try {
@@ -98,6 +99,7 @@ export function HashtagSection({ title, tag, photo, storyTemplate, onToast }: Pr
             <IconInstagram size={18} />
             <span>{sharing ? "Menyiapkan…" : storyLabel}</span>
           </button>
+          <p className="hashtag-mod__story-hint">{storyHint}</p>
         </div>
       ) : null}
       <a

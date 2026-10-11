@@ -196,6 +196,7 @@ export type SiteContentOverrides = {
     photo?: string;
     storyTemplate?: string;
     storyButton?: string;
+    storyHint?: string;
     storyFallbackToast?: string;
     copySuccess?: string;
     instagramButton?: string;

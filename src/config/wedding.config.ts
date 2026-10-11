@@ -219,6 +219,7 @@ export const wedding = {
     photo: "/assets/ballroom/og-image.jpg",
     storyTemplate: "/assets/ballroom/story-template.png",
     storyButton: "Bagikan ke Story",
+    storyHint: "Pilih Instagram → Story",
     storyFallbackToast: "Template tersimpan, buka Instagram lalu pilih dari galeri",
     copySuccess: "Hashtag disalin",
     instagramButton: "Lihat di Instagram",

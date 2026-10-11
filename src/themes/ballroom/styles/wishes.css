@@ -423,6 +423,15 @@
   cursor: wait;
 }
 
+.theme-ballroom .hashtag-mod__story-hint {
+  margin: -0.35rem 0 0;
+  text-align: center;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--cream-dim);
+  opacity: 0.75;
+}
+
 .theme-ballroom .hashtag-mod__ig {
   display: grid;
   place-items: center;
