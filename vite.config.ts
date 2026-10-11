@@ -58,6 +58,7 @@ function sitemapPlugin(siteUrl: string): Plugin {
   const robots = `User-agent: *
 Allow: /
 Disallow: /admin
+Disallow: /k/
 
 Sitemap: ${base}/sitemap.xml
 `;

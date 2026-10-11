@@ -2,15 +2,15 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import { WeddingContentProvider } from "./context/WeddingContentContext";
+import { parseAppRoute } from "./lib/wa-desk-route";
 import "./styles/boot.css";
 
-const isAdminRoute =
-  window.location.pathname === "/admin" || window.location.pathname === "/admin/";
+const route = parseAppRoute(window.location.pathname);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <WeddingContentProvider>
-      <App adminMode={isAdminRoute} />
+      <App route={route} />
     </WeddingContentProvider>
   </StrictMode>,
 );

@@ -6,24 +6,34 @@ import { useAlertDialog } from "./hooks/useAlertDialog";
 import { AlertDialog } from "./components/ui/AlertDialog";
 import { BootScreen } from "./components/BootScreen";
 import { RotateNotice } from "./components/RotateNotice";
+import type { AppRoute } from "./lib/wa-desk-route";
 
 const AdminPage = lazy(() => import("./pages/AdminPage").then((m) => ({ default: m.AdminPage })));
+
+const WaDeskPage = lazy(() =>
+  import("./pages/WaDeskPage").then((m) => ({ default: m.WaDeskPage })),
+);
 
 const BallroomApp = lazy(() =>
   import("./themes/ballroom/BallroomApp").then((m) => ({ default: m.BallroomApp })),
 );
 
 type AppProps = {
+  route?: AppRoute;
+  /** @deprecated use route */
   adminMode?: boolean;
 };
 
-export default function App({ adminMode = false }: AppProps) {
+export default function App({ route, adminMode = false }: AppProps) {
+  const resolvedRoute: AppRoute = route ?? (adminMode ? { kind: "admin" } : { kind: "invite" });
   const { content, loading: contentLoading, loadError, refresh } = useWeddingContent();
   const { guestName, guestId, loading: guestLoading } = useGuestName();
   const [bootStuck, setBootStuck] = useState(false);
   const { alert, showError, hideAlert } = useAlertDialog();
 
-  usePageMeta(content);
+  usePageMeta(content, {
+    noIndex: resolvedRoute.kind === "admin" || resolvedRoute.kind === "wa-desk",
+  });
 
   useEffect(() => {
     if (!contentLoading && !guestLoading) {
@@ -55,10 +65,18 @@ export default function App({ adminMode = false }: AppProps) {
 
   const logoSrc = content.media.logo || "/assets/ballroom/logo.webp";
 
-  if (adminMode) {
+  if (resolvedRoute.kind === "admin") {
     return (
       <Suspense fallback={<BootScreen logoSrc={logoSrc} label="Memuat admin…" />}>
         <AdminPage />
+      </Suspense>
+    );
+  }
+
+  if (resolvedRoute.kind === "wa-desk") {
+    return (
+      <Suspense fallback={<BootScreen logoSrc={logoSrc} label="Memuat meja WA…" />}>
+        <WaDeskPage token={resolvedRoute.token} />
       </Suspense>
     );
   }
