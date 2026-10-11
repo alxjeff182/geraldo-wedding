@@ -166,7 +166,7 @@ Dengan penuh sukacita dan mengucap syukur kepada Tuhan Yesus Kristus, kami mengu
     const merged = mergeWeddingContent({
       media: { ogImage: "/assets/ballroom/og-image.jpg" },
     });
-    expect(merged.media.ogImage).toBe("/assets/ballroom/og-opening-v2.jpg");
+    expect(merged.media.ogImage).toBe("/assets/ballroom/og-wa.jpg");
   });
 
   it("migrates legacy story.paragraphs into milestones", () => {

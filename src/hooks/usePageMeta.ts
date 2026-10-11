@@ -68,8 +68,8 @@ export function usePageMeta(content: WeddingConfig, options?: { noIndex?: boolea
     setMeta("og:url", `${siteUrl.replace(/\/$/, "")}/`, true);
     setMeta("og:image", ogImage, true);
     setMeta("og:image:type", "image/jpeg", true);
-    setMeta("og:image:width", "720", true);
-    setMeta("og:image:height", "1280", true);
+    setMeta("og:image:width", "1200", true);
+    setMeta("og:image:height", "630", true);
     setMeta("og:image:alt", imageAlt, true);
     setMeta("og:locale", "id_ID", true);
 
