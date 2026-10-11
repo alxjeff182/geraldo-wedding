@@ -2365,20 +2365,35 @@ textarea.admin-input {
   color: rgba(245, 240, 232, 0.62);
 }
 
-.admin-wa-export__message {
+.admin-wa-export__link {
+  display: block;
   margin: 0 0 0.65rem;
   padding: 0.7rem 0.75rem;
   border-radius: 0.6rem;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(245, 240, 232, 0.08);
-  white-space: pre-wrap;
-  word-break: break-word;
-  font-family: inherit;
-  font-size: 0.82rem;
-  line-height: 1.5;
-  color: rgba(245, 240, 232, 0.9);
-  max-height: 14rem;
+  color: #86efac;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  word-break: break-all;
+  text-decoration: none;
+  max-height: 7.5rem;
   overflow: auto;
+}
+
+.admin-wa-export__link:hover {
+  border-color: rgba(134, 239, 172, 0.45);
+  background: rgba(134, 239, 172, 0.06);
+}
+
+.admin-wa-export__empty-link {
+  margin: 0 0 0.65rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.55rem;
+  border: 1px dashed rgba(245, 240, 232, 0.18);
+  color: rgba(245, 240, 232, 0.55);
+  font-size: 0.8rem;
 }
 
 .admin-wa-export__card-actions {

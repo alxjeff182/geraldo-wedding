@@ -38,25 +38,32 @@ export function buildWaExportEntries(
   });
 }
 
-/** Plain-text pack for paste into Notes / chat — easy to scan one guest at a time. */
+/** Readable list of wa.me deep links for one-by-one opens. */
 export function formatWaExportPlainText(entries: readonly WaExportEntry[]): string {
   if (entries.length === 0) return "";
 
   const blocks = entries.map((entry) => {
-    const phoneLine = entry.hasPhone ? `WA: ${entry.phone}` : "WA: (belum ada nomor)";
-    return [`${entry.index}. ${entry.name}`, phoneLine, "─".repeat(28), entry.message.trim()].join(
-      "\n",
-    );
+    const phoneLine = entry.hasPhone ? entry.phone : "(belum ada nomor)";
+    const linkLine = entry.waUrl ?? "(tidak ada link WA)";
+    return [`${entry.index}. ${entry.name}`, phoneLine, linkLine].join("\n");
   });
 
   return [
-    `Daftar pesan WhatsApp (${entries.length} tamu)`,
+    `Batch link WhatsApp (${entries.length} tamu)`,
     `Dibuat: ${new Date().toLocaleString("id-ID")}`,
     "═".repeat(32),
     "",
-    blocks.join(`\n\n${"═".repeat(32)}\n\n`),
+    blocks.join("\n\n"),
     "",
   ].join("\n");
+}
+
+/** One wa.me URL per line — handy for paste into a notes app. */
+export function formatWaExportLinksOnly(entries: readonly WaExportEntry[]): string {
+  return entries
+    .map((entry) => entry.waUrl)
+    .filter((url): url is string => Boolean(url))
+    .join("\n");
 }
 
 export function downloadWaExportText(text: string, filename?: string): void {
@@ -64,7 +71,7 @@ export function downloadWaExportText(text: string, filename?: string): void {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = filename ?? `pesan-wa-${new Date().toISOString().slice(0, 10)}.txt`;
+  link.download = filename ?? `link-wa-${new Date().toISOString().slice(0, 10)}.txt`;
   link.click();
   URL.revokeObjectURL(url);
 }

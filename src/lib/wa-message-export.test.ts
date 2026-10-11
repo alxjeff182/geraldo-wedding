@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { buildWaExportEntries, formatWaExportPlainText } from "./wa-message-export";
+import {
+  buildWaExportEntries,
+  formatWaExportLinksOnly,
+  formatWaExportPlainText,
+} from "./wa-message-export";
 
 describe("wa-message-export", () => {
   const guests = [
@@ -7,29 +11,29 @@ describe("wa-message-export", () => {
     { id: "2", display_name: "Salim", phone: null, slug: "salim" },
   ];
 
-  it("builds numbered entries with wa urls when phone exists", () => {
+  it("builds numbered entries with wa.me urls when phone exists", () => {
     const entries = buildWaExportEntries(guests, (g) => `Halo ${g.display_name}`);
     expect(entries).toHaveLength(2);
-    expect(entries[0]).toMatchObject({
-      index: 1,
-      name: "Ade",
-      hasPhone: true,
-      message: "Halo Ade",
-    });
     expect(entries[0].waUrl).toContain("https://wa.me/");
+    expect(entries[0].waUrl).toContain("62895391606832");
     expect(entries[0].waUrl).toContain(encodeURIComponent("Halo Ade"));
-    expect(entries[1].hasPhone).toBe(false);
     expect(entries[1].waUrl).toBeNull();
   });
 
-  it("formats a readable plain-text pack", () => {
-    const entries = buildWaExportEntries(guests, (g) => `Halo ${g.display_name}\nLink: x`);
+  it("formats a readable pack of wa.me links", () => {
+    const entries = buildWaExportEntries(guests, (g) => `Halo ${g.display_name}`);
     const text = formatWaExportPlainText(entries);
-    expect(text).toContain("Daftar pesan WhatsApp (2 tamu)");
+    expect(text).toContain("Batch link WhatsApp (2 tamu)");
     expect(text).toContain("1. Ade");
-    expect(text).toContain("WA: 0895391606832");
-    expect(text).toContain("Halo Ade");
+    expect(text).toContain("https://wa.me/62895391606832?text=");
     expect(text).toContain("2. Salim");
-    expect(text).toContain("WA: (belum ada nomor)");
+    expect(text).toContain("(tidak ada link WA)");
+  });
+
+  it("formats links-only export", () => {
+    const entries = buildWaExportEntries(guests, (g) => `Halo ${g.display_name}`);
+    const text = formatWaExportLinksOnly(entries);
+    expect(text.split("\n")).toHaveLength(1);
+    expect(text).toContain("https://wa.me/62895391606832?text=");
   });
 });

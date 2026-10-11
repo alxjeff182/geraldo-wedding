@@ -4,9 +4,11 @@ import type { Guest } from "../../../lib/supabase";
 import {
   buildWaExportEntries,
   downloadWaExportText,
+  formatWaExportLinksOnly,
   formatWaExportPlainText,
   type WaExportEntry,
 } from "../../../lib/wa-message-export";
+
 type InviteCopy = WeddingConfig["invite"];
 
 type Props = {
@@ -79,6 +81,15 @@ export function GuestWaExport({
     void copyText(text, invite.waExportAllCopied, "all");
   };
 
+  const handleCopyLinksOnly = () => {
+    const text = formatWaExportLinksOnly(entries);
+    if (!text) {
+      onNotify(invite.waExportEmpty);
+      return;
+    }
+    void copyText(text, invite.waExportAllCopied, "links");
+  };
+
   const handleDownload = () => {
     const text = formatWaExportPlainText(entries);
     if (!text) {
@@ -131,7 +142,7 @@ export function GuestWaExport({
           <button
             type="button"
             className="admin-btn admin-btn--primary"
-            disabled={entries.length === 0}
+            disabled={withPhone === 0}
             onClick={handleCopyAll}
           >
             {invite.waExportCopyAll}
@@ -139,7 +150,15 @@ export function GuestWaExport({
           <button
             type="button"
             className="admin-btn"
-            disabled={entries.length === 0}
+            disabled={withPhone === 0}
+            onClick={handleCopyLinksOnly}
+          >
+            {invite.waExportCopyLinksOnly}
+          </button>
+          <button
+            type="button"
+            className="admin-btn"
+            disabled={withPhone === 0}
             onClick={handleDownload}
           >
             {invite.waExportDownload}
@@ -156,7 +175,13 @@ export function GuestWaExport({
                 entry={entry}
                 invite={invite}
                 copied={copiedId === entry.id}
-                onCopy={() => void copyText(entry.message, invite.waExportCopied, entry.id)}
+                onCopyLink={() => {
+                  if (!entry.waUrl) {
+                    onNotify(invite.noPhone);
+                    return;
+                  }
+                  void copyText(entry.waUrl, invite.waExportCopied, entry.id);
+                }}
                 onOpenWa={() => {
                   const guest = guestById(entry.id);
                   if (guest && entry.waUrl) onOpenWhatsApp(guest, entry.waUrl);
@@ -175,13 +200,13 @@ function WaExportCard({
   entry,
   invite,
   copied,
-  onCopy,
+  onCopyLink,
   onOpenWa,
 }: {
   entry: WaExportEntry;
   invite: InviteCopy;
   copied: boolean;
-  onCopy: () => void;
+  onCopyLink: () => void;
   onOpenWa: () => void;
 }) {
   return (
@@ -195,9 +220,20 @@ function WaExportCard({
           </span>
         </div>
       </div>
-      <pre className="admin-wa-export__message">{entry.message}</pre>
+      {entry.waUrl ? (
+        <a
+          className="admin-wa-export__link"
+          href={entry.waUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {entry.waUrl}
+        </a>
+      ) : (
+        <p className="admin-wa-export__empty-link">{invite.waExportNoPhone}</p>
+      )}
       <div className="admin-wa-export__card-actions">
-        <button type="button" className="admin-btn" onClick={onCopy}>
+        <button type="button" className="admin-btn" disabled={!entry.waUrl} onClick={onCopyLink}>
           {copied ? "✓ Tersalin" : invite.waExportCopyMessage}
         </button>
         <button
