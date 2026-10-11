@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import type { WeddingEvent } from "../../../config/wedding.config";
-import { buildGoogleCalendarUrl } from "../../../lib/calendar-links";
+import { openCalendarForEvent } from "../../../lib/calendar-links";
+import { openMaps } from "../../../lib/maps-links";
 import { IconCopy, IconPin, IconPinSm } from "../icons";
 
 type Props = {
@@ -34,16 +35,6 @@ export function LocationSheet({
     ? `https://maps.google.com/maps?q=${encodeURIComponent(event.address || event.venue)}&z=15&output=embed`
     : "";
 
-  const calUrl = event
-    ? buildGoogleCalendarUrl({
-        title: event.name,
-        details: `${event.time}\n${event.venue}`,
-        location: event.address,
-        startsAt: event.startsAt,
-        endsAt: event.endsAt,
-      })
-    : null;
-
   const copyAddress = async () => {
     if (!event) return;
     try {
@@ -52,6 +43,30 @@ export function LocationSheet({
     } catch {
       onToast("Gagal menyalin");
     }
+  };
+
+  const openEventMaps = (e: MouseEvent<HTMLAnchorElement>) => {
+    if (!event?.mapsUrl) return;
+    e.preventDefault();
+    openMaps({
+      mapsUrl: event.mapsUrl,
+      address: event.address,
+      venue: event.venue,
+    });
+  };
+
+  const saveEventCalendar = () => {
+    if (!event) return;
+    openCalendarForEvent(
+      {
+        title: event.name,
+        details: `${event.time}\n${event.venue}`,
+        location: event.address,
+        startsAt: event.startsAt,
+        endsAt: event.endsAt,
+      },
+      `${event.name.toLowerCase().replace(/\s+/g, "-")}.ics`,
+    );
   };
 
   return (
@@ -143,25 +158,15 @@ export function LocationSheet({
         ) : null}
       </div>
       <footer className="sheet__foot sheet__foot--row">
-        {event ? (
-          <a
-            className="btn sheet__cta"
-            href={event.mapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+        {event?.mapsUrl ? (
+          <a className="btn sheet__cta" href={event.mapsUrl} onClick={openEventMaps}>
             {mapsLabel}
           </a>
         ) : null}
-        {calUrl ? (
-          <a
-            className="btn btn--ghost sheet__cta"
-            href={calUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+        {event ? (
+          <button type="button" className="btn btn--ghost sheet__cta" onClick={saveEventCalendar}>
             {calendarLabel}
-          </a>
+          </button>
         ) : null}
       </footer>
     </section>
