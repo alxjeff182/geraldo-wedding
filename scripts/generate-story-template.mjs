@@ -1,72 +1,110 @@
 #!/usr/bin/env node
 /**
- * Generates the default IG Story template (1080×1920) for Share Your Moments.
- * Replace later via CMS upload.
+ * Keys the checkerboard background out of the designer JPG and writes a
+ * transparent 1080×1920 Instagram Story overlay PNG.
+ *
+ * Source: assets/source/story-template-src.jpg (gitignored)
+ * Output: public/assets/ballroom/story-template.png
  */
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { existsSync } from "node:fs";
 import sharp from "sharp";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const src = resolve(root, "assets/source/story-template-src.jpg");
 const outPng = resolve(root, "public/assets/ballroom/story-template.png");
-const outWebp = resolve(root, "public/assets/ballroom/story-template.webp");
+const OUT_W = 1080;
+const OUT_H = 1920;
 
-const W = 1080;
-const H = 1920;
+if (!existsSync(src)) {
+  console.error("Missing source:", src);
+  process.exit(1);
+}
 
-const svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#1a0f0c"/>
-      <stop offset="45%" stop-color="#241612"/>
-      <stop offset="100%" stop-color="#120c0a"/>
-    </linearGradient>
-    <linearGradient id="frame" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#d4af70"/>
-      <stop offset="50%" stop-color="#f0d9a8"/>
-      <stop offset="100%" stop-color="#b8924a"/>
-    </linearGradient>
-    <radialGradient id="glow" cx="50%" cy="28%" r="42%">
-      <stop offset="0%" stop-color="#d4af70" stop-opacity="0.18"/>
-      <stop offset="100%" stop-color="#d4af70" stop-opacity="0"/>
-    </radialGradient>
-  </defs>
+const { data, info } = await sharp(src).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+const { width, height, channels } = info;
+const rgba = Buffer.alloc(width * height * 4);
 
-  <rect width="${W}" height="${H}" fill="url(#bg)"/>
-  <rect width="${W}" height="${H}" fill="url(#glow)"/>
+for (let i = 0; i < width * height; i++) {
+  const o = i * channels;
+  const r = data[o];
+  const g = data[o + 1];
+  const b = data[o + 2];
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const sat = max - min;
+  const brightness = (r + g + b) / 3;
 
-  <!-- Outer gold frame -->
-  <rect x="48" y="48" width="984" height="1824" rx="28" fill="none" stroke="url(#frame)" stroke-width="2" opacity="0.7"/>
-  <rect x="68" y="68" width="944" height="1784" rx="20" fill="none" stroke="#d4af70" stroke-width="1" opacity="0.28"/>
+  // Checkerboard is near-neutral and bright. Logo is rose-gold (sat ≥ 26).
+  // Hashtag text is dark (bri ≲ 120). Soft ramp only for mid-edge pixels.
+  let alpha = 255;
+  if (sat < 20 && brightness > 130) {
+    alpha = 0;
+  } else if (sat < 28 && brightness > 150) {
+    const t = Math.max((sat - 18) / 10, (180 - brightness) / 30);
+    alpha = Math.round(255 * Math.min(1, Math.max(0, t)));
+  }
 
-  <!-- Top monogram -->
-  <text x="540" y="180" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="42" letter-spacing="10" fill="#d4af70" opacity="0.9">G &amp; C</text>
-  <line x1="360" y1="210" x2="720" y2="210" stroke="#d4af70" stroke-width="1" opacity="0.35"/>
+  const d = i * 4;
+  if (alpha < 8) {
+    rgba[d] = 0;
+    rgba[d + 1] = 0;
+    rgba[d + 2] = 0;
+    rgba[d + 3] = 0;
+  } else {
+    rgba[d] = r;
+    rgba[d + 1] = g;
+    rgba[d + 2] = b;
+    rgba[d + 3] = alpha;
+  }
+}
 
-  <!-- Photo placeholder (guest can sticker over) -->
-  <rect x="180" y="280" width="720" height="900" rx="18" fill="#2a1c17" stroke="#d4af70" stroke-width="1.5" stroke-dasharray="14 10" opacity="0.85"/>
-  <circle cx="540" cy="680" r="54" fill="none" stroke="#d4af70" stroke-width="1.5" opacity="0.45"/>
-  <path d="M540 648 v64 M508 680 h64" stroke="#d4af70" stroke-width="1.5" opacity="0.45"/>
-  <text x="540" y="820" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="28" letter-spacing="4" fill="#f0d9a8" opacity="0.55">FOTO KAMU</text>
-  <text x="540" y="860" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="20" letter-spacing="2" fill="#cbb9a8" opacity="0.4">Tambahkan foto di Story</text>
+// Drop isolated speckles left by JPEG noise (keep only if a neighbor has content).
+const cleaned = Buffer.from(rgba);
+for (let y = 1; y < height - 1; y++) {
+  for (let x = 1; x < width - 1; x++) {
+    const i = (y * width + x) * 4;
+    if (rgba[i + 3] === 0) continue;
+    if (rgba[i + 3] > 40) continue;
+    let neighbors = 0;
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        if (dx === 0 && dy === 0) continue;
+        const n = ((y + dy) * width + (x + dx)) * 4;
+        if (rgba[n + 3] > 40) neighbors++;
+      }
+    }
+    if (neighbors < 2) {
+      cleaned[i] = 0;
+      cleaned[i + 1] = 0;
+      cleaned[i + 2] = 0;
+      cleaned[i + 3] = 0;
+    }
+  }
+}
 
-  <!-- Names -->
-  <text x="540" y="1320" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="56" fill="#f5ebe0">Geraldo</text>
-  <text x="540" y="1385" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="28" letter-spacing="8" fill="#d4af70">&amp;</text>
-  <text x="540" y="1455" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="56" fill="#f5ebe0">Christin</text>
+await sharp(cleaned, { raw: { width, height, channels: 4 } })
+  .resize(OUT_W, OUT_H, { fit: "fill", kernel: "lanczos3" })
+  .png({ compressionLevel: 9 })
+  .toFile(outPng);
 
-  <!-- Date -->
-  <line x1="380" y1="1510" x2="700" y2="1510" stroke="#d4af70" stroke-width="1" opacity="0.35"/>
-  <text x="540" y="1570" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="26" letter-spacing="6" fill="#d4af70">24 · 10 · 2026</text>
-
-  <!-- Hashtag -->
-  <text x="540" y="1720" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="30" letter-spacing="2" fill="#f0d9a8">#GeraldoChristin2026</text>
-  <text x="540" y="1780" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="18" letter-spacing="3" fill="#cbb9a8" opacity="0.55">SHARE YOUR MOMENT</text>
-</svg>`;
-
-const buf = Buffer.from(svg);
-await sharp(buf).png({ compressionLevel: 9 }).toFile(outPng);
-await sharp(buf).webp({ quality: 88 }).toFile(outWebp);
 console.log("Wrote", outPng);
-console.log("Wrote", outWebp);
+
+const verifyDir = resolve(root, "assets/source");
+await sharp({
+  create: { width: OUT_W, height: OUT_H, channels: 3, background: { r: 0, g: 0, b: 0 } },
+})
+  .composite([{ input: outPng, blend: "over" }])
+  .jpeg({ quality: 90 })
+  .toFile(resolve(verifyDir, "story-template-on-black.jpg"));
+await sharp({
+  create: { width: OUT_W, height: OUT_H, channels: 3, background: { r: 255, g: 255, b: 255 } },
+})
+  .composite([{ input: outPng, blend: "over" }])
+  .jpeg({ quality: 90 })
+  .toFile(resolve(verifyDir, "story-template-on-white.jpg"));
+
+const meta = await sharp(outPng).metadata();
+console.log("meta", meta.width, meta.height, meta.hasAlpha, meta.format);
+console.log("Wrote verify composites in assets/source/");

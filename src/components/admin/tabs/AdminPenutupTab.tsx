@@ -48,13 +48,6 @@ export function AdminPenutupTab({ merged, updateDraft }: AdminTabProps) {
           />
         </div>
         <ImageUploader
-          label="Foto Hashtag"
-          folder="hashtag"
-          spec={MEDIA_SPECS.hashtagPhoto}
-          value={merged.hashtag.photo}
-          onChange={(url) => updateDraft(["hashtag", "photo"], url)}
-        />
-        <ImageUploader
           label="Template Instagram Story (1080×1920)"
           folder="hashtag"
           accept="image/png,image/jpeg,image/jpg,image/webp"

@@ -50,13 +50,13 @@ describe("shareStoryTemplate", () => {
       clipboard: { writeText: vi.fn() },
     });
 
-    const result = await shareStoryTemplate(TEMPLATE_URL, "GeraldoChristin2026");
+    const result = await shareStoryTemplate(TEMPLATE_URL, "GeralDOanythingforChristin");
 
     expect(canShare).toHaveBeenCalled();
     expect(share).toHaveBeenCalledOnce();
     const payload = share.mock.calls[0][0] as ShareData;
     expect(payload.files?.[0]).toBeInstanceOf(File);
-    expect(payload.text).toBe("#GeraldoChristin2026");
+    expect(payload.text).toBe("#GeralDOanythingforChristin");
     expect(result).toEqual({ status: "shared" });
   });
 
@@ -123,13 +123,13 @@ describe("shareStoryTemplate", () => {
 
     const result = await shareStoryTemplate(
       TEMPLATE_URL,
-      "#GeraldoChristin2026",
+      "#GeralDOanythingforChristin",
       "Custom fallback",
     );
 
     expect(createObjectURL).toHaveBeenCalled();
     expect(click).toHaveBeenCalled();
-    expect(writeText).toHaveBeenCalledWith("#GeraldoChristin2026");
+    expect(writeText).toHaveBeenCalledWith("#GeralDOanythingforChristin");
     expect(hrefSetter).toHaveBeenCalledWith("instagram://story-camera");
     expect(result).toEqual({ status: "fallback", message: "Custom fallback" });
 

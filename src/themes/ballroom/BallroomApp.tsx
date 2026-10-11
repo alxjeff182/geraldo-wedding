@@ -268,7 +268,6 @@ export function BallroomApp({ guestName, guestId }: Props) {
           <HashtagSection
             title={content.hashtag.title}
             tag={content.hashtag.tag}
-            photo={content.hashtag.photo}
             storyTemplate={content.hashtag.storyTemplate}
             onToast={show}
           />

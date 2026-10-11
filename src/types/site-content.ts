@@ -193,8 +193,9 @@ export type SiteContentOverrides = {
   hashtag?: {
     title?: string;
     tag?: string;
-    photo?: string;
+    lead?: string;
     storyTemplate?: string;
+    storyPreviewBg?: string;
     storyButton?: string;
     storyHint?: string;
     storyFallbackToast?: string;

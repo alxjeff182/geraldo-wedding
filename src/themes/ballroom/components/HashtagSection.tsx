@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { MediaImage } from "../../../components/MediaImage";
 import { useWeddingContent } from "../../../context/use-wedding-content";
 import { hashtagExploreUrl } from "../../../lib/hashtag-url";
 import { shareStoryTemplate } from "../../../lib/share-story";
@@ -8,12 +7,11 @@ import { IconInstagram } from "../icons";
 type Props = {
   title: string;
   tag: string;
-  photo?: string;
   storyTemplate?: string;
   onToast?: (msg: string) => void;
 };
 
-export function HashtagSection({ title, tag, photo, storyTemplate, onToast }: Props) {
+export function HashtagSection({ title, tag, storyTemplate, onToast }: Props) {
   const { content } = useWeddingContent();
   const [sharing, setSharing] = useState(false);
   if (!tag.trim()) return null;
@@ -21,8 +19,10 @@ export function HashtagSection({ title, tag, photo, storyTemplate, onToast }: Pr
   const display = tag.startsWith("#") ? tag : `#${tag}`;
   const explore = hashtagExploreUrl(tag);
   const template = storyTemplate?.trim() || content.hashtag.storyTemplate?.trim() || "";
+  const previewBg = content.hashtag.storyPreviewBg?.trim() || "/assets/ballroom/gallery/01.webp";
   const storyLabel = content.hashtag.storyButton || "Bagikan ke Story";
   const storyHint = content.hashtag.storyHint || "Pilih Instagram → Story";
+  const lead = content.hashtag.lead || "Abadikan momen bersama kami di Instagram Story";
 
   const copyTag = async () => {
     try {
@@ -59,36 +59,29 @@ export function HashtagSection({ title, tag, photo, storyTemplate, onToast }: Pr
         <h3>{title}</h3>
         <div className="ornament" aria-hidden="true" />
       </div>
-      {photo ? (
-        <MediaImage
-          className="hashtag-mod__photo"
-          src={photo}
-          alt=""
-          width={720}
-          height={480}
-          loading="lazy"
-        />
-      ) : null}
-      <button
-        type="button"
-        className="hashtag-mod__tag hashtag-mod__tag--btn"
-        aria-label={`Salin ${display}`}
-        onClick={() => void copyTag()}
-      >
-        {display}
-      </button>
+      <p className="hashtag-mod__lead">{lead}</p>
       {template ? (
         <div className="hashtag-mod__story">
-          {/* Plain img: avoid MediaImage .webp swap when only PNG exists */}
-          <img
-            className="hashtag-mod__story-preview"
-            src={template}
-            alt="Preview template Instagram Story"
-            width={108}
-            height={192}
-            loading="lazy"
-            decoding="async"
-          />
+          <div className="hashtag-mod__phone" aria-hidden="true">
+            <img
+              className="hashtag-mod__phone-bg"
+              src={previewBg}
+              alt=""
+              width={270}
+              height={480}
+              loading="lazy"
+              decoding="async"
+            />
+            <img
+              className="hashtag-mod__phone-overlay"
+              src={template}
+              alt=""
+              width={270}
+              height={480}
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
           <button
             type="button"
             className="btn hashtag-mod__story-btn"
@@ -102,15 +95,25 @@ export function HashtagSection({ title, tag, photo, storyTemplate, onToast }: Pr
           <p className="hashtag-mod__story-hint">{storyHint}</p>
         </div>
       ) : null}
-      <a
-        className="hashtag-mod__ig"
-        href={explore}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={content.hashtag.instagramButton || "Instagram"}
-      >
-        <IconInstagram />
-      </a>
+      <div className="hashtag-mod__actions">
+        <button
+          type="button"
+          className="hashtag-mod__tag hashtag-mod__tag--pill"
+          aria-label={`Salin ${display}`}
+          onClick={() => void copyTag()}
+        >
+          {display}
+        </button>
+        <a
+          className="hashtag-mod__ig"
+          href={explore}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={content.hashtag.instagramButton || "Instagram"}
+        >
+          <IconInstagram size={18} />
+        </a>
+      </div>
     </section>
   );
 }

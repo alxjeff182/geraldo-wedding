@@ -65,16 +65,6 @@ export const MEDIA_SPECS = {
     formats: "PNG",
     notes: "Logo bank. Tampil max lebar 140px.",
   },
-  hashtagPhoto: {
-    dimensions: "850 × 898 px",
-    width: 850,
-    height: 898,
-    ratio: "≈ 1:1",
-    maxSize: "300 KB",
-    maxBytes: 320 * 1024,
-    formats: "WebP / JPG",
-    notes: "Foto hashtag (opsional).",
-  },
   storyTemplate: {
     dimensions: "1080 × 1920 px",
     width: 1080,

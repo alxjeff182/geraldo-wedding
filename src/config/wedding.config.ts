@@ -215,9 +215,10 @@ export const wedding = {
 
   hashtag: {
     title: "Share Your Moments",
-    tag: "#GeraldoChristin2026",
-    photo: "/assets/ballroom/og-image.jpg",
+    tag: "#GeralDOanythingforChristin",
+    lead: "Abadikan momen bersama kami di Instagram Story",
     storyTemplate: "/assets/ballroom/story-template.png",
+    storyPreviewBg: "/assets/ballroom/gallery/01.webp",
     storyButton: "Bagikan ke Story",
     storyHint: "Pilih Instagram → Story",
     storyFallbackToast: "Template tersimpan, buka Instagram lalu pilih dari galeri",
