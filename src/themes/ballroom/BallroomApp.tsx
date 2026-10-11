@@ -260,6 +260,9 @@ export function BallroomApp({ guestName, guestId }: Props) {
               musicWasPlayingRef.current = false;
             }}
           />
+          {content.guestbook.enabled ? (
+            <Wishes guestId={guestId} guestName={guestName} onToast={show} />
+          ) : null}
           <GiftHub
             title={content.gift.title}
             description={content.gift.description}
@@ -277,9 +280,6 @@ export function BallroomApp({ guestName, guestId }: Props) {
             coupleTitle={coupleTitle}
             onToast={show}
           />
-          {content.guestbook.enabled ? (
-            <Wishes guestId={guestId} guestName={guestName} onToast={show} />
-          ) : null}
           <footer className="footer">
             <div className="footer__glow" aria-hidden="true" />
             <MediaImage
