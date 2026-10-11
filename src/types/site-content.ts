@@ -196,6 +196,11 @@ export type SiteContentOverrides = {
     lead?: string;
     storyTemplate?: string;
     storyPreviewBg?: string;
+    boothButton?: string;
+    boothMaxSeconds?: number;
+    boothShare?: string;
+    boothRetry?: string;
+    boothDenied?: string;
     storyButton?: string;
     storyHint?: string;
     storyFallbackToast?: string;

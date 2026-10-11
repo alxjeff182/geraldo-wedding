@@ -173,6 +173,29 @@ export function IconX({ size = 14 }: IconProps) {
   );
 }
 
+export function IconCameraFlip({ size = 20, className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M16 4h3a1 1 0 0 1 1 1v3" />
+      <path d="M8 20H5a1 1 0 0 1-1-1v-3" />
+      <path d="M20 8a8 8 0 0 0-13.5-4.5L4 6" />
+      <path d="M4 16a8 8 0 0 0 13.5 4.5L20 18" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
 export function IconSuccess({ size = 48 }: IconProps) {
   return (
     <svg

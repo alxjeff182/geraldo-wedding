@@ -55,9 +55,10 @@ export function BallroomApp({ guestName, guestId }: Props) {
   const [revealed, setRevealed] = useState(false);
   const [heroProgress, setHeroProgress] = useState(0);
   const [inFirstSection, setInFirstSection] = useState(true);
-  const { audioRef, play, toggle, playing } = useAudio();
+  const { audioRef, play, pause, toggle, playing } = useAudio();
   const { message, show, hide } = useToast();
   const hasAudio = Boolean(content.media.audio?.trim());
+  const musicWasPlayingRef = useRef(false);
 
   const inertTargets = useMemo(
     () => [inviteRef.current, document.getElementById("ballroom-dock")],
@@ -270,6 +271,14 @@ export function BallroomApp({ guestName, guestId }: Props) {
             tag={content.hashtag.tag}
             storyTemplate={content.hashtag.storyTemplate}
             onToast={show}
+            onBoothOpen={() => {
+              musicWasPlayingRef.current = playing;
+              if (playing) pause();
+            }}
+            onBoothClose={() => {
+              if (musicWasPlayingRef.current && hasAudio) play();
+              musicWasPlayingRef.current = false;
+            }}
           />
           <footer className="footer">
             <div className="footer__glow" aria-hidden="true" />

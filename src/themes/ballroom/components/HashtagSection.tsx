@@ -1,55 +1,49 @@
 import { useState } from "react";
 import { useWeddingContent } from "../../../context/use-wedding-content";
 import { hashtagExploreUrl } from "../../../lib/hashtag-url";
-import { shareStoryTemplate } from "../../../lib/share-story";
 import { IconInstagram } from "../icons";
+import { StoryBooth } from "./StoryBooth";
 
 type Props = {
   title: string;
   tag: string;
   storyTemplate?: string;
   onToast?: (msg: string) => void;
+  onBoothOpen?: () => void;
+  onBoothClose?: () => void;
 };
 
-export function HashtagSection({ title, tag, storyTemplate, onToast }: Props) {
+export function HashtagSection({
+  title,
+  tag,
+  storyTemplate,
+  onToast,
+  onBoothOpen,
+  onBoothClose,
+}: Props) {
   const { content } = useWeddingContent();
-  const [sharing, setSharing] = useState(false);
+  const [boothOpen, setBoothOpen] = useState(false);
   if (!tag.trim()) return null;
 
   const display = tag.startsWith("#") ? tag : `#${tag}`;
   const explore = hashtagExploreUrl(tag);
   const template = storyTemplate?.trim() || content.hashtag.storyTemplate?.trim() || "";
   const previewBg = content.hashtag.storyPreviewBg?.trim() || "/assets/ballroom/gallery/01.webp";
-  const storyLabel = content.hashtag.storyButton || "Bagikan ke Story";
-  const storyHint = content.hashtag.storyHint || "Pilih Instagram → Story";
+  const boothLabel = content.hashtag.boothButton || "Rekam Video Story";
+  const storyHint =
+    content.hashtag.storyHint || "Rekam video dengan bingkai kami, lalu pilih Instagram → Story";
   const lead = content.hashtag.lead || "Abadikan momen bersama kami di Instagram Story";
+  const maxSeconds = content.hashtag.boothMaxSeconds ?? 15;
 
-  const copyTag = async () => {
-    try {
-      await navigator.clipboard.writeText(display);
-      onToast?.(content.hashtag.copySuccess ?? "Hashtag disalin");
-    } catch {
-      onToast?.(content.giftUi.copyError || "Gagal menyalin");
-    }
+  const openBooth = () => {
+    if (!template) return;
+    onBoothOpen?.();
+    setBoothOpen(true);
   };
 
-  const shareStory = async () => {
-    if (!template || sharing) return;
-    setSharing(true);
-    try {
-      const result = await shareStoryTemplate(
-        template,
-        display,
-        content.hashtag.storyFallbackToast,
-      );
-      if (result.status === "fallback" && result.message) {
-        onToast?.(result.message);
-      } else if (result.status === "error") {
-        onToast?.(result.message);
-      }
-    } finally {
-      setSharing(false);
-    }
+  const closeBooth = () => {
+    setBoothOpen(false);
+    onBoothClose?.();
   };
 
   return (
@@ -85,12 +79,11 @@ export function HashtagSection({ title, tag, storyTemplate, onToast }: Props) {
           <button
             type="button"
             className="btn hashtag-mod__story-btn"
-            disabled={sharing}
-            onClick={() => void shareStory()}
-            aria-label={storyLabel}
+            onClick={openBooth}
+            aria-label={boothLabel}
           >
             <IconInstagram size={18} />
-            <span>{sharing ? "Menyiapkan…" : storyLabel}</span>
+            <span>{boothLabel}</span>
           </button>
           <p className="hashtag-mod__story-hint">{storyHint}</p>
         </div>
@@ -100,7 +93,12 @@ export function HashtagSection({ title, tag, storyTemplate, onToast }: Props) {
           type="button"
           className="hashtag-mod__tag hashtag-mod__tag--pill"
           aria-label={`Salin ${display}`}
-          onClick={() => void copyTag()}
+          onClick={() => {
+            void navigator.clipboard.writeText(display).then(
+              () => onToast?.(content.hashtag.copySuccess ?? "Hashtag disalin"),
+              () => onToast?.(content.giftUi.copyError || "Gagal menyalin"),
+            );
+          }}
         >
           {display}
         </button>
@@ -114,6 +112,21 @@ export function HashtagSection({ title, tag, storyTemplate, onToast }: Props) {
           <IconInstagram size={18} />
         </a>
       </div>
+      {template ? (
+        <StoryBooth
+          open={boothOpen}
+          overlayUrl={template}
+          hashtag={display}
+          maxSeconds={maxSeconds}
+          shareLabel={content.hashtag.boothShare || "Bagikan ke Story"}
+          retryLabel={content.hashtag.boothRetry || "Ulangi"}
+          photoFallbackLabel={content.hashtag.storyButton || "Bagikan Foto"}
+          deniedMessage={content.hashtag.boothDenied}
+          fallbackToast={content.hashtag.storyFallbackToast}
+          onClose={closeBooth}
+          onToast={onToast}
+        />
+      ) : null}
     </section>
   );
 }

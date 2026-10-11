@@ -84,28 +84,14 @@ function openInstagramStoryCamera(): void {
 }
 
 /**
- * Share an Instagram Story template via Web Share (files) when available.
+ * Share a ready File (image or video) via Web Share when available.
  * Falls back to download + hashtag copy + Instagram deep link.
  */
-export async function shareStoryTemplate(
-  url: string,
+export async function shareStoryFile(
+  file: File,
   hashtag: string,
   fallbackToast?: string,
 ): Promise<ShareStoryResult> {
-  if (!url?.trim()) {
-    return { status: "error", message: "Template belum tersedia" };
-  }
-
-  let file: File;
-  try {
-    file = await fetchTemplateFile(url);
-  } catch (err) {
-    return {
-      status: "error",
-      message: err instanceof Error ? err.message : "Gagal memuat template",
-    };
-  }
-
   if (canShareFiles(file)) {
     try {
       await navigator.share({
@@ -128,4 +114,30 @@ export async function shareStoryTemplate(
     status: "fallback",
     message: fallbackToast || "Template tersimpan, buka Instagram lalu pilih dari galeri",
   };
+}
+
+/**
+ * Share an Instagram Story template via Web Share (files) when available.
+ * Falls back to download + hashtag copy + Instagram deep link.
+ */
+export async function shareStoryTemplate(
+  url: string,
+  hashtag: string,
+  fallbackToast?: string,
+): Promise<ShareStoryResult> {
+  if (!url?.trim()) {
+    return { status: "error", message: "Template belum tersedia" };
+  }
+
+  let file: File;
+  try {
+    file = await fetchTemplateFile(url);
+  } catch (err) {
+    return {
+      status: "error",
+      message: err instanceof Error ? err.message : "Gagal memuat template",
+    };
+  }
+
+  return shareStoryFile(file, hashtag, fallbackToast);
 }
