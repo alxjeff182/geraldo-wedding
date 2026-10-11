@@ -9,8 +9,10 @@
 
 .theme-ballroom .intro-mod {
   position: relative;
-  /* Override .section (5rem) — keep top tight after hero */
-  padding: 0.85rem 1.35rem 1.5rem;
+  z-index: 1;
+  /* Override .section (5rem); negative top pulls into couple-story pin trailing space */
+  margin-top: -4.5rem;
+  padding: 0.15rem 1.35rem 1.35rem;
 }
 
 .theme-ballroom .intro-mod__text {

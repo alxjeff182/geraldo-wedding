@@ -91,7 +91,7 @@
   perspective-origin: 50% 45%;
   display: grid;
   place-items: center;
-  padding: 0.5rem 0 3.25rem;
+  padding: 0.5rem 0 1.5rem;
 }
 .theme-ballroom .couple-story__carousel {
   position: relative;
