@@ -44,8 +44,7 @@ export function HashtagSection({
   const leadIsGuide = /^panduan\s*:/i.test(lead);
   const templateNote = leadIsGuide ? "feel free to use our template" : lead;
   const guideHint =
-    storyHint ||
-    "Panduan: klik rekam video story, lalu bagikan pilih Instagram → Story.";
+    storyHint || "Panduan: klik rekam video story, lalu bagikan pilih Instagram → Story.";
   const maxSeconds = content.hashtag.boothMaxSeconds ?? 15;
   const explore = hashtagExploreUrl(tag);
 

@@ -278,8 +278,7 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
   const legacyGiftQris =
     /qris-dummy|qris-bride(?:-code|-qr)?\.webp$|qris-groom(?:-code|-qr)?\.webp$/i.test(
       String(merged.gift.qrisBride ?? merged.gift.qris ?? ""),
-    ) ||
-    /qris-dummy|qris-groom(?:-code|-qr)?\.webp$/i.test(String(merged.gift.qrisGroom ?? ""));
+    ) || /qris-dummy|qris-groom(?:-code|-qr)?\.webp$/i.test(String(merged.gift.qrisGroom ?? ""));
   const gift =
     legacyBrideAccount || legacyGroomAccount || legacyGiftQris
       ? {
