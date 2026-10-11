@@ -96,8 +96,16 @@ export function formatInviteMessage(template: string, vars: InviteTemplateVars):
   });
 }
 
-export function buildWhatsAppUrl(phone: string, message: string): string | null {
+/** Short chat opener — readable/clickable when pasted into WhatsApp. */
+export function buildWhatsAppChatUrl(phone: string): string | null {
   const normalized = normalizePhoneForWhatsApp(phone);
   if (!normalized) return null;
-  return `https://wa.me/${normalized}?text=${encodeURIComponent(message)}`;
+  return `https://wa.me/${normalized}`;
+}
+
+/** Prefill message (long). Use for “Buka WA”, not for batch paste into chat. */
+export function buildWhatsAppUrl(phone: string, message: string): string | null {
+  const chat = buildWhatsAppChatUrl(phone);
+  if (!chat) return null;
+  return `${chat}?text=${encodeURIComponent(message)}`;
 }

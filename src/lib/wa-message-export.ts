@@ -1,4 +1,8 @@
-import { buildWhatsAppUrl, formatPhoneDisplay } from "./invite-links";
+import {
+  buildWhatsAppChatUrl,
+  buildWhatsAppUrl,
+  formatPhoneDisplay,
+} from "./invite-links";
 
 export type WaExportGuest = {
   id: string;
@@ -14,6 +18,9 @@ export type WaExportEntry = {
   phone: string | null;
   phoneDisplay: string;
   message: string;
+  /** Short https://wa.me/62… — safe to paste / click in WhatsApp. */
+  chatUrl: string | null;
+  /** Full prefilled deep link — only for window.open (“Buka WA”). */
   waUrl: string | null;
   hasPhone: boolean;
 };
@@ -32,6 +39,7 @@ export function buildWaExportEntries(
       phone,
       phoneDisplay: phone ? formatPhoneDisplay(phone) : "",
       message,
+      chatUrl: phone ? buildWhatsAppChatUrl(phone) : null,
       waUrl: phone ? buildWhatsAppUrl(phone, message) : null,
       hasPhone: Boolean(phone),
     };
@@ -39,26 +47,30 @@ export function buildWaExportEntries(
 }
 
 /**
- * WhatsApp-safe pack: name + lone wa.me URL, separated by blank lines.
- * Adjacent long URLs get glued/corrupted when pasted into WA without gaps.
+ * Readable pack for Notes / .txt:
+ * short chat link + plain message (never the encoded ?text= monster URL).
  */
 export function formatWaExportPlainText(entries: readonly WaExportEntry[]): string {
   if (entries.length === 0) return "";
 
-  const ready = entries.filter((entry) => entry.waUrl);
+  const ready = entries.filter((entry) => entry.chatUrl);
   if (ready.length === 0) return "";
 
-  const blocks = ready.map((entry) => `${entry.index}. ${entry.name}\n${entry.waUrl}`);
+  const blocks = ready.map((entry) => {
+    const phoneLine = entry.phone ? `\n${entry.phone}` : "";
+    return `${entry.index}. ${entry.name}${phoneLine}\n${entry.chatUrl}\n\n${entry.message}`;
+  });
 
-  // Triple newline keeps each wa.me on its own “island” in WhatsApp.
-  return `${blocks.join("\n\n\n")}\n`;
+  return `${blocks.join("\n\n———\n\n")}\n`;
 }
 
-/** wa.me URLs only, still spaced so WhatsApp does not merge them. */
+/** Short wa.me chat links only — one per block, easy to tap in WhatsApp. */
 export function formatWaExportLinksOnly(entries: readonly WaExportEntry[]): string {
-  const links = entries.map((entry) => entry.waUrl).filter((url): url is string => Boolean(url));
-  if (links.length === 0) return "";
-  return `${links.join("\n\n\n")}\n`;
+  const ready = entries.filter((entry) => entry.chatUrl);
+  if (ready.length === 0) return "";
+
+  const blocks = ready.map((entry) => `${entry.index}. ${entry.name}\n${entry.chatUrl}`);
+  return `${blocks.join("\n\n")}\n`;
 }
 
 export function downloadWaExportText(text: string, filename?: string): void {

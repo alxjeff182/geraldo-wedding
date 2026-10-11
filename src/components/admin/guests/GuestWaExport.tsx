@@ -176,11 +176,14 @@ export function GuestWaExport({
                 invite={invite}
                 copied={copiedId === entry.id}
                 onCopyLink={() => {
-                  if (!entry.waUrl) {
+                  if (!entry.chatUrl) {
                     onNotify(invite.noPhone);
                     return;
                   }
-                  void copyText(entry.waUrl, invite.waExportCopied, entry.id);
+                  void copyText(entry.chatUrl, invite.waExportCopied, entry.id);
+                }}
+                onCopyMessage={() => {
+                  void copyText(entry.message, invite.waExportCopied, `${entry.id}-msg`);
                 }}
                 onOpenWa={() => {
                   const guest = guestById(entry.id);
@@ -201,12 +204,14 @@ function WaExportCard({
   invite,
   copied,
   onCopyLink,
+  onCopyMessage,
   onOpenWa,
 }: {
   entry: WaExportEntry;
   invite: InviteCopy;
   copied: boolean;
   onCopyLink: () => void;
+  onCopyMessage: () => void;
   onOpenWa: () => void;
 }) {
   return (
@@ -220,9 +225,9 @@ function WaExportCard({
           </span>
         </div>
       </div>
-      {entry.waUrl ? (
-        <code className="admin-wa-export__link" title={entry.waUrl}>
-          {entry.waUrl}
+      {entry.chatUrl ? (
+        <code className="admin-wa-export__link" title={entry.chatUrl}>
+          {entry.chatUrl}
         </code>
       ) : (
         <p className="admin-wa-export__empty-link">{invite.waExportNoPhone}</p>
@@ -236,8 +241,11 @@ function WaExportCard({
         >
           {invite.waExportOpenWa}
         </button>
-        <button type="button" className="admin-btn" disabled={!entry.waUrl} onClick={onCopyLink}>
-          {copied ? "✓ Tersalin" : invite.waExportCopyMessage}
+        <button type="button" className="admin-btn" disabled={!entry.chatUrl} onClick={onCopyLink}>
+          {copied ? "✓ Tersalin" : invite.waExportCopyLink}
+        </button>
+        <button type="button" className="admin-btn" onClick={onCopyMessage}>
+          {invite.waExportCopyMessage}
         </button>
       </div>
     </li>

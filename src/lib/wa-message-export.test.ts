@@ -12,33 +12,33 @@ describe("wa-message-export", () => {
     { id: "3", display_name: "Alfian", phone: "082142803753", slug: "alfian" },
   ];
 
-  it("builds numbered entries with wa.me urls when phone exists", () => {
+  it("builds short chat urls plus prefilled wa urls when phone exists", () => {
     const entries = buildWaExportEntries(guests, (g) => `Halo ${g.display_name}`);
     expect(entries).toHaveLength(3);
-    expect(entries[0].waUrl).toContain("https://wa.me/");
-    expect(entries[0].waUrl).toContain("62895391606832");
+    expect(entries[0].chatUrl).toBe("https://wa.me/62895391606832");
+    expect(entries[0].waUrl).toContain("https://wa.me/62895391606832?text=");
     expect(entries[0].waUrl).toContain(encodeURIComponent("Halo Ade"));
+    expect(entries[1].chatUrl).toBeNull();
     expect(entries[1].waUrl).toBeNull();
   });
 
-  it("formats a WhatsApp-safe pack with blank gaps between links", () => {
+  it("formats pack with short links and plain messages (no encoded ?text=)", () => {
     const entries = buildWaExportEntries(guests, (g) => `Halo ${g.display_name}`);
     const text = formatWaExportPlainText(entries);
-    expect(text).toContain("1. Ade\nhttps://wa.me/62895391606832?text=");
-    expect(text).toContain("3. Alfian\nhttps://wa.me/");
+    expect(text).toContain("1. Ade\n0895391606832\nhttps://wa.me/62895391606832\n\nHalo Ade");
+    expect(text).toContain("3. Alfian\n082142803753\nhttps://wa.me/6282142803753\n\nHalo Alfian");
+    expect(text).not.toContain("?text=");
+    expect(text).not.toContain("%20");
     expect(text).not.toContain("Salim");
-    const blocks = text.trim().split(/\n{3,}/);
-    expect(blocks).toHaveLength(2);
-    expect(blocks[0].startsWith("1. Ade\nhttps://wa.me/")).toBe(true);
-    expect(blocks[1].startsWith("3. Alfian\nhttps://wa.me/")).toBe(true);
+    expect(text).toContain("———");
   });
 
-  it("formats links-only export with blank gaps", () => {
+  it("formats short links-only export", () => {
     const entries = buildWaExportEntries(guests, (g) => `Halo ${g.display_name}`);
     const text = formatWaExportLinksOnly(entries);
-    const parts = text.trim().split(/\n{3,}/);
-    expect(parts).toHaveLength(2);
-    expect(parts[0]).toContain("https://wa.me/62895391606832?text=");
-    expect(parts[1]).toContain("https://wa.me/6282142803753?text=");
+    expect(text).toBe(
+      "1. Ade\nhttps://wa.me/62895391606832\n\n3. Alfian\nhttps://wa.me/6282142803753\n",
+    );
+    expect(text).not.toContain("?text=");
   });
 });

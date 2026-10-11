@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildGuestInviteUrl,
   resolveInviteSlug,
+  buildWhatsAppChatUrl,
   buildWhatsAppUrl,
   formatInviteMessage,
   normalizePhoneForWhatsApp,
@@ -39,7 +40,8 @@ describe("invite-links", () => {
     expect(message).toBe("Halo Budi, buka https://example.com/?guest=budi");
   });
 
-  it("builds WhatsApp deep links", () => {
+  it("builds short WhatsApp chat links and prefilled deep links", () => {
+    expect(buildWhatsAppChatUrl("081234567890")).toBe("https://wa.me/6281234567890");
     const url = buildWhatsAppUrl("081234567890", "Halo");
     expect(url).toBe("https://wa.me/6281234567890?text=Halo");
   });
