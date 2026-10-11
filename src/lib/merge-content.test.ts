@@ -127,9 +127,10 @@ describe("mergeWeddingContent", () => {
     expect(merged.story.milestones[0].title).toBe("Bertemu");
   });
 
-  it("replaces legacy bride BCA account and QRIS from defaults", () => {
+  it("replaces legacy gift accounts and QRIS from defaults", () => {
     const merged = mergeWeddingContent({
       gift: {
+        qrisGroom: "/assets/ballroom/qris-dummy.svg",
         accounts: [
           {
             bank: "BCA",
@@ -140,7 +141,7 @@ describe("mergeWeddingContent", () => {
           },
           {
             bank: "BCA",
-            number: "999",
+            number: "",
             holder: "Geraldo Gracedo Sudena Tampubolon",
             logo: "/assets/ballroom/bca-logo.png",
             side: "groom",
@@ -152,7 +153,9 @@ describe("mergeWeddingContent", () => {
     const groom = merged.gift.accounts.find((account) => account.side === "groom");
     expect(bride?.number).toBe("2480419009");
     expect(bride?.holder).toBe("Christin Samosir");
+    expect(groom?.number).toBe("5271021641");
+    expect(groom?.holder).toBe("Geraldo Gracedo Sudena");
     expect(merged.gift.qrisBride).toContain("qris-bride");
-    expect(groom?.number).toBe("999");
+    expect(merged.gift.qrisGroom).toContain("qris-groom");
   });
 });

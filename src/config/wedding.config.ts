@@ -194,7 +194,7 @@ export const wedding = {
     /** @deprecated prefer qrisBride / qrisGroom */
     qris: "/assets/ballroom/qris-bride.webp",
     qrisBride: "/assets/ballroom/qris-bride.webp",
-    qrisGroom: "/assets/ballroom/qris-dummy.svg",
+    qrisGroom: "/assets/ballroom/qris-groom.webp",
     accounts: [
       {
         bank: "BCA",
@@ -205,8 +205,8 @@ export const wedding = {
       },
       {
         bank: "BCA",
-        number: "",
-        holder: "Geraldo Gracedo Sudena Tampubolon",
+        number: "5271021641",
+        holder: "Geraldo Gracedo Sudena",
         logo: "/assets/ballroom/bca-logo.png",
         side: "groom",
       },

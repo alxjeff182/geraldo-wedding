@@ -156,22 +156,26 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
   const bibleQuote = legacyMatthew ? wedding.bibleQuote : merged.bibleQuote;
   const bibleReference = legacyMatthew ? wedding.bibleReference : merged.bibleReference;
 
-  // One-time: CMS still has the previous bride BCA number / dummy QRIS.
+  // One-time: CMS still has previous bride number, empty groom number, or dummy QRIS.
   const legacyBrideAccount = merged.gift.accounts.some(
     (account) => account.side === "bride" && account.number === "6705188657",
   );
-  const gift = legacyBrideAccount
-    ? {
-        ...merged.gift,
-        qris: wedding.gift.qris,
-        qrisBride: wedding.gift.qrisBride,
-        accounts: wedding.gift.accounts.map((account) => {
-          if (account.side !== "groom") return account;
-          const cmsGroom = merged.gift.accounts.find((item) => item.side === "groom");
-          return cmsGroom ? { ...account, ...cmsGroom, side: "groom" as const } : account;
-        }),
-      }
-    : merged.gift;
+  const legacyGroomAccount = merged.gift.accounts.some(
+    (account) => account.side === "groom" && !String(account.number ?? "").trim(),
+  );
+  const legacyGiftQris =
+    /qris-dummy/i.test(String(merged.gift.qrisBride ?? merged.gift.qris ?? "")) ||
+    /qris-dummy/i.test(String(merged.gift.qrisGroom ?? ""));
+  const gift =
+    legacyBrideAccount || legacyGroomAccount || legacyGiftQris
+      ? {
+          ...merged.gift,
+          qris: wedding.gift.qris,
+          qrisBride: wedding.gift.qrisBride,
+          qrisGroom: wedding.gift.qrisGroom,
+          accounts: wedding.gift.accounts,
+        }
+      : merged.gift;
 
   const story = {
     ...merged.story,
