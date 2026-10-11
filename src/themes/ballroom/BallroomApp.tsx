@@ -208,6 +208,20 @@ export function BallroomApp({ guestName, guestId }: Props) {
             }}
             enabled={revealed}
           />
+          <section id="quote" className="quote" aria-label="Ayat">
+            <blockquote className="quote__card">
+              <span className="quote__mark" aria-hidden="true">
+                “
+              </span>
+              <QuoteWithEm text={content.bibleQuote} />
+              <div className="quote__divider" aria-hidden="true">
+                <span />
+                <i />
+                <span />
+              </div>
+              <cite>{content.bibleReference}</cite>
+            </blockquote>
+          </section>
           <IntroSection text={content.intro} />
           <EventCard
             eyebrow="Mark Your Calendar"
@@ -224,20 +238,6 @@ export function BallroomApp({ guestName, guestId }: Props) {
               enabled={revealed}
             />
           ) : null}
-          <section id="quote" className="quote" aria-label="Ayat">
-            <blockquote className="quote__card">
-              <span className="quote__mark" aria-hidden="true">
-                “
-              </span>
-              <QuoteWithEm text={content.bibleQuote} />
-              <div className="quote__divider" aria-hidden="true">
-                <span />
-                <i />
-                <span />
-              </div>
-              <cite>{content.bibleReference}</cite>
-            </blockquote>
-          </section>
           <Gallery3D
             eyebrow="Moments"
             title={content.gallery.title}
