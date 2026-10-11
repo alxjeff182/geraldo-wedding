@@ -226,6 +226,7 @@ export const wedding = {
     boothRetry: "Ulangi",
     boothDenied: "Kamera tidak tersedia. Bagikan foto template saja.",
     storyButton: "Bagikan Foto",
+    /** Only under the Rekam Video Story button — do not reuse as lead/caption. */
     storyHint: "Panduan: klik rekam video story, lalu bagikan pilih Instagram → Story.",
     storyFallbackToast: "Tersimpan, buka Instagram lalu pilih dari galeri",
     copySuccess: "Hashtag disalin",

@@ -37,11 +37,15 @@ export function HashtagSection({
   const display = tag.startsWith("#") ? tag : `#${tag}`;
   const template = storyTemplate?.trim() || content.hashtag.storyTemplate?.trim() || "";
   const boothLabel = content.hashtag.boothButton || "Rekam Video Story";
-  const storyHint =
-    content.hashtag.storyHint ||
-    "Panduan: klik rekam video story, lalu bagikan pilih Instagram → Story.";
+  const storyHint = (content.hashtag.storyHint || "").trim();
   const subtitle = content.hashtag.subtitle || "Abadikan Momenmu";
-  const lead = content.hashtag.lead || "feel free to use our template";
+  // Tagline above the template — never reuse the under-button panduan here.
+  const lead = (content.hashtag.lead || "feel free to use our template").trim();
+  const leadIsGuide = /^panduan\s*:/i.test(lead);
+  const templateNote = leadIsGuide ? "feel free to use our template" : lead;
+  const guideHint =
+    storyHint ||
+    "Panduan: klik rekam video story, lalu bagikan pilih Instagram → Story.";
   const maxSeconds = content.hashtag.boothMaxSeconds ?? 15;
   const explore = hashtagExploreUrl(tag);
 
@@ -176,9 +180,9 @@ export function HashtagSection({
         {subtitle ? <p className="hashtag-mod__subtitle">{subtitle}</p> : null}
         <div className="ornament" aria-hidden="true" />
       </div>
-      {lead ? <p className="hashtag-mod__lead">{lead}</p> : null}
       {template ? (
         <div className="hashtag-mod__story">
+          {templateNote ? <p className="hashtag-mod__lead">{templateNote}</p> : null}
           <button
             ref={phoneRef}
             type="button"
@@ -215,7 +219,7 @@ export function HashtagSection({
             <IconInstagram size={18} />
             <span>{boothLabel}</span>
           </button>
-          <p className="hashtag-mod__story-hint">{storyHint}</p>
+          <p className="hashtag-mod__story-hint">{guideHint}</p>
         </div>
       ) : null}
       <div className="hashtag-mod__actions">
