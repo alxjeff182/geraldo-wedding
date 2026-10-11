@@ -37,8 +37,8 @@ describe("RsvpSheet invite gating", () => {
   it("shows attendance form when guestId is present", () => {
     renderSheet("11111111-1111-4111-8111-111111111111");
     expect(screen.getByRole("radiogroup", { name: /kehadiran/i })).toBeInTheDocument();
-    expect(screen.getByText(/hadir/i)).toBeInTheDocument();
-    expect(screen.getByText(/berhalangan/i)).toBeInTheDocument();
-    expect(screen.queryByText(/^ragu$/i)).toBeNull();
+    expect(screen.getByRole("radio", { name: /hadir/i })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /berhalangan/i })).toBeInTheDocument();
+    expect(screen.queryByRole("radio", { name: /^ragu$/i })).toBeNull();
   });
 });
