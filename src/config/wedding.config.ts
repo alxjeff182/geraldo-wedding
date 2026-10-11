@@ -388,7 +388,8 @@ export const wedding = {
   },
 
   footer: {
-    creditPrefix: "© 2026 · Undangan Digital",
+    creditPrefix: "© 2026.",
+    creditBrand: "KlikMomen",
     portfolioPrompt: "",
     portfolioLinkLabel: "Portfolio",
     websiteAriaLabel: "Kunjungi portfolio pembuat undangan",

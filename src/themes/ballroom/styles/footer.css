@@ -138,3 +138,18 @@
   text-transform: uppercase;
   color: rgba(140, 126, 111, 0.72);
 }
+
+.theme-ballroom .site-credit__brand {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition:
+    color 0.2s,
+    border-color 0.2s;
+}
+
+.theme-ballroom .site-credit__brand:hover,
+.theme-ballroom .site-credit__brand:focus-visible {
+  color: var(--cream-dim);
+  border-bottom-color: rgba(212, 196, 176, 0.45);
+}

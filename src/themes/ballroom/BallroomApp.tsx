@@ -321,7 +321,22 @@ export function BallroomApp({ guestName, guestId }: Props) {
                 {content.footer.portfolioLinkLabel}
               </a>
             ) : null}
-            <p className="site-credit__copy">{content.footer.creditPrefix}</p>
+            <p className="site-credit__copy">
+              {content.footer.creditPrefix}{" "}
+              {content.site.creator.websiteUrl || content.site.creator.url ? (
+                <a
+                  className="site-credit__brand"
+                  href={content.site.creator.websiteUrl || content.site.creator.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={content.footer.websiteAriaLabel}
+                >
+                  {content.footer.creditBrand || "KlikMomen"}
+                </a>
+              ) : (
+                <span>{content.footer.creditBrand || "KlikMomen"}</span>
+              )}
+            </p>
           </div>
         </main>
 
