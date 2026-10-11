@@ -7,6 +7,10 @@ export type WeddingEvent = {
   venue: string;
   address: string;
   mapsUrl: string;
+  /** WGS84 latitude — used for precise native maps / directions */
+  lat?: number;
+  /** WGS84 longitude — used for precise native maps / directions */
+  lng?: number;
   /** ISO datetime for calendar export */
   startsAt: string;
   /** ISO datetime for calendar export */
@@ -94,6 +98,8 @@ export const wedding = {
       venue: "Gereja HKBP Ress. Kebon Jeruk",
       address: "Gereja HKBP Ress. Kebon Jeruk, Jakarta Barat",
       mapsUrl: "https://maps.app.goo.gl/CTqpxvQrfmLgQpsb8",
+      lat: -6.1839709,
+      lng: 106.7553829,
       startsAt: "2026-10-24T08:00:00+07:00",
       endsAt: "2026-10-24T10:00:00+07:00",
     },
@@ -104,6 +110,8 @@ export const wedding = {
       venue: "Gedung Gorga",
       address: "Gedung Gorga, Jakarta",
       mapsUrl: "https://maps.app.goo.gl/WSsX9X17dp7qSwqh6",
+      lat: -6.1806164,
+      lng: 106.7798582,
       startsAt: "2026-10-24T11:00:00+07:00",
       endsAt: "2026-10-24T15:00:00+07:00",
     },

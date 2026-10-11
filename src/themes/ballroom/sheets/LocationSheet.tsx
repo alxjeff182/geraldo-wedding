@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import type { WeddingEvent } from "../../../config/wedding.config";
-import { openCalendarForEvent } from "../../../lib/calendar-links";
 import { openMaps } from "../../../lib/maps-links";
 import { IconCopy, IconPin, IconPinSm } from "../icons";
 
@@ -8,21 +7,12 @@ type Props = {
   open: boolean;
   events: WeddingEvent[];
   mapsLabel: string;
-  calendarLabel: string;
   onClose: () => void;
   setSheetRef: (el: HTMLElement | null) => void;
   onToast: (msg: string) => void;
 };
 
-export function LocationSheet({
-  open,
-  events,
-  mapsLabel,
-  calendarLabel,
-  onClose,
-  setSheetRef,
-  onToast,
-}: Props) {
+export function LocationSheet({ open, events, mapsLabel, onClose, setSheetRef, onToast }: Props) {
   const [tab, setTab] = useState(0);
   const event = events[tab] ?? events[0];
   const sameVenue = events.length > 0 && events.every((item) => item.venue === events[0]?.venue);
@@ -32,7 +22,9 @@ export function LocationSheet({
   }, [open]);
 
   const embedSrc = event
-    ? `https://maps.google.com/maps?q=${encodeURIComponent(event.address || event.venue)}&z=15&output=embed`
+    ? hasCoords(event)
+      ? `https://maps.google.com/maps?q=${event.lat},${event.lng}&z=16&output=embed`
+      : `https://maps.google.com/maps?q=${encodeURIComponent(event.address || event.venue)}&z=15&output=embed`
     : "";
 
   const copyAddress = async () => {
@@ -51,21 +43,9 @@ export function LocationSheet({
       mapsUrl: event.mapsUrl,
       address: event.address,
       venue: event.venue,
+      lat: event.lat,
+      lng: event.lng,
     });
-  };
-
-  const saveEventCalendar = () => {
-    if (!event) return;
-    openCalendarForEvent(
-      {
-        title: event.name,
-        details: `${event.time}\n${event.venue}`,
-        location: event.address,
-        startsAt: event.startsAt,
-        endsAt: event.endsAt,
-      },
-      `${event.name.toLowerCase().replace(/\s+/g, "-")}.ics`,
-    );
   };
 
   return (
@@ -156,18 +136,22 @@ export function LocationSheet({
           </>
         ) : null}
       </div>
-      <footer className="sheet__foot sheet__foot--row">
+      <footer className="sheet__foot">
         {event?.mapsUrl ? (
           <button type="button" className="btn sheet__cta" onClick={openEventMaps}>
             {mapsLabel}
           </button>
         ) : null}
-        {event ? (
-          <button type="button" className="btn btn--ghost sheet__cta" onClick={saveEventCalendar}>
-            {calendarLabel}
-          </button>
-        ) : null}
       </footer>
     </section>
+  );
+}
+
+function hasCoords(event: WeddingEvent): event is WeddingEvent & { lat: number; lng: number } {
+  return (
+    typeof event.lat === "number" &&
+    typeof event.lng === "number" &&
+    Number.isFinite(event.lat) &&
+    Number.isFinite(event.lng)
   );
 }

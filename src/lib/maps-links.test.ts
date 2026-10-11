@@ -8,8 +8,10 @@ import {
 } from "./maps-links";
 
 describe("maps-links", () => {
-  const mapsUrl = "https://maps.app.goo.gl/CTqpxvQrfmLgQpsb8";
-  const address = "Gereja HKBP Ress. Kebon Jeruk, Jakarta Barat";
+  const mapsUrl = "https://maps.app.goo.gl/WSsX9X17dp7qSwqh6";
+  const address = "Gedung Gorga, Jakarta";
+  const venue = "Gedung Gorga";
+  const coords = { lat: -6.1806164, lng: 106.7798582 };
 
   afterEach(() => {
     vi.restoreAllMocks();
@@ -42,22 +44,23 @@ describe("maps-links", () => {
     ).toBe("desktop");
   });
 
-  it("builds Android geo URI from address (app-first, not goo.gl web)", () => {
-    expect(buildAndroidGeoUrl(address)).toBe(`geo:0,0?q=${encodeURIComponent(address)}`);
-    expect(buildAndroidGeoUrl("")).toBeNull();
+  it("builds Android geo URI with coordinates", () => {
+    expect(buildAndroidGeoUrl({ mapsUrl, address, venue, ...coords })).toBe(
+      `geo:-6.1806164,106.7798582?q=${encodeURIComponent("-6.1806164,106.7798582(Gedung Gorga, Jakarta)")}`,
+    );
+    expect(buildAndroidGeoUrl({ mapsUrl, address: "" })).toBeNull();
   });
 
-  it("builds Android Google Maps intent from query without web fallback", () => {
-    const intent = buildAndroidMapsIntent(address);
+  it("builds Android Google Maps intent without web fallback", () => {
+    const intent = buildAndroidMapsIntent({ mapsUrl, address, venue, ...coords });
     expect(intent).toContain("intent://maps.google.com/maps?q=");
     expect(intent).toContain("package=com.google.android.apps.maps");
     expect(intent).not.toContain("browser_fallback_url");
-    expect(buildAndroidMapsIntent("")).toBeNull();
   });
 
-  it("builds iOS Google Maps deep link", () => {
-    expect(buildIosGoogleMapsUrl(address)).toBe(
-      `comgooglemaps://?q=${encodeURIComponent(address)}`,
+  it("builds iOS Google Maps directions deep link with coordinates", () => {
+    expect(buildIosGoogleMapsUrl({ mapsUrl, address, venue, ...coords })).toBe(
+      "comgooglemaps://?daddr=-6.1806164,106.7798582&directionsmode=driving",
     );
   });
 
@@ -66,11 +69,26 @@ describe("maps-links", () => {
     vi.stubGlobal("location", { assign, href: "https://example.com" });
 
     const ok = openMaps(
-      { mapsUrl, address },
+      { mapsUrl, address, venue, ...coords },
       "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/120.0.0.0 Mobile Safari/537.36",
     );
     expect(ok).toBe(true);
-    expect(assign).toHaveBeenCalledWith(`geo:0,0?q=${encodeURIComponent(address)}`);
+    expect(assign).toHaveBeenCalledWith(
+      `geo:-6.1806164,106.7798582?q=${encodeURIComponent("-6.1806164,106.7798582(Gedung Gorga, Jakarta)")}`,
+    );
+  });
+
+  it("openMaps launches iOS directions deep link", () => {
+    const assign = vi.fn();
+    vi.stubGlobal("location", { assign, href: "https://example.com" });
+
+    openMaps(
+      { mapsUrl, address, venue, ...coords },
+      "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15",
+    );
+    expect(assign).toHaveBeenCalledWith(
+      "comgooglemaps://?daddr=-6.1806164,106.7798582&directionsmode=driving",
+    );
   });
 
   it("openMaps opens desktop mapsUrl in new tab", () => {
@@ -91,7 +109,7 @@ describe("maps-links", () => {
     });
 
     openMaps(
-      { mapsUrl, address },
+      { mapsUrl, address, venue, ...coords },
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
     );
     expect(href).toContain("maps.app.goo.gl");

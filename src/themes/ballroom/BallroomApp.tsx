@@ -321,7 +321,6 @@ export function BallroomApp({ guestName, guestId }: Props) {
           open={sheet.activeId === "location"}
           events={[...content.events]}
           mapsLabel={content.eventsSection.sheetMapsButton}
-          calendarLabel={content.eventsSection.sheetCalendarButton}
           onClose={sheet.close}
           setSheetRef={(el) => sheet.setSheetRef("location", el)}
           onToast={show}

@@ -37,6 +37,26 @@ describe("mergeWeddingContent", () => {
     expect(merged.events[0].name).toBe("Solo Event");
   });
 
+  it("restores lat/lng from defaults when CMS events omit them", () => {
+    const base = wedding.events[1];
+    const merged = mergeWeddingContent({
+      events: [
+        {
+          name: base.name,
+          dateLabel: base.dateLabel,
+          time: base.time,
+          venue: base.venue,
+          address: base.address,
+          mapsUrl: base.mapsUrl,
+          startsAt: base.startsAt,
+          endsAt: base.endsAt,
+        },
+      ],
+    });
+    expect(merged.events[0].lat).toBe(base.lat);
+    expect(merged.events[0].lng).toBe(base.lng);
+  });
+
   it("ignores obsolete Batak media keys from CMS overrides", () => {
     const merged = mergeWeddingContent({
       media: {
