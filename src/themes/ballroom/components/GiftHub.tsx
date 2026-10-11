@@ -239,7 +239,7 @@ export function GiftHub({
           {waHref ? (
             <a className="btn btn--wa" href={waHref} target="_blank" rel="noopener noreferrer">
               <IconWhatsApp size={18} />
-              <span>Konfirmasi WhatsApp</span>
+              <span>Konfirmasi WA</span>
             </a>
           ) : null}
         </div>

@@ -348,8 +348,14 @@
   box-sizing: border-box;
 }
 .theme-ballroom .sheet__cta.btn--wa {
-  /* Keep icon + label on one row inside the sheet footer */
+  flex-wrap: nowrap;
   white-space: nowrap;
+  height: var(--ctl-h);
+  overflow: hidden;
+}
+.theme-ballroom .sheet__cta.btn--wa > span {
+  white-space: nowrap;
+  flex: 0 0 auto;
 }
 .theme-ballroom .sheet__cta.is-disabled {
   opacity: 0.55;
