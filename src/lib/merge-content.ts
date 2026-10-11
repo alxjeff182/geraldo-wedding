@@ -343,12 +343,14 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
   const cmsQrisBride = String(merged.gift.qrisBride ?? merged.gift.qris ?? "");
   const cmsQrisGroom = String(merged.gift.qrisGroom ?? "");
   const legacyGiftQris =
-    /qris-dummy|qris-bride(?:-v2|-code|-qr)?\.(?:webp|jpg|jpeg|png)$|\/qris-bride\.(?:webp|jpg|jpeg|png)$/i.test(
+    /qris-dummy|qris-bride(?:-v[123]|-code|-qr)?\.(?:webp|jpg|jpeg|png)$|\/qris-bride\.(?:webp|jpg|jpeg|png)$/i.test(
       cmsQrisBride,
     ) ||
-    /qris-dummy|qris-groom(?:-v2|-code|-qr)?\.(?:webp|jpg|jpeg|png)$|\/qris-groom\.(?:webp|jpg|jpeg|png)$/i.test(
+    /qris-dummy|qris-groom(?:-v[123]|-code|-qr)?\.(?:webp|jpg|jpeg|png)$|\/qris-groom\.(?:webp|jpg|jpeg|png)$/i.test(
       cmsQrisGroom,
-    );
+    ) ||
+    !cmsQrisBride ||
+    !cmsQrisGroom;
   const gift =
     legacyBrideAccount || legacyGroomAccount || legacyGiftQris
       ? {

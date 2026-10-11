@@ -231,8 +231,8 @@ Dengan penuh sukacita dan mengucap syukur kepada Tuhan Yesus Kristus, kami mengu
     expect(bride?.holder).toBe("Christin Samosir");
     expect(groom?.number).toBe("5271021641");
     expect(groom?.holder).toBe("Geraldo Gracedo Sudena");
-    expect(merged.gift.qrisBride).toContain("qris-bride-v3");
-    expect(merged.gift.qrisGroom).toContain("qris-groom-v3");
+    expect(merged.gift.qrisBride).toContain("qris-bride-v4");
+    expect(merged.gift.qrisGroom).toContain("qris-groom-v4");
   });
 
   it("migrates old v2 QRIS assets to BCA v3 flyers", () => {
@@ -258,8 +258,8 @@ Dengan penuh sukacita dan mengucap syukur kepada Tuhan Yesus Kristus, kami mengu
         ],
       },
     });
-    expect(merged.gift.qrisBride).toBe("/assets/ballroom/qris-bride-v3.webp");
-    expect(merged.gift.qrisGroom).toBe("/assets/ballroom/qris-groom-v3.webp");
+    expect(merged.gift.qrisBride).toBe("/assets/ballroom/qris-bride-v4.webp");
+    expect(merged.gift.qrisGroom).toBe("/assets/ballroom/qris-groom-v4.webp");
     expect(merged.gift.accounts.find((a) => a.side === "bride")?.holder).toBe("Christin Samosir");
     expect(merged.gift.accounts.find((a) => a.side === "groom")?.holder).toBe(
       "Geraldo Gracedo Sudena",
