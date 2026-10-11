@@ -8,6 +8,7 @@ type UseSheetOptions = {
 };
 
 const SWIPE_CLOSE_PX = 88;
+const SWIPE_DOWN_CLOSE_PX = 96;
 
 export function useSheet({ inertTargets = [] }: UseSheetOptions = {}) {
   const [activeId, setActiveId] = useState<SheetId>(null);
@@ -89,7 +90,7 @@ export function useSheet({ inertTargets = [] }: UseSheetOptions = {}) {
     return () => window.removeEventListener("keydown", onKey);
   }, [activeId, close]);
 
-  // Horizontal swipe dismiss (vertical scroll still wins via touch-action: pan-y).
+  // Swipe dismiss: horizontal anywhere, or downward from handle/head / when body is at top.
   useEffect(() => {
     if (!activeId) return;
     const sheet = sheetRefs.current[activeId];
@@ -98,6 +99,7 @@ export function useSheet({ inertTargets = [] }: UseSheetOptions = {}) {
     let startX = 0;
     let startY = 0;
     let tracking = false;
+    let canDragDown = false;
     let axis: "x" | "y" | null = null;
     let pointerId: number | null = null;
     let suppressClick = false;
@@ -107,6 +109,7 @@ export function useSheet({ inertTargets = [] }: UseSheetOptions = {}) {
       sheet.style.transform = "";
       sheet.style.transition = "";
       tracking = false;
+      canDragDown = false;
       axis = null;
       pointerId = null;
     };
@@ -127,11 +130,26 @@ export function useSheet({ inertTargets = [] }: UseSheetOptions = {}) {
       }, 400);
     };
 
+    const beginDrag = (e: PointerEvent) => {
+      sheet.classList.add("is-dragging");
+      try {
+        sheet.setPointerCapture(e.pointerId);
+      } catch {
+        /* ignore */
+      }
+    };
+
     const onPointerDown = (e: PointerEvent) => {
       if (e.pointerType === "mouse" && e.button !== 0) return;
       const target = e.target as HTMLElement | null;
       if (!target) return;
-      if (target.closest("input, textarea, select, iframe")) return;
+      if (target.closest("input, textarea, select, iframe, button, a")) return;
+
+      const body = sheet.querySelector<HTMLElement>(".sheet__body");
+      const onChrome = Boolean(target.closest(".sheet__handle, .sheet__head"));
+      const bodyAtTop = !body || body.scrollTop <= 0;
+      canDragDown = onChrome || bodyAtTop;
+
       startX = e.clientX;
       startY = e.clientY;
       tracking = true;
@@ -148,25 +166,32 @@ export function useSheet({ inertTargets = [] }: UseSheetOptions = {}) {
         if (Math.abs(dx) < 12 && Math.abs(dy) < 12) return;
         if (Math.abs(dx) > Math.abs(dy)) {
           axis = "x";
-          sheet.classList.add("is-dragging");
-          try {
-            sheet.setPointerCapture(e.pointerId);
-          } catch {
-            /* ignore */
-          }
+          beginDrag(e);
+        } else if (dy > 0 && canDragDown) {
+          axis = "y";
+          beginDrag(e);
         } else {
+          // Upward / scrollable content — let native scroll win.
           tracking = false;
           axis = null;
           return;
         }
       }
 
-      if (axis !== "x") return;
-      e.preventDefault();
-      sheet.style.transform = `translate3d(${dx}px, 0, 0)`;
+      if (axis === "x") {
+        e.preventDefault();
+        sheet.style.transform = `translate3d(${dx}px, 0, 0)`;
+        return;
+      }
+
+      if (axis === "y") {
+        e.preventDefault();
+        const pull = Math.max(0, dy);
+        sheet.style.transform = `translate3d(0, ${pull}px, 0)`;
+      }
     };
 
-    const finishClose = (dx: number) => {
+    const finishCloseX = (dx: number) => {
       const dir = dx < 0 ? -1 : 1;
       sheet.classList.remove("is-dragging");
       sheet.style.transition = "transform 0.18s var(--ease-out, ease-out)";
@@ -181,12 +206,33 @@ export function useSheet({ inertTargets = [] }: UseSheetOptions = {}) {
       pointerId = null;
     };
 
+    const finishCloseY = () => {
+      sheet.classList.remove("is-dragging");
+      sheet.style.transition = "transform 0.22s var(--ease-out, ease-out)";
+      sheet.style.transform = "translate3d(0, 110%, 0)";
+      blockNextClick();
+      window.setTimeout(() => {
+        clearDrag();
+        close();
+      }, 200);
+      tracking = false;
+      axis = null;
+      pointerId = null;
+    };
+
     const onPointerUp = (e: PointerEvent) => {
       if (pointerId !== e.pointerId) return;
       if (axis === "x") {
         const dx = e.clientX - startX;
         if (Math.abs(dx) >= SWIPE_CLOSE_PX) {
-          finishClose(dx);
+          finishCloseX(dx);
+          return;
+        }
+      }
+      if (axis === "y") {
+        const dy = e.clientY - startY;
+        if (dy >= SWIPE_DOWN_CLOSE_PX) {
+          finishCloseY();
           return;
         }
       }

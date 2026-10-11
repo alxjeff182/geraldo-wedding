@@ -52,6 +52,13 @@
   background: var(--gold-a40);
   touch-action: none;
   flex-shrink: 0;
+  /* Larger hit area for swipe-down dismiss */
+  position: relative;
+}
+.theme-ballroom .sheet__handle::before {
+  content: "";
+  position: absolute;
+  inset: -0.75rem -2.5rem;
 }
 .theme-ballroom .sheet__close {
   appearance: none;
