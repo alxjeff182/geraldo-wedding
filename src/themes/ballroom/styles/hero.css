@@ -39,12 +39,10 @@
   from {
     opacity: 0;
     transform: scale(1.04);
-    filter: blur(8px);
   }
   to {
     opacity: 1;
     transform: scale(1);
-    filter: blur(0);
   }
 } /* Hero — native video playback */
 .theme-ballroom .hero {
@@ -70,7 +68,7 @@
   object-position: center center;
   background: #8a847c;
   display: block;
-  filter: sepia(0.18) saturate(1.05) contrast(1.04);
+  /* No CSS filter on <video> — iOS Safari often freezes / blacks out filtered video. */
 }
 .theme-ballroom .hero__veil {
   position: absolute;
@@ -84,7 +82,9 @@
       transparent 72%,
       rgba(26, 15, 12, 0.25) 88%,
       rgba(26, 15, 12, 0.55) 100%
-    );
+    ),
+    /* Warm cast previously on the video via filter — kept on the veil for iOS safety */
+    linear-gradient(0deg, rgba(180, 140, 90, 0.12), rgba(180, 140, 90, 0.12));
   opacity: 0.7;
   transition:
     opacity 0.5s var(--ease-out),

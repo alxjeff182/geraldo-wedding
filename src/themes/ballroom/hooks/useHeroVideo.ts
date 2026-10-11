@@ -21,7 +21,16 @@ export function useHeroVideo({ videoRef, heroRef, enabled = true, onProgress }: 
     let cancelled = false;
     let raf = 0;
     let waitRaf = 0;
+    const timers = new Set<number>();
     let detach: (() => void) | null = null;
+
+    const later = (fn: () => void, ms: number) => {
+      const id = window.setTimeout(() => {
+        timers.delete(id);
+        fn();
+      }, ms);
+      timers.add(id);
+    };
 
     const bind = () => {
       const video = videoRef.current;
@@ -33,6 +42,7 @@ export function useHeroVideo({ videoRef, heroRef, enabled = true, onProgress }: 
 
       const heroInner = heroEl.querySelector(".hero__inner") as HTMLElement | null;
       const revealEls = heroEl.querySelectorAll("[data-reveal]");
+      const scrollRoot = heroEl.closest(".invitation") as HTMLElement | null;
 
       const applyProgress = (progress: number) => {
         const p = clamp(progress, 0, 1);
@@ -74,11 +84,15 @@ export function useHeroVideo({ videoRef, heroRef, enabled = true, onProgress }: 
         applyProgress(readProgress());
       };
 
+      // iOS needs muted + playsInline before any play() attempt.
       video.muted = true;
       video.defaultMuted = true;
       video.playsInline = true;
+      video.setAttribute("muted", "");
       video.setAttribute("playsinline", "");
       video.setAttribute("webkit-playsinline", "");
+      video.setAttribute("autoplay", "");
+      video.preload = "auto";
 
       video.addEventListener("timeupdate", onTimeUpdate);
       video.addEventListener("ended", onEnded);
@@ -95,22 +109,70 @@ export function useHeroVideo({ videoRef, heroRef, enabled = true, onProgress }: 
         };
         if (video.readyState >= 1) jump();
         else video.addEventListener("loadedmetadata", jump, { once: true });
-      } else {
-        const tryPlay = () => {
-          void video.play().catch(() => {
-            applyProgress(0);
-          });
+
+        detach = () => {
+          video.removeEventListener("timeupdate", onTimeUpdate);
+          video.removeEventListener("ended", onEnded);
+          video.removeEventListener("loadedmetadata", onLoaded);
+          video.removeEventListener("play", tick);
         };
-        if (video.readyState >= 2) tryPlay();
-        else video.addEventListener("canplay", tryPlay, { once: true });
-        raf = requestAnimationFrame(tick);
+        return;
       }
+
+      let attempts = 0;
+      const maxAttempts = 8;
+
+      const tryPlay = () => {
+        if (cancelled || (!video.paused && !video.ended)) return;
+        attempts += 1;
+        video.muted = true;
+        const playPromise = video.play();
+        if (playPromise?.catch) {
+          void playPromise.catch(() => {
+            applyProgress(readProgress());
+            if (!cancelled && attempts < maxAttempts) {
+              later(tryPlay, 280 * attempts);
+            }
+          });
+        }
+      };
+
+      // Parent was `hidden` until reveal — force a fresh load on iOS.
+      try {
+        video.load();
+      } catch {
+        /* noop */
+      }
+
+      const onCanPlay = () => tryPlay();
+      const onLoadedData = () => tryPlay();
+      video.addEventListener("canplay", onCanPlay);
+      video.addEventListener("loadeddata", onLoadedData);
+
+      // First touch/scroll inside the invite unlocks autoplay if muted-play was blocked.
+      const unlock = () => tryPlay();
+      scrollRoot?.addEventListener("touchstart", unlock, { passive: true });
+      scrollRoot?.addEventListener("pointerdown", unlock, { passive: true });
+      scrollRoot?.addEventListener("scroll", unlock, { passive: true, once: true });
+
+      // Kick off after layout — invite reveal animation finishes ~1.4s; start sooner too.
+      tryPlay();
+      later(tryPlay, 120);
+      later(tryPlay, 500);
+      later(tryPlay, 1600);
+
+      raf = requestAnimationFrame(tick);
 
       detach = () => {
         video.removeEventListener("timeupdate", onTimeUpdate);
         video.removeEventListener("ended", onEnded);
         video.removeEventListener("loadedmetadata", onLoaded);
         video.removeEventListener("play", tick);
+        video.removeEventListener("canplay", onCanPlay);
+        video.removeEventListener("loadeddata", onLoadedData);
+        scrollRoot?.removeEventListener("touchstart", unlock);
+        scrollRoot?.removeEventListener("pointerdown", unlock);
+        scrollRoot?.removeEventListener("scroll", unlock);
         video.pause();
       };
     };
@@ -121,6 +183,8 @@ export function useHeroVideo({ videoRef, heroRef, enabled = true, onProgress }: 
       cancelled = true;
       cancelAnimationFrame(raf);
       cancelAnimationFrame(waitRaf);
+      timers.forEach((id) => window.clearTimeout(id));
+      timers.clear();
       detach?.();
     };
   }, [videoRef, heroRef, enabled]);

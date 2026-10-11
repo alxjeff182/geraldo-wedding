@@ -55,13 +55,15 @@ export function Hero({
         <video
           ref={videoRef}
           className="hero__video"
-          src={videoSrc}
           poster={posterSrc}
           muted
+          autoPlay
           playsInline
           preload="auto"
           aria-hidden="true"
-        />
+        >
+          <source src={videoSrc} type="video/mp4" />
+        </video>
         <div className="hero__veil" aria-hidden="true" />
         <div className="hero__inner">
           <p className="hero__eyebrow" data-reveal="0.08">
