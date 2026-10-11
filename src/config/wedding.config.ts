@@ -192,14 +192,14 @@ export const wedding = {
     description:
       "Doa restu Anda sudah lebih dari cukup. Bila ingin berbagi kebahagiaan, kami sediakan cara mudah di bawah ini.",
     /** @deprecated prefer qrisBride / qrisGroom */
-    qris: "/assets/ballroom/qris-dummy.svg",
-    qrisBride: "/assets/ballroom/qris-dummy.svg",
+    qris: "/assets/ballroom/qris-bride.webp",
+    qrisBride: "/assets/ballroom/qris-bride.webp",
     qrisGroom: "/assets/ballroom/qris-dummy.svg",
     accounts: [
       {
         bank: "BCA",
-        number: "6705188657",
-        holder: "Christin Samosir, S.M.",
+        number: "2480419009",
+        holder: "Christin Samosir",
         logo: "/assets/ballroom/bca-logo.png",
         side: "bride",
       },
