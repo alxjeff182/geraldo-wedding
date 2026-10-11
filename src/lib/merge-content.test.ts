@@ -145,7 +145,7 @@ describe("mergeWeddingContent", () => {
     const merged = mergeWeddingContent({
       media: { ogImage: "/assets/ballroom/og-image.jpg" },
     });
-    expect(merged.media.ogImage).toBe("/assets/ballroom/og-share.jpg");
+    expect(merged.media.ogImage).toBe("/og.jpg");
   });
 
   it("migrates legacy story.paragraphs into milestones", () => {

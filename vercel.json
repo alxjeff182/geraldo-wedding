@@ -4,7 +4,12 @@
       "main": false
     }
   },
-  "rewrites": [{ "source": "/((?!api/).*)", "destination": "/" }],
+  "rewrites": [
+    {
+      "source": "/((?!api/|assets/|.*\\.[A-Za-z0-9]{1,8}$).*)",
+      "destination": "/"
+    }
+  ],
   "headers": [
     {
       "source": "/admin",
