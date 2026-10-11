@@ -553,7 +553,7 @@
 }
 
 /* ========== STORY VIDEO BOOTH ========== */
-.theme-ballroom .booth {
+.booth {
   position: fixed;
   inset: 0;
   z-index: 120;
@@ -565,7 +565,7 @@
   backdrop-filter: blur(10px);
 }
 
-.theme-ballroom .booth__stage {
+.booth__stage {
   position: relative;
   width: min(100%, 22rem);
   aspect-ratio: 9 / 16;
@@ -579,7 +579,7 @@
     0 24px 64px rgba(0, 0, 0, 0.55);
 }
 
-.theme-ballroom .booth__cam {
+.booth__cam {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -587,8 +587,8 @@
   pointer-events: none;
 }
 
-.theme-ballroom .booth__canvas,
-.theme-ballroom .booth__review {
+.booth__canvas,
+.booth__review {
   position: absolute;
   inset: 0;
   display: block;
@@ -597,11 +597,11 @@
   object-fit: cover;
 }
 
-.theme-ballroom .booth__canvas.is-hidden {
+.booth__canvas.is-hidden {
   visibility: hidden;
 }
 
-.theme-ballroom .booth__chrome {
+.booth__chrome {
   position: absolute;
   top: 0;
   left: 0;
@@ -612,13 +612,13 @@
   padding: 0.75rem;
 }
 
-.theme-ballroom .booth__icon-btn,
-.theme-ballroom .booth__icon-spacer {
+.booth__icon-btn,
+.booth__icon-spacer {
   width: 2.5rem;
   height: 2.5rem;
 }
 
-.theme-ballroom .booth__icon-btn {
+.booth__icon-btn {
   display: grid;
   place-items: center;
   border: 1px solid var(--gold-a40);
@@ -629,14 +629,14 @@
   backdrop-filter: blur(8px);
 }
 
-.theme-ballroom .booth__icon-btn:disabled {
+.booth__icon-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
 
-.theme-ballroom .booth__status,
-.theme-ballroom .booth__tip,
-.theme-ballroom .booth__timer {
+.booth__status,
+.booth__tip,
+.booth__timer {
   position: absolute;
   left: 50%;
   z-index: 3;
@@ -647,28 +647,28 @@
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.65);
 }
 
-.theme-ballroom .booth__status {
+.booth__status {
   top: 50%;
   transform: translate(-50%, -50%);
   font-size: 0.9rem;
   letter-spacing: 0.06em;
 }
 
-.theme-ballroom .booth__tip,
-.theme-ballroom .booth__timer {
+.booth__tip,
+.booth__timer {
   bottom: 6.5rem;
   font-size: 0.75rem;
   letter-spacing: 0.06em;
   opacity: 0.9;
 }
 
-.theme-ballroom .booth__timer {
+.booth__timer {
   font-variant-numeric: tabular-nums;
   font-size: 1rem;
   color: var(--gold-soft);
 }
 
-.theme-ballroom .booth__controls {
+.booth__controls {
   position: absolute;
   left: 0;
   right: 0;
@@ -682,7 +682,7 @@
   background: linear-gradient(180deg, transparent, rgba(8, 5, 4, 0.72) 45%);
 }
 
-.theme-ballroom .booth__rec {
+.booth__rec {
   position: relative;
   width: 4.5rem;
   height: 4.5rem;
@@ -692,7 +692,7 @@
   cursor: pointer;
 }
 
-.theme-ballroom .booth__ring {
+.booth__ring {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -700,13 +700,13 @@
   transform: rotate(-90deg);
 }
 
-.theme-ballroom .booth__ring-track {
+.booth__ring-track {
   fill: none;
   stroke: rgba(255, 255, 255, 0.22);
   stroke-width: 3;
 }
 
-.theme-ballroom .booth__ring-fill {
+.booth__ring-fill {
   fill: none;
   stroke: var(--gold);
   stroke-width: 3;
@@ -714,7 +714,7 @@
   transition: stroke-dashoffset 0.1s linear;
 }
 
-.theme-ballroom .booth__rec-core {
+.booth__rec-core {
   position: absolute;
   inset: 0.7rem;
   border-radius: 50%;
@@ -726,14 +726,14 @@
     background 0.15s;
 }
 
-.theme-ballroom .booth__rec.is-rec .booth__rec-core {
+.booth__rec.is-rec .booth__rec-core {
   inset: 1.15rem;
   border-radius: 0.35rem;
   background: #fff;
 }
 
-.theme-ballroom .booth__review-actions,
-.theme-ballroom .booth__error {
+.booth__review-actions,
+.booth__error {
   position: absolute;
   left: 0;
   right: 0;
@@ -747,7 +747,7 @@
   background: linear-gradient(180deg, transparent, rgba(8, 5, 4, 0.78) 40%);
 }
 
-.theme-ballroom .booth__error p {
+.booth__error p {
   margin: 0 0 0.25rem;
   max-width: 16rem;
   text-align: center;
@@ -756,13 +756,13 @@
   line-height: 1.5;
 }
 
-.theme-ballroom .booth__share-btn,
-.theme-ballroom .booth__retry {
+.booth__share-btn,
+.booth__retry {
   gap: 0.5rem;
   width: min(100%, 16rem);
   white-space: nowrap;
 }
 
-.theme-ballroom .booth__retry {
+.booth__retry {
   background: transparent;
 }
