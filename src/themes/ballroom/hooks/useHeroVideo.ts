@@ -141,7 +141,10 @@ export function useHeroVideo({ videoRef, heroRef, enabled = true, onProgress }: 
       const tryPlay = () => {
         if (cancelled) return;
         // Finished — keep last frame, don't restart on every scroll tick.
-        if (video.ended || (Number.isFinite(video.duration) && video.currentTime >= video.duration - 0.08)) {
+        if (
+          video.ended ||
+          (Number.isFinite(video.duration) && video.currentTime >= video.duration - 0.08)
+        ) {
           holdLastFrame(video);
           applyProgress(1);
           return;

@@ -18,15 +18,7 @@ export function RotateNotice({ logoSrc = DEFAULT_LOGO }: Props) {
         />
         <div className="rotate-notice__phone" aria-hidden="true">
           <svg viewBox="0 0 64 96" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect
-              x="6"
-              y="2"
-              width="52"
-              height="92"
-              rx="8"
-              stroke="currentColor"
-              strokeWidth="3"
-            />
+            <rect x="6" y="2" width="52" height="92" rx="8" stroke="currentColor" strokeWidth="3" />
             <circle cx="32" cy="82" r="3.5" fill="currentColor" />
             <rect x="24" y="8" width="16" height="3" rx="1.5" fill="currentColor" opacity="0.45" />
           </svg>
