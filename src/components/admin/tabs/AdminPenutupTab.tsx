@@ -41,6 +41,11 @@ export function AdminPenutupTab({ merged, updateDraft }: AdminTabProps) {
             value={merged.hashtag.tag}
             onChange={(value) => updateDraft(["hashtag", "tag"], value)}
           />
+          <AdminTextField
+            label="Label Tombol Story"
+            value={merged.hashtag.storyButton ?? ""}
+            onChange={(value) => updateDraft(["hashtag", "storyButton"], value)}
+          />
         </div>
         <ImageUploader
           label="Foto Hashtag"
@@ -48,6 +53,14 @@ export function AdminPenutupTab({ merged, updateDraft }: AdminTabProps) {
           spec={MEDIA_SPECS.hashtagPhoto}
           value={merged.hashtag.photo}
           onChange={(url) => updateDraft(["hashtag", "photo"], url)}
+        />
+        <ImageUploader
+          label="Template Instagram Story (1080×1920)"
+          folder="hashtag"
+          accept="image/png,image/jpeg,image/jpg,image/webp"
+          spec={MEDIA_SPECS.storyTemplate}
+          value={merged.hashtag.storyTemplate ?? ""}
+          onChange={(url) => updateDraft(["hashtag", "storyTemplate"], url)}
         />
       </fieldset>
       <fieldset className="admin-fieldset">

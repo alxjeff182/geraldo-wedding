@@ -389,6 +389,42 @@
   font: inherit;
 }
 
+.theme-ballroom .hashtag-mod__story {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.35rem;
+}
+
+.theme-ballroom .hashtag-mod__story-preview {
+  display: block;
+  width: 6.75rem;
+  height: auto;
+  aspect-ratio: 9 / 16;
+  object-fit: cover;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--gold-a40);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.theme-ballroom .hashtag-mod__story-btn {
+  gap: 0.55rem;
+  width: min(100%, 18rem);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.theme-ballroom .hashtag-mod__story-btn > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.theme-ballroom .hashtag-mod__story-btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
 .theme-ballroom .hashtag-mod__ig {
   display: grid;
   place-items: center;

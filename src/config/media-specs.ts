@@ -75,6 +75,16 @@ export const MEDIA_SPECS = {
     formats: "WebP / JPG",
     notes: "Foto hashtag (opsional).",
   },
+  storyTemplate: {
+    dimensions: "1080 × 1920 px",
+    width: 1080,
+    height: 1920,
+    ratio: "9:16 (portrait story)",
+    maxSize: "1.5 MB",
+    maxBytes: 1.5 * 1024 * 1024,
+    formats: "PNG / JPG",
+    notes: "Template Instagram Story. Jangan crop; unggah full 9:16.",
+  },
   story: {
     dimensions: "800 × 800 px",
     width: 800,
