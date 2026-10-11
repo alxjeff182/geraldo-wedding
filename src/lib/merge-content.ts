@@ -258,8 +258,7 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
   const preferredDefaultId = wedding.invite.defaultTemplateId;
   const cmsDefaultId = merged.invite.defaultTemplateId;
   // Prefer shipped default (Singkat & Sopan) when CMS still points at the old formal default.
-  const resolvedDefaultId =
-    cmsDefaultId === "formal-kristen" ? preferredDefaultId : cmsDefaultId;
+  const resolvedDefaultId = cmsDefaultId === "formal-kristen" ? preferredDefaultId : cmsDefaultId;
   const defaultTemplateId = whatsappTemplates.some((item) => item.id === resolvedDefaultId)
     ? resolvedDefaultId
     : whatsappTemplates.some((item) => item.id === preferredDefaultId)

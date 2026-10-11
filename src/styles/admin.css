@@ -2233,9 +2233,7 @@ textarea.admin-input {
   padding: 1rem 1rem 1.15rem;
   border-radius: 1.1rem 1.1rem 0 0;
   border: 1px solid rgba(212, 175, 55, 0.28);
-  background:
-    linear-gradient(165deg, rgba(62, 36, 32, 0.98), rgba(28, 16, 14, 0.99)),
-    #1c100e;
+  background: linear-gradient(165deg, rgba(62, 36, 32, 0.98), rgba(28, 16, 14, 0.99)), #1c100e;
   box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.45);
   overflow: hidden;
 }

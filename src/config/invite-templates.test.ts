@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  DEFAULT_INVITE_TEMPLATE_ID,
-  INVITE_MESSAGE_TEMPLATES,
-} from "../config/invite-templates";
+import { DEFAULT_INVITE_TEMPLATE_ID, INVITE_MESSAGE_TEMPLATES } from "../config/invite-templates";
 
 describe("invite-templates", () => {
   it("ships 3 default WhatsApp templates", () => {

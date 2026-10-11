@@ -44,12 +44,9 @@ export function formatWaExportPlainText(entries: readonly WaExportEntry[]): stri
 
   const blocks = entries.map((entry) => {
     const phoneLine = entry.hasPhone ? `WA: ${entry.phone}` : "WA: (belum ada nomor)";
-    return [
-      `${entry.index}. ${entry.name}`,
-      phoneLine,
-      "─".repeat(28),
-      entry.message.trim(),
-    ].join("\n");
+    return [`${entry.index}. ${entry.name}`, phoneLine, "─".repeat(28), entry.message.trim()].join(
+      "\n",
+    );
   });
 
   return [

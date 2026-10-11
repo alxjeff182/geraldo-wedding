@@ -34,9 +34,7 @@ export function GuestWaExport({
 
   const entries = useMemo(
     () =>
-      buildWaExportEntries(guests, (guest) =>
-        buildMessage(guest, getGuestTemplateId(guest.id)),
-      ),
+      buildWaExportEntries(guests, (guest) => buildMessage(guest, getGuestTemplateId(guest.id))),
     [guests, buildMessage, getGuestTemplateId],
   );
 
@@ -158,9 +156,7 @@ export function GuestWaExport({
                 entry={entry}
                 invite={invite}
                 copied={copiedId === entry.id}
-                onCopy={() =>
-                  void copyText(entry.message, invite.waExportCopied, entry.id)
-                }
+                onCopy={() => void copyText(entry.message, invite.waExportCopied, entry.id)}
                 onOpenWa={() => {
                   const guest = guestById(entry.id);
                   if (guest && entry.waUrl) onOpenWhatsApp(guest, entry.waUrl);
