@@ -74,8 +74,6 @@ export type GuestbookContent = {
   remainingLabel?: string;
   countLabel?: string;
   loadMore?: string;
-  pagerPrev?: string;
-  pagerNext?: string;
   errorMessage?: string;
   successMessage?: string;
   localSuccessMessage?: string;
@@ -90,10 +88,8 @@ export type SiteContentOverrides = {
     url?: string;
     noIndex?: boolean;
     creator?: {
-      name?: string;
       url?: string;
       websiteUrl?: string;
-      instagramUrl?: string;
     };
   };
   couple?: {
@@ -101,7 +97,6 @@ export type SiteContentOverrides = {
       shortName?: string;
       fullName?: string;
       parents?: string;
-      instagram?: string;
       instagramHandle?: string;
       photo?: string;
     };
@@ -109,7 +104,6 @@ export type SiteContentOverrides = {
       shortName?: string;
       fullName?: string;
       parents?: string;
-      instagram?: string;
       instagramHandle?: string;
       photo?: string;
     };
@@ -123,7 +117,6 @@ export type SiteContentOverrides = {
   coupleSection?: {
     prefix?: string;
     title?: string;
-    connector?: string;
   };
   date?: string;
   dateLabel?: string;
@@ -135,22 +128,12 @@ export type SiteContentOverrides = {
     brideName?: string;
   };
   intro?: string;
-  quote?: string;
   bibleQuote?: string;
   bibleReference?: string;
   events?: WeddingEvent[];
   eventsSection?: {
-    title?: string;
-    titleEmbedded?: string;
-    subtitle?: string;
-    venueLabel?: string;
-    venueLabelColon?: string;
-    mapsButton?: string;
     calendarGoogleButton?: string;
     sheetMapsButton?: string;
-    sheetCalendarButton?: string;
-    calendarIcsButton?: string;
-    calendarFabLabel?: string;
     calendarSaveAll?: string;
   };
   story?: {
@@ -168,13 +151,11 @@ export type SiteContentOverrides = {
   };
   gallery?: {
     title?: string;
-    subtitle?: string;
     images?: { src: string; alt: string }[];
   };
   gift?: {
     title?: string;
     description?: string;
-    physicalAddress?: string;
     qris?: string;
     qrisBride?: string;
     qrisGroom?: string;
@@ -182,14 +163,7 @@ export type SiteContentOverrides = {
   };
   giftUi?: {
     openButton?: string;
-    bankLabel?: string;
-    accountNumberLabel?: string;
-    accountHolderPrefix?: string;
-    copyAccountButton?: string;
-    physicalGiftTitle?: string;
-    copyAddressButton?: string;
     copyAccountSuccess?: string;
-    copyAddressSuccess?: string;
     copyError?: string;
   };
   hashtag?: {
@@ -198,7 +172,6 @@ export type SiteContentOverrides = {
     tag?: string;
     lead?: string;
     storyTemplate?: string;
-    storyPreviewBg?: string;
     boothButton?: string;
     boothMaxSeconds?: number;
     boothShare?: string;
@@ -217,18 +190,12 @@ export type SiteContentOverrides = {
   opening?: {
     skipLabel?: string;
   };
-  closing?: {
-    paragraphs?: string[];
-  };
   cover?: {
-    eyebrow?: string;
     salutation?: string;
     openButton?: string;
     openButtonAriaLabel?: string;
   };
   countdown?: {
-    title?: string;
-    heading?: string;
     labels?: {
       days?: string;
       hours?: string;
@@ -239,18 +206,11 @@ export type SiteContentOverrides = {
   footer?: {
     creditPrefix?: string;
     creditBrand?: string;
-    portfolioPrompt?: string;
-    portfolioLinkLabel?: string;
     websiteAriaLabel?: string;
-    instagramAriaLabel?: string;
-    ariaLabel?: string;
   };
   shortcuts?: {
-    countdown?: string;
     events?: string;
     rsvp?: string;
-    navAriaLabel?: string;
-    openAriaLabel?: string;
   };
   media?: {
     coverBg?: string;
@@ -260,10 +220,6 @@ export type SiteContentOverrides = {
     openingVideo?: string;
     heroVideo?: string;
     heroPoster?: string;
-    /** @deprecated use heroVideo */
-    heroFramesBase?: string;
-    /** @deprecated use heroVideo */
-    heroFrameCount?: number;
   };
   rsvp?: RsvpContent;
   guestbook?: GuestbookContent;

@@ -27,13 +27,6 @@ export function AdminGaleriTab({ merged, updateDraft }: AdminTabProps) {
         value={merged.gallery.title}
         onChange={(value) => updateDraft(["gallery", "title"], value)}
       />
-      <AdminTextField
-        label="Subtitle"
-        wide
-        value={merged.gallery.subtitle}
-        onChange={(value) => updateDraft(["gallery", "subtitle"], value)}
-        rows={2}
-      />
       {images.map((img, index) => (
         <div key={index} className="admin-gallery-row admin-fieldset">
           <div className="admin-gallery-row__toolbar">

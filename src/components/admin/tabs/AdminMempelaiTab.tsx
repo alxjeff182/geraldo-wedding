@@ -19,11 +19,6 @@ export function AdminMempelaiTab({ merged, updateDraft }: AdminTabProps) {
             value={merged.coupleSection.title}
             onChange={(value) => updateDraft(["coupleSection", "title"], value)}
           />
-          <AdminTextField
-            label="Konektor"
-            value={merged.coupleSection.connector}
-            onChange={(value) => updateDraft(["coupleSection", "connector"], value)}
-          />
         </div>
       </fieldset>
       {(["groom", "bride"] as const).map((role) => (
@@ -53,14 +48,6 @@ export function AdminMempelaiTab({ merged, updateDraft }: AdminTabProps) {
                 value={merged.couple[role].parents}
                 onChange={(e) => updateDraft(["couple", role, "parents"], e.target.value)}
                 placeholder="Putra/Putri dari …"
-              />
-            </label>
-            <label className="admin-field">
-              <span className="admin-label">Instagram URL</span>
-              <input
-                className="admin-input"
-                value={merged.couple[role].instagram}
-                onChange={(e) => updateDraft(["couple", role, "instagram"], e.target.value)}
               />
             </label>
             <label className="admin-field">

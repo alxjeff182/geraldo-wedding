@@ -45,10 +45,8 @@ export const wedding = {
     url: import.meta.env.VITE_SITE_URL || "http://localhost:5173",
     noIndex: false,
     creator: {
-      name: "Jeffry Alexander",
       url: "https://jeff-interactive-resume.vercel.app/en",
       websiteUrl: "https://jeff-interactive-resume.vercel.app/en",
-      instagramUrl: "",
     },
   },
 
@@ -57,7 +55,6 @@ export const wedding = {
       shortName: "Geraldo",
       fullName: "Geraldo Gracedo Sudena Tampubolon",
       parents: "Putra dari A. Tampubolon / br. Situmorang",
-      instagram: "https://instagram.com/geraldo.gracedo",
       instagramHandle: "@geraldo.gracedo",
       photo: "/assets/ballroom/couple/groom.jpg",
     },
@@ -65,7 +62,6 @@ export const wedding = {
       shortName: "Christin",
       fullName: "Christin br. Samosir",
       parents: "Putri dari R. Samosir / br. Silalahi",
-      instagram: "https://instagram.com/christin.samosir",
       instagramHandle: "@christin.samosir",
       photo: "/assets/ballroom/couple/bride.jpg",
     },
@@ -93,8 +89,6 @@ export const wedding = {
 
   intro:
     "Dengan penuh sukacita dan mengucap syukur kepada Tuhan Yesus Kristus, kami mengundang Bapak/Ibu/Saudara/i untuk hadir dalam pemberkatan pernikahan kami. Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan mendoakan kami.",
-
-  quote: "Constantly, consistently, continually, You.",
 
   bibleQuote: "Kekasihku kepunyaanku, dan aku kepunyaan dia.",
   bibleReference: "Kidung Agung 2:16",
@@ -174,7 +168,6 @@ export const wedding = {
 
   gallery: {
     title: "Galeri",
-    subtitle: "Constantly, consistently,\ncontinually, You.",
     images: [
       { src: "/assets/ballroom/gallery/01.jpg", alt: "Bersama" },
       { src: "/assets/ballroom/gallery/02.jpg", alt: "Ulos Pertama" },
@@ -219,7 +212,6 @@ export const wedding = {
     tag: "#GeralDOanythingforChristine",
     lead: "feel free to use our template",
     storyTemplate: "/assets/ballroom/story-template.png",
-    storyPreviewBg: "/assets/ballroom/gallery/01.webp",
     boothButton: "Rekam Video Story",
     boothMaxSeconds: 15,
     boothShare: "Bagikan ke Story",
@@ -240,10 +232,6 @@ export const wedding = {
 
   opening: {
     skipLabel: "Lewati",
-  },
-
-  closing: {
-    paragraphs: ["Terima kasih atas doa dan kehadiran Anda."],
   },
 
   media: {
@@ -333,8 +321,6 @@ export const wedding = {
     remainingLabel: "Sisa {n} ucapan",
     countLabel: "{n} ucapan",
     loadMore: "Lihat lebih banyak",
-    pagerPrev: "Sebelumnya",
-    pagerNext: "Selanjutnya",
     errorMessage: "Gagal mengirim ucapan. Silakan coba lagi.",
     successMessage: "Terima kasih atas ucapan Anda!",
     localSuccessMessage: "Ucapan tersimpan secara lokal (hubungkan Supabase untuk penyimpanan)",
@@ -343,7 +329,6 @@ export const wedding = {
   },
 
   cover: {
-    eyebrow: "Wedding Invitation",
     salutation: "Kepada Yth.",
     openButton: "Buka Undangan",
     openButtonAriaLabel: "Buka undangan pernikahan",
@@ -352,12 +337,9 @@ export const wedding = {
   coupleSection: {
     prefix: "Sang",
     title: "Mempelai",
-    connector: "dengan",
   },
 
   countdown: {
-    title: "Counting The Days",
-    heading: "Hitung mundur menuju hari pernikahan",
     labels: {
       days: "hari",
       hours: "jam",
@@ -367,25 +349,13 @@ export const wedding = {
   },
 
   eventsSection: {
-    title: "Wedding\nEvent",
-    titleEmbedded: "Detail Acara",
-    subtitle: "Acara akan dilaksanakan pada:",
-    venueLabel: "Bertempat di",
-    venueLabelColon: "Bertempat di:",
-    mapsButton: "Petunjuk Arah",
     calendarGoogleButton: "Simpan Kalender",
     sheetMapsButton: "Buka Maps",
-    sheetCalendarButton: "Kalender",
-    calendarFabLabel: "Tambah ke Kalender",
     calendarSaveAll: "Simpan ke Kalender",
   },
 
   giftUi: {
     openButton: "Hadiah",
-    bankLabel: "Bank",
-    accountNumberLabel: "No. Rekening —",
-    accountHolderPrefix: "a.n",
-    copyAccountButton: "Salin Nomor Rekening",
     copyAccountSuccess: "Nomor rekening tersalin",
     copyError: "Gagal menyalin",
   },
@@ -393,19 +363,12 @@ export const wedding = {
   footer: {
     creditPrefix: "© 2026.",
     creditBrand: "KlikMomen",
-    portfolioPrompt: "",
-    portfolioLinkLabel: "Portfolio",
     websiteAriaLabel: "Kunjungi portfolio pembuat undangan",
-    instagramAriaLabel: "Kunjungi Instagram",
-    ariaLabel: "Kredit pembuat undangan",
   },
 
   shortcuts: {
-    countdown: "Waktu",
     events: "Lokasi",
     rsvp: "RSVP",
-    navAriaLabel: "Navigasi cepat undangan",
-    openAriaLabel: "Buka",
   },
 
   invite: {

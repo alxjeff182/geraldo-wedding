@@ -38,50 +38,17 @@ export function AdminAcaraTab({ merged, updateDraft }: AdminTabProps) {
   return (
     <div className="admin-stack">
       <fieldset className="admin-fieldset">
-        <legend>Caption Section Acara</legend>
+        <legend>Tombol Acara</legend>
         <div className="admin-form-grid">
-          <AdminTextField
-            label="Judul (desktop, pakai enter)"
-            wide
-            value={merged.eventsSection.title}
-            onChange={(value) => updateDraft(["eventsSection", "title"], value)}
-            rows={2}
-          />
-          <AdminTextField
-            label="Judul Embedded"
-            value={merged.eventsSection.titleEmbedded}
-            onChange={(value) => updateDraft(["eventsSection", "titleEmbedded"], value)}
-          />
-          <AdminTextField
-            label="Subtitle"
-            wide
-            value={merged.eventsSection.subtitle}
-            onChange={(value) => updateDraft(["eventsSection", "subtitle"], value)}
-          />
-          <AdminTextField
-            label="Label Venue"
-            value={merged.eventsSection.venueLabel}
-            onChange={(value) => updateDraft(["eventsSection", "venueLabel"], value)}
-          />
-          <AdminTextField
-            label="Label Venue (dengan titik dua)"
-            value={merged.eventsSection.venueLabelColon}
-            onChange={(value) => updateDraft(["eventsSection", "venueLabelColon"], value)}
-          />
-          <AdminTextField
-            label="Tombol Maps"
-            value={merged.eventsSection.mapsButton}
-            onChange={(value) => updateDraft(["eventsSection", "mapsButton"], value)}
-          />
           <AdminTextField
             label="Tombol Google Calendar"
             value={merged.eventsSection.calendarGoogleButton}
             onChange={(value) => updateDraft(["eventsSection", "calendarGoogleButton"], value)}
           />
           <AdminTextField
-            label="Label FAB Kalender (pojok kanan)"
-            value={merged.eventsSection.calendarFabLabel}
-            onChange={(value) => updateDraft(["eventsSection", "calendarFabLabel"], value)}
+            label="Tombol Buka Maps (sheet)"
+            value={merged.eventsSection.sheetMapsButton ?? "Buka Maps"}
+            onChange={(value) => updateDraft(["eventsSection", "sheetMapsButton"], value)}
           />
         </div>
       </fieldset>
@@ -98,19 +65,6 @@ export function AdminAcaraTab({ merged, updateDraft }: AdminTabProps) {
                 onChange={(e) => {
                   const next = [...events];
                   next[index] = { ...next[index], name: e.target.value };
-                  setEvents(next);
-                }}
-              />
-            </label>
-            <label className="admin-field">
-              <span className="admin-label">Tanggal (baris baru = enter)</span>
-              <textarea
-                className="admin-input"
-                rows={2}
-                value={event.dateLabel}
-                onChange={(e) => {
-                  const next = [...events];
-                  next[index] = { ...next[index], dateLabel: e.target.value };
                   setEvents(next);
                 }}
               />

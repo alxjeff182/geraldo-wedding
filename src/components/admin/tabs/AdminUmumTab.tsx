@@ -81,11 +81,6 @@ export function AdminUmumTab({ merged, defaults, updateDraft, clearDraftPath }: 
         <legend>Sampul Undangan</legend>
         <div className="admin-form-grid">
           <AdminTextField
-            label="Eyebrow"
-            value={merged.cover.eyebrow}
-            onChange={(value) => updateDraft(["cover", "eyebrow"], value)}
-          />
-          <AdminTextField
             label="Salam"
             value={merged.cover.salutation}
             onChange={(value) => updateDraft(["cover", "salutation"], value)}
@@ -105,16 +100,6 @@ export function AdminUmumTab({ merged, defaults, updateDraft, clearDraftPath }: 
       <fieldset className="admin-fieldset admin-field--wide">
         <legend>Countdown</legend>
         <div className="admin-form-grid">
-          <AdminTextField
-            label="Judul"
-            value={merged.countdown.title}
-            onChange={(value) => updateDraft(["countdown", "title"], value)}
-          />
-          <AdminTextField
-            label="Heading (sr-only)"
-            value={merged.countdown.heading}
-            onChange={(value) => updateDraft(["countdown", "heading"], value)}
-          />
           <AdminTextField
             label="Label Days"
             value={merged.countdown.labels.days}

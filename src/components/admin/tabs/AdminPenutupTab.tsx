@@ -1,4 +1,4 @@
-import { AdminParagraphListField, AdminTextField } from "../AdminFields";
+import { AdminTextField } from "../AdminFields";
 import { ImageUploader } from "../ImageUploader";
 import { MEDIA_SPECS } from "../../../config/media-specs";
 import type { AdminTabProps } from "../types";
@@ -7,7 +7,7 @@ export function AdminPenutupTab({ merged, updateDraft }: AdminTabProps) {
   return (
     <div className="admin-stack">
       <fieldset className="admin-fieldset">
-        <legend>Ayat & Penutup</legend>
+        <legend>Ayat</legend>
         <div className="admin-form-grid">
           <AdminTextField
             label="Ayat Alkitab"
@@ -22,11 +22,6 @@ export function AdminPenutupTab({ merged, updateDraft }: AdminTabProps) {
             onChange={(value) => updateDraft(["bibleReference"], value)}
           />
         </div>
-        <AdminParagraphListField
-          label="Paragraf Penutup (pisah baris kosong)"
-          value={merged.closing.paragraphs}
-          onChange={(value) => updateDraft(["closing", "paragraphs"], value)}
-        />
       </fieldset>
       <fieldset className="admin-fieldset">
         <legend>Hashtag</legend>
@@ -57,7 +52,7 @@ export function AdminPenutupTab({ merged, updateDraft }: AdminTabProps) {
         />
       </fieldset>
       <fieldset className="admin-fieldset">
-        <legend>Footer & Shortcut Hero</legend>
+        <legend>Footer & Shortcut Dock</legend>
         <div className="admin-form-grid">
           <AdminTextField
             label="Footer Prefix"
@@ -65,14 +60,9 @@ export function AdminPenutupTab({ merged, updateDraft }: AdminTabProps) {
             onChange={(value) => updateDraft(["footer", "creditPrefix"], value)}
           />
           <AdminTextField
-            label="Footer Prompt"
-            value={merged.footer.portfolioPrompt}
-            onChange={(value) => updateDraft(["footer", "portfolioPrompt"], value)}
-          />
-          <AdminTextField
-            label="Shortcut Waktu"
-            value={merged.shortcuts.countdown}
-            onChange={(value) => updateDraft(["shortcuts", "countdown"], value)}
+            label="Footer Brand"
+            value={merged.footer.creditBrand}
+            onChange={(value) => updateDraft(["footer", "creditBrand"], value)}
           />
           <AdminTextField
             label="Shortcut Lokasi"
@@ -90,24 +80,14 @@ export function AdminPenutupTab({ merged, updateDraft }: AdminTabProps) {
         <legend>Kredit Pembuat</legend>
         <div className="admin-form-grid">
           <AdminTextField
-            label="Nama"
-            value={merged.site.creator.name}
-            onChange={(value) => updateDraft(["site", "creator", "name"], value)}
-          />
-          <AdminTextField
-            label="URL Profil"
-            value={merged.site.creator.url}
-            onChange={(value) => updateDraft(["site", "creator", "url"], value)}
-          />
-          <AdminTextField
             label="URL Website"
             value={merged.site.creator.websiteUrl ?? ""}
             onChange={(value) => updateDraft(["site", "creator", "websiteUrl"], value)}
           />
           <AdminTextField
-            label="URL Instagram"
-            value={merged.site.creator.instagramUrl ?? ""}
-            onChange={(value) => updateDraft(["site", "creator", "instagramUrl"], value)}
+            label="URL Profil (fallback)"
+            value={merged.site.creator.url}
+            onChange={(value) => updateDraft(["site", "creator", "url"], value)}
           />
         </div>
       </fieldset>

@@ -37,15 +37,13 @@ function deepMerge<T>(base: T, overrides: unknown): T {
 
   if (isPlainObject(base) && isPlainObject(overrides)) {
     const result = { ...base } as Record<string, unknown>;
+    const allowed = new Set(Object.keys(base as object));
     for (const key of Object.keys(overrides)) {
       const baseVal = (base as Record<string, unknown>)[key];
       const overrideVal = overrides[key];
       if (overrideVal === undefined) continue;
-      // Ignore unknown / removed Batak media keys from old CMS rows
-      if (baseVal === undefined && isPlainObject(base) && "coverBg" in (base as object)) {
-        const allowed = new Set(Object.keys(base as object));
-        if (!allowed.has(key)) continue;
-      }
+      // Ignore unknown / removed keys from old CMS rows
+      if (baseVal === undefined && !allowed.has(key)) continue;
       result[key] = deepMerge(baseVal, overrideVal);
     }
     return result as T;
@@ -61,10 +59,128 @@ export function isOverridden(current: unknown, defaultValue: unknown): boolean {
   return JSON.stringify(current) !== JSON.stringify(defaultValue);
 }
 
+function omitKeys<T extends Record<string, unknown>>(obj: T, keys: string[]): T {
+  const next = { ...obj };
+  for (const key of keys) delete next[key];
+  return next;
+}
+
 /** Strip obsolete CMS keys before save / load. */
 export function stripLockedMedia(overrides: SiteContentOverrides): SiteContentOverrides {
-  const next = { ...overrides } as SiteContentOverrides & { guestGuide?: unknown };
+  const next = { ...overrides } as SiteContentOverrides & Record<string, unknown>;
   delete next.guestGuide;
+  delete next.quote;
+  delete next.closing;
+  // Keep contact — used by Undangan (WA RSVP / gift templates).
+
+  if (next.site?.creator) {
+    next.site = {
+      ...next.site,
+      creator: omitKeys({ ...next.site.creator } as Record<string, unknown>, [
+        "name",
+        "instagramUrl",
+      ]) as NonNullable<NonNullable<SiteContentOverrides["site"]>["creator"]>,
+    };
+  }
+
+  if (next.couple) {
+    const couple = { ...next.couple };
+    for (const role of ["groom", "bride"] as const) {
+      if (couple[role]) {
+        couple[role] = omitKeys({ ...couple[role] } as Record<string, unknown>, [
+          "instagram",
+        ]) as (typeof couple)[typeof role];
+      }
+    }
+    next.couple = couple;
+  }
+
+  if (next.coupleSection) {
+    next.coupleSection = omitKeys({ ...next.coupleSection } as Record<string, unknown>, [
+      "connector",
+    ]) as SiteContentOverrides["coupleSection"];
+  }
+
+  if (next.cover) {
+    next.cover = omitKeys({ ...next.cover } as Record<string, unknown>, [
+      "eyebrow",
+    ]) as SiteContentOverrides["cover"];
+  }
+
+  if (next.countdown) {
+    next.countdown = omitKeys({ ...next.countdown } as Record<string, unknown>, [
+      "title",
+      "heading",
+    ]) as SiteContentOverrides["countdown"];
+  }
+
+  if (next.gallery) {
+    next.gallery = omitKeys({ ...next.gallery } as Record<string, unknown>, [
+      "subtitle",
+    ]) as SiteContentOverrides["gallery"];
+  }
+
+  if (next.eventsSection) {
+    next.eventsSection = omitKeys({ ...next.eventsSection } as Record<string, unknown>, [
+      "title",
+      "titleEmbedded",
+      "subtitle",
+      "venueLabel",
+      "venueLabelColon",
+      "mapsButton",
+      "sheetCalendarButton",
+      "calendarIcsButton",
+      "calendarFabLabel",
+    ]) as SiteContentOverrides["eventsSection"];
+  }
+
+  if (next.gift) {
+    next.gift = omitKeys({ ...next.gift } as Record<string, unknown>, [
+      "physicalAddress",
+    ]) as SiteContentOverrides["gift"];
+  }
+
+  if (next.giftUi) {
+    next.giftUi = omitKeys({ ...next.giftUi } as Record<string, unknown>, [
+      "bankLabel",
+      "accountNumberLabel",
+      "accountHolderPrefix",
+      "copyAccountButton",
+      "physicalGiftTitle",
+      "copyAddressButton",
+      "copyAddressSuccess",
+    ]) as SiteContentOverrides["giftUi"];
+  }
+
+  if (next.hashtag) {
+    next.hashtag = omitKeys({ ...next.hashtag } as Record<string, unknown>, [
+      "storyPreviewBg",
+    ]) as SiteContentOverrides["hashtag"];
+  }
+
+  if (next.guestbook) {
+    next.guestbook = omitKeys({ ...next.guestbook } as Record<string, unknown>, [
+      "pagerPrev",
+      "pagerNext",
+    ]) as SiteContentOverrides["guestbook"];
+  }
+
+  if (next.footer) {
+    next.footer = omitKeys({ ...next.footer } as Record<string, unknown>, [
+      "portfolioPrompt",
+      "portfolioLinkLabel",
+      "instagramAriaLabel",
+      "ariaLabel",
+    ]) as SiteContentOverrides["footer"];
+  }
+
+  if (next.shortcuts) {
+    next.shortcuts = omitKeys({ ...next.shortcuts } as Record<string, unknown>, [
+      "countdown",
+      "navAriaLabel",
+      "openAriaLabel",
+    ]) as SiteContentOverrides["shortcuts"];
+  }
 
   if (next.media) {
     const media = { ...next.media } as Record<string, unknown>;
@@ -79,6 +195,8 @@ export function stripLockedMedia(overrides: SiteContentOverrides): SiteContentOv
       "heroPhoto",
       "portrait",
       "video",
+      "heroFramesBase",
+      "heroFrameCount",
     ]) {
       delete media[key];
     }
@@ -89,7 +207,7 @@ export function stripLockedMedia(overrides: SiteContentOverrides): SiteContentOv
 }
 
 export function mergeWeddingContent(overrides: SiteContentOverrides = {}): WeddingConfig {
-  const normalized = structuredClone(overrides) as SiteContentOverrides;
+  const normalized = stripLockedMedia(structuredClone(overrides) as SiteContentOverrides);
 
   if (normalized.invite) {
     const invite = normalized.invite;
@@ -99,14 +217,8 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
     }
   }
 
-  // Drop removed fields from old CMS payloads
   if (normalized.site && "theme" in normalized.site) {
     delete (normalized.site as { theme?: unknown }).theme;
-  }
-  delete (normalized as SiteContentOverrides & { guestGuide?: unknown }).guestGuide;
-  if (normalized.media) {
-    const cleaned = stripLockedMedia({ media: normalized.media }).media;
-    normalized.media = cleaned;
   }
 
   // Migrate legacy story.paragraphs → milestones before deepMerge so arrays replace cleanly.

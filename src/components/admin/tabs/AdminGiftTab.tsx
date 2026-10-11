@@ -172,29 +172,9 @@ export function AdminGiftTab({ merged, defaults, updateDraft, clearDraftPath }: 
         <legend>Caption & Tombol</legend>
         <div className="admin-form-grid">
           <AdminTextField
-            label="Tombol Buka Amplop"
+            label="Tombol Dock Hadiah"
             value={merged.giftUi.openButton}
             onChange={(value) => updateDraft(["giftUi", "openButton"], value)}
-          />
-          <AdminTextField
-            label="Label Bank"
-            value={merged.giftUi.bankLabel}
-            onChange={(value) => updateDraft(["giftUi", "bankLabel"], value)}
-          />
-          <AdminTextField
-            label="Label Nomor Rekening"
-            value={merged.giftUi.accountNumberLabel}
-            onChange={(value) => updateDraft(["giftUi", "accountNumberLabel"], value)}
-          />
-          <AdminTextField
-            label="Prefix a.n"
-            value={merged.giftUi.accountHolderPrefix}
-            onChange={(value) => updateDraft(["giftUi", "accountHolderPrefix"], value)}
-          />
-          <AdminTextField
-            label="Tombol Salin Rekening"
-            value={merged.giftUi.copyAccountButton}
-            onChange={(value) => updateDraft(["giftUi", "copyAccountButton"], value)}
           />
           <AdminTextField
             label="Toast Salin Rekening"

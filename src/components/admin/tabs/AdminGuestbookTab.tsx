@@ -70,14 +70,14 @@ export function AdminGuestbookTab({
         onChange={(value) => updateDraft(["guestbook", "remainingLabel"], value)}
       />
       <AdminTextField
-        label="Pager Sebelumnya"
-        value={merged.guestbook.pagerPrev}
-        onChange={(value) => updateDraft(["guestbook", "pagerPrev"], value)}
+        label="Label Jumlah Ucapan"
+        value={merged.guestbook.countLabel ?? "{n} ucapan"}
+        onChange={(value) => updateDraft(["guestbook", "countLabel"], value)}
       />
       <AdminTextField
-        label="Pager Selanjutnya"
-        value={merged.guestbook.pagerNext}
-        onChange={(value) => updateDraft(["guestbook", "pagerNext"], value)}
+        label="Tombol Lihat Lebih Banyak"
+        value={merged.guestbook.loadMore ?? "Lihat lebih banyak"}
+        onChange={(value) => updateDraft(["guestbook", "loadMore"], value)}
       />
       <AdminTextField
         label="Pesan Sukses"

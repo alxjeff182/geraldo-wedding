@@ -69,6 +69,42 @@ describe("mergeWeddingContent", () => {
     expect("desktopBg" in merged.media).toBe(false);
   });
 
+  it("strips dead CMS keys but keeps contact and invite", () => {
+    const merged = mergeWeddingContent({
+      // @ts-expect-error obsolete top-level keys
+      quote: { text: "old" },
+      // @ts-expect-error obsolete top-level keys
+      closing: { paragraphs: ["bye"] },
+      contact: { whatsappNumber: "6281111111111" },
+      invite: { salutation: "Yth. Bapak/Ibu" },
+      cover: {
+        salutation: "Kepada Yth.",
+        // @ts-expect-error obsolete nested key
+        eyebrow: "legacy",
+      },
+      guestbook: {
+        title: "Ucapan",
+        // @ts-expect-error obsolete nested key
+        pagerPrev: "Sebelumnya",
+      },
+      couple: {
+        groom: {
+          shortName: "G",
+          // @ts-expect-error obsolete nested key
+          instagram: "https://instagram.com/x",
+        },
+      },
+    });
+    expect("quote" in merged).toBe(false);
+    expect("closing" in merged).toBe(false);
+    expect(merged.contact.whatsappNumber).toBe("6281111111111");
+    expect(merged.invite.salutation).toBe("Yth. Bapak/Ibu");
+    expect("eyebrow" in merged.cover).toBe(false);
+    expect("pagerPrev" in merged.guestbook).toBe(false);
+    expect("instagram" in merged.couple.groom).toBe(false);
+    expect(merged.couple.groom.shortName).toBe("G");
+  });
+
   it("keeps story and guestbook on by default", () => {
     const merged = mergeWeddingContent({});
     expect(merged.story.enabled).toBe(true);
