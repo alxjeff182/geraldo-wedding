@@ -63,7 +63,7 @@ export const wedding = {
     },
     bride: {
       shortName: "Christin",
-      fullName: "Christin Samosir, S.M.",
+      fullName: "Christin br. Samosir",
       parents: "Putri dari R. Samosir / br. Silalahi",
       instagram: "https://instagram.com/christin.samosir",
       instagramHandle: "@christin.samosir",
@@ -88,7 +88,7 @@ export const wedding = {
   hero: {
     eyebrow: "The Wedding Of",
     groomName: "Geraldo Tampubolon",
-    brideName: "Christin Samosir, S.M.",
+    brideName: "Christin br. Samosir",
   },
 
   intro:
