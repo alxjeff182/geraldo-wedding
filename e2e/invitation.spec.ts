@@ -7,7 +7,7 @@ async function openInvitation(
   page: import("@playwright/test").Page,
   path = "/?guest=keluarga-tampubolon",
 ) {
-  await freezeBrowserTime(page, "2026-04-10T12:00:00+07:00");
+  await freezeBrowserTime(page, "2026-10-10T12:00:00+07:00");
   await mockSupabaseMinimal(page);
   await mockSupabaseGuest(page, "keluarga-tampubolon", {
     id: "11111111-1111-4111-8111-111111111111",
@@ -60,7 +60,7 @@ test("rsvp sheet opens from dock", async ({ page }) => {
 });
 
 test("public link locks RSVP without personal guest", async ({ page }) => {
-  await freezeBrowserTime(page, "2026-04-10T12:00:00+07:00");
+  await freezeBrowserTime(page, "2026-10-10T12:00:00+07:00");
   await mockSupabaseMinimal(page);
   await page.goto("/");
   await page.getByRole("button", { name: /buka undangan/i }).click();
@@ -79,7 +79,7 @@ test("public link locks RSVP without personal guest", async ({ page }) => {
 });
 
 test("personal guest unlocks RSVP with mocked slug lookup", async ({ page }) => {
-  await freezeBrowserTime(page, "2026-04-10T12:00:00+07:00");
+  await freezeBrowserTime(page, "2026-10-10T12:00:00+07:00");
   await mockSupabaseMinimal(page);
   await mockSupabaseGuest(page, "jeffry-istri", {
     id: "22222222-2222-4222-8222-222222222222",

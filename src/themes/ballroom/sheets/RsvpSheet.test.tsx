@@ -21,7 +21,7 @@ function renderSheet(guestId: string | null) {
 describe("RsvpSheet invite gating", () => {
   beforeEach(() => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-04-10T12:00:00+07:00"));
+    vi.setSystemTime(new Date("2026-10-10T12:00:00+07:00"));
   });
 
   afterEach(() => {

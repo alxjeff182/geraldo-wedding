@@ -61,7 +61,7 @@ test.beforeAll(async ({ request }) => {
 });
 
 async function openInvitation(page: import("@playwright/test").Page) {
-  await freezeBrowserTime(page, "2026-04-10T12:00:00+07:00");
+  await freezeBrowserTime(page, "2026-10-10T12:00:00+07:00");
   await page.addInitScript(() => window.localStorage.clear());
   await page.goto("/?guest=keluarga-tampubolon");
   await page.getByRole("button", { name: /buka undangan/i }).click();
@@ -138,7 +138,7 @@ test("guestbook form submits to edge function", async ({ page }) => {
 
 test("gift section shows bank details", async ({ page }) => {
   const { mockSupabaseMinimal, mockSupabaseGuest } = await import("./helpers/supabase-mock");
-  await freezeBrowserTime(page, "2026-04-10T12:00:00+07:00");
+  await freezeBrowserTime(page, "2026-10-10T12:00:00+07:00");
   await mockSupabaseMinimal(page);
   await mockSupabaseGuest(page, "keluarga-tampubolon", {
     id: "11111111-1111-4111-8111-111111111111",

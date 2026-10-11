@@ -28,8 +28,8 @@ describe("mergeWeddingContent", () => {
           venue: "Venue",
           address: "Addr",
           mapsUrl: "https://maps.example",
-          startsAt: "2026-04-25T10:00:00+07:00",
-          endsAt: "2026-04-25T12:00:00+07:00",
+          startsAt: "2026-10-24T10:00:00+07:00",
+          endsAt: "2026-10-24T12:00:00+07:00",
         },
       ],
     });
@@ -54,7 +54,7 @@ describe("mergeWeddingContent", () => {
     expect(merged.story.enabled).toBe(true);
     expect(merged.guestGuide.enabled).toBe(true);
     expect(merged.guestbook.enabled).toBe(true);
-    expect(merged.rsvp.deadline).toContain("2026-04-18");
+    expect(merged.rsvp.deadline).toContain("2026-10-17");
     expect(merged.rsvp.guestCountOptions).toEqual(["1", "2", "3"]);
   });
 

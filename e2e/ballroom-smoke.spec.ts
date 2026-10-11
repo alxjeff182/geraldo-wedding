@@ -4,7 +4,7 @@ import { freezeBrowserTime } from "./helpers/time-freeze";
 
 test.describe("ballroom theme smoke", () => {
   test("cover personalization and sheets", async ({ page }) => {
-    await freezeBrowserTime(page, "2026-04-10T12:00:00+07:00");
+    await freezeBrowserTime(page, "2026-10-10T12:00:00+07:00");
     await mockSupabaseMinimal(page);
     await mockSupabaseGuest(page, "keluarga-tampubolon", {
       id: "11111111-1111-4111-8111-111111111111",

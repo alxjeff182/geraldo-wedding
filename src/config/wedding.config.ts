@@ -23,7 +23,7 @@ export type GiftAccount = {
 export const wedding = {
   site: {
     title: "Geraldo & Christin",
-    description: "Pernikahan Geraldo & Christin. Tangerang, 25 April 2026",
+    description: "Pernikahan Geraldo & Christin. Tangerang, 24 Oktober 2026",
     url: import.meta.env.VITE_SITE_URL || "http://localhost:5173",
     noIndex: false,
     creator: {
@@ -62,9 +62,9 @@ export const wedding = {
       "Halo, saya *{nama}* sudah mengirim hadiah untuk {pasangan}.\nMetode: {metode}",
   },
 
-  date: "2026-04-25T08:00:00+07:00",
-  dateLabel: "Sabtu, 25 April 2026",
-  dateShort: "25 . 04 . 2026",
+  date: "2026-10-24T08:00:00+07:00",
+  dateLabel: "Sabtu, 24 Oktober 2026",
+  dateShort: "24 . 10 . 2026",
   location: "Tangerang",
 
   hero: {
@@ -85,23 +85,23 @@ export const wedding = {
   events: [
     {
       name: "Pemberkatan",
-      dateLabel: "Sabtu\n25 . 04 . 2026",
+      dateLabel: "Sabtu\n24 . 10 . 2026",
       time: "08.00 WIB",
       venue: "GPI Pondok Arum",
       address: "Perum. Pondok Arum, Blok J No. 26, Kel. Pabuaran Tumpeng, Kec. Karawaci, Tangerang",
       mapsUrl: "https://share.google/grqB2yx9JoR0Cdkdq",
-      startsAt: "2026-04-25T08:00:00+07:00",
-      endsAt: "2026-04-25T10:00:00+07:00",
+      startsAt: "2026-10-24T08:00:00+07:00",
+      endsAt: "2026-10-24T10:00:00+07:00",
     },
     {
       name: "Resepsi & Adat",
-      dateLabel: "Sabtu\n25 . 04 . 2026",
+      dateLabel: "Sabtu\n24 . 10 . 2026",
       time: "11.00 WIB",
       venue: "UFIT HALL GK",
       address: "Jl. Palem Raja Raya No.31, Panunggangan Bar., Kec. Cibodas, Kab. Tangerang",
       mapsUrl: "https://share.google/xxDvbeTIhjN0hvbBg",
-      startsAt: "2026-04-25T11:00:00+07:00",
-      endsAt: "2026-04-25T15:00:00+07:00",
+      startsAt: "2026-10-24T11:00:00+07:00",
+      endsAt: "2026-10-24T15:00:00+07:00",
     },
   ] satisfies WeddingEvent[],
 
@@ -196,7 +196,7 @@ export const wedding = {
     title: "RSVP",
     subtitle: "Konfirmasi kehadiran Anda dengan mengisi form berikut",
     note: "*Mohon maaf! Khusus untuk tamu undangan",
-    deadline: "2026-04-18T23:59:59+07:00",
+    deadline: "2026-10-17T23:59:59+07:00",
     deadlineLabel: "Mohon konfirmasi sebelum {date}",
     deadlineClosedMessage:
       "Batas konfirmasi kehadiran telah berakhir. Terima kasih atas perhatiannya.",
