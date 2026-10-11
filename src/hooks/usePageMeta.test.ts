@@ -4,7 +4,7 @@ import { buildOgImageAlt, buildSeoTitle } from "./usePageMeta";
 
 describe("buildSeoTitle", () => {
   it("puts brand first with hero eyebrow", () => {
-    expect(buildSeoTitle(wedding)).toBe("Geraldo & Christin · The Wedding Of");
+    expect(buildSeoTitle(wedding)).toBe("The Wedding Of · Geraldo & Christin");
   });
 
   it("falls back to brand when eyebrow empty", () => {
@@ -18,6 +18,6 @@ describe("buildSeoTitle", () => {
 
 describe("buildOgImageAlt", () => {
   it("echoes brand, eyebrow, and short date", () => {
-    expect(buildOgImageAlt(wedding)).toBe("Geraldo & Christin · The Wedding Of — 24 . 10 . 2026");
+    expect(buildOgImageAlt(wedding)).toBe("The Wedding Of · Geraldo & Christin — 24 . 10 . 2026");
   });
 });

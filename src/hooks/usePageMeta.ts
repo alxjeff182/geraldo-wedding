@@ -23,20 +23,20 @@ function setLink(rel: string, href: string) {
   el.href = href;
 }
 
-/** Brand-first title that echoes the hero caption, e.g. "Geraldo & Christin · The Wedding Of". */
+/** Caption-first title, e.g. "The Wedding Of · Geraldo & Christin". */
 export function buildSeoTitle(content: WeddingConfig): string {
   const brand = content.site.title.trim();
   const eyebrow = content.hero.eyebrow.trim();
   if (!brand) return eyebrow || "Wedding";
   if (!eyebrow || brand.toLowerCase().includes(eyebrow.toLowerCase())) return brand;
-  return `${brand} · ${eyebrow}`;
+  return `${eyebrow} · ${brand}`;
 }
 
 export function buildOgImageAlt(content: WeddingConfig): string {
   const brand = content.site.title.trim() || "Wedding";
   const eyebrow = content.hero.eyebrow.trim();
   const date = content.dateShort.trim() || content.dateLabel.trim();
-  const lead = eyebrow ? `${brand} · ${eyebrow}` : brand;
+  const lead = eyebrow ? `${eyebrow} · ${brand}` : brand;
   return date ? `${lead} — ${date}` : lead;
 }
 
