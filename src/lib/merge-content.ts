@@ -276,6 +276,12 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
     ? { ...merged.site, description: wedding.site.description }
     : merged.site;
 
+  // One-time: CMS still points OG preview to the bare field photo.
+  const cmsOg = String(merged.media.ogImage ?? "").trim();
+  const legacyOg =
+    !cmsOg || cmsOg.endsWith("/og-image.jpg") || cmsOg.endsWith("/assets/ballroom/og-image.jpg");
+  const media = legacyOg ? { ...merged.media, ogImage: wedding.media.ogImage } : merged.media;
+
   // One-time: CMS still has previous bride number, empty groom number, or dummy QRIS.
   const legacyBrideAccount = merged.gift.accounts.some(
     (account) => account.side === "bride" && account.number === "6705188657",
@@ -309,6 +315,7 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
   return {
     ...merged,
     site,
+    media,
     events,
     story,
     bibleQuote,

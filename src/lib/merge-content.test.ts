@@ -141,6 +141,13 @@ describe("mergeWeddingContent", () => {
     expect(merged.site.description).toContain("The Wedding Of");
   });
 
+  it("migrates legacy OG image to the share card", () => {
+    const merged = mergeWeddingContent({
+      media: { ogImage: "/assets/ballroom/og-image.jpg" },
+    });
+    expect(merged.media.ogImage).toBe("/assets/ballroom/og-share.jpg");
+  });
+
   it("migrates legacy story.paragraphs into milestones", () => {
     const merged = mergeWeddingContent({
       story: {
