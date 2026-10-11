@@ -29,7 +29,8 @@
   display: none;
 }
 .theme-ballroom .invitation.is-revealed {
-  animation: inviteIn 1.4s var(--ease-out) both;
+  /* Opacity-only: any transform on this scroll root blanks <video> while scrolling (WebKit). */
+  animation: inviteIn 1.4s var(--ease-out);
 }
 .theme-ballroom .invitation.has-dock {
   padding-bottom: calc(var(--dock-space) + env(safe-area-inset-bottom));
@@ -38,11 +39,9 @@
 @keyframes inviteIn {
   from {
     opacity: 0;
-    transform: scale(1.04);
   }
   to {
     opacity: 1;
-    transform: scale(1);
   }
 } /* Hero — native video playback */
 .theme-ballroom .hero {
@@ -58,6 +57,7 @@
   overflow: hidden;
   display: grid;
   place-items: start center;
+  /* No transform here — WebKit blanks <video> under transformed ancestors while scrolling. */
 }
 .theme-ballroom .hero__video {
   position: absolute;
@@ -103,8 +103,6 @@
   max-width: 36rem;
   /* Extra top inset so eyebrow never clips under overflow:hidden / status bar */
   padding: max(3.25rem, env(safe-area-inset-top, 0px) + 2.25rem) 1.25rem 0;
-  transform: translate3d(0, 0, 0);
-  will-change: transform;
 }
 .theme-ballroom .hero__eyebrow,
 .theme-ballroom .hero__names,

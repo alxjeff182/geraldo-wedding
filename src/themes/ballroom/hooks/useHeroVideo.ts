@@ -11,6 +11,19 @@ function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n));
 }
 
+/** Keep the last decoded frame visible (iOS often blanks after ended). */
+function holdLastFrame(video: HTMLVideoElement) {
+  if (!Number.isFinite(video.duration) || video.duration <= 0) return;
+  try {
+    const end = Math.max(0, video.duration - 0.05);
+    if (video.currentTime < end - 0.01 || video.ended) {
+      video.currentTime = end;
+    }
+  } catch {
+    /* seek can throw while not ready */
+  }
+}
+
 export function useHeroVideo({ videoRef, heroRef, enabled = true, onProgress }: Options) {
   const onProgressRef = useRef(onProgress);
   onProgressRef.current = onProgress;
@@ -23,6 +36,7 @@ export function useHeroVideo({ videoRef, heroRef, enabled = true, onProgress }: 
     let waitRaf = 0;
     const timers = new Set<number>();
     let detach: (() => void) | null = null;
+    let loadedOnce = false;
 
     const later = (fn: () => void, ms: number) => {
       const id = window.setTimeout(() => {
@@ -78,13 +92,15 @@ export function useHeroVideo({ videoRef, heroRef, enabled = true, onProgress }: 
       };
 
       const onTimeUpdate = () => applyProgress(readProgress());
-      const onEnded = () => applyProgress(1);
+      const onEnded = () => {
+        holdLastFrame(video);
+        applyProgress(1);
+      };
       const onLoaded = () => {
         if (cancelled) return;
         applyProgress(readProgress());
       };
 
-      // iOS needs muted + playsInline before any play() attempt.
       video.muted = true;
       video.defaultMuted = true;
       video.playsInline = true;
@@ -104,7 +120,7 @@ export function useHeroVideo({ videoRef, heroRef, enabled = true, onProgress }: 
         const jump = () => {
           if (!Number.isFinite(video.duration) || video.duration <= 0) return;
           video.pause();
-          video.currentTime = video.duration;
+          holdLastFrame(video);
           applyProgress(1);
         };
         if (video.readyState >= 1) jump();
@@ -123,7 +139,15 @@ export function useHeroVideo({ videoRef, heroRef, enabled = true, onProgress }: 
       const maxAttempts = 8;
 
       const tryPlay = () => {
-        if (cancelled || (!video.paused && !video.ended)) return;
+        if (cancelled) return;
+        // Finished — keep last frame, don't restart on every scroll tick.
+        if (video.ended || (Number.isFinite(video.duration) && video.currentTime >= video.duration - 0.08)) {
+          holdLastFrame(video);
+          applyProgress(1);
+          return;
+        }
+        if (!video.paused) return;
+
         attempts += 1;
         video.muted = true;
         const playPromise = video.play();
@@ -137,11 +161,14 @@ export function useHeroVideo({ videoRef, heroRef, enabled = true, onProgress }: 
         }
       };
 
-      // Parent was `hidden` until reveal — force a fresh load on iOS.
-      try {
-        video.load();
-      } catch {
-        /* noop */
+      // Only load() once after reveal — repeating load() blanks the frame on scroll.
+      if (!loadedOnce) {
+        loadedOnce = true;
+        try {
+          video.load();
+        } catch {
+          /* noop */
+        }
       }
 
       const onCanPlay = () => tryPlay();
@@ -149,13 +176,37 @@ export function useHeroVideo({ videoRef, heroRef, enabled = true, onProgress }: 
       video.addEventListener("canplay", onCanPlay);
       video.addEventListener("loadeddata", onLoadedData);
 
-      // First touch/scroll inside the invite unlocks autoplay if muted-play was blocked.
-      const unlock = () => tryPlay();
-      scrollRoot?.addEventListener("touchstart", unlock, { passive: true });
-      scrollRoot?.addEventListener("pointerdown", unlock, { passive: true });
-      scrollRoot?.addEventListener("scroll", unlock, { passive: true, once: true });
+      const onScroll = () => {
+        if (video.ended) {
+          holdLastFrame(video);
+          return;
+        }
+        if (video.paused) tryPlay();
+      };
 
-      // Kick off after layout — invite reveal animation finishes ~1.4s; start sooner too.
+      scrollRoot?.addEventListener("touchstart", onScroll, { passive: true });
+      scrollRoot?.addEventListener("pointerdown", onScroll, { passive: true });
+      scrollRoot?.addEventListener("scroll", onScroll, { passive: true });
+
+      // If hero re-enters the viewport after a WebKit blank, resume / restore frame.
+      const io =
+        typeof IntersectionObserver !== "undefined"
+          ? new IntersectionObserver(
+              (entries) => {
+                const visible = entries.some((e) => e.isIntersecting && e.intersectionRatio > 0.2);
+                if (!visible) return;
+                if (video.ended) {
+                  holdLastFrame(video);
+                  applyProgress(1);
+                  return;
+                }
+                tryPlay();
+              },
+              { root: scrollRoot, threshold: [0.2, 0.5, 0.9] },
+            )
+          : null;
+      io?.observe(heroEl);
+
       tryPlay();
       later(tryPlay, 120);
       later(tryPlay, 500);
@@ -170,9 +221,10 @@ export function useHeroVideo({ videoRef, heroRef, enabled = true, onProgress }: 
         video.removeEventListener("play", tick);
         video.removeEventListener("canplay", onCanPlay);
         video.removeEventListener("loadeddata", onLoadedData);
-        scrollRoot?.removeEventListener("touchstart", unlock);
-        scrollRoot?.removeEventListener("pointerdown", unlock);
-        scrollRoot?.removeEventListener("scroll", unlock);
+        scrollRoot?.removeEventListener("touchstart", onScroll);
+        scrollRoot?.removeEventListener("pointerdown", onScroll);
+        scrollRoot?.removeEventListener("scroll", onScroll);
+        io?.disconnect();
         video.pause();
       };
     };
