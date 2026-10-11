@@ -237,7 +237,7 @@ export const wedding = {
   media: {
     coverBg: "/assets/ballroom/cover-frame.jpg",
     audio: "/assets/ballroom/goodness-of-god.mp3",
-    ogImage: "/assets/ballroom/og-v3.jpg",
+    ogImage: "/assets/ballroom/og-opening.jpg",
     logo: "/assets/ballroom/logo.png",
     openingVideo: "/assets/ballroom/opening.mp4",
     heroVideo: "/assets/ballroom/hero.mp4",

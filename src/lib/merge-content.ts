@@ -305,6 +305,7 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
     cmsOg.endsWith("/og-share.jpg") ||
     cmsOg.includes("/assets/ballroom/og-image.jpg") ||
     cmsOg.includes("/assets/ballroom/og-share.jpg") ||
+    cmsOg.includes("/assets/ballroom/og-v3.jpg") ||
     cmsOg === "/assets/ballroom/og-share.jpg";
   const media = legacyOg ? { ...merged.media, ogImage: wedding.media.ogImage } : merged.media;
 
