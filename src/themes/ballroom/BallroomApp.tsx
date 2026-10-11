@@ -310,17 +310,6 @@ export function BallroomApp({ guestName, guestId }: Props) {
             </button>
           </footer>
           <div className="site-credit">
-            {content.site.creator.websiteUrl || content.site.creator.url ? (
-              <a
-                className="site-credit__porto"
-                href={content.site.creator.websiteUrl || content.site.creator.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={content.footer.websiteAriaLabel}
-              >
-                {content.footer.portfolioLinkLabel}
-              </a>
-            ) : null}
             <p className="site-credit__copy">
               {content.footer.creditPrefix}{" "}
               {content.site.creator.websiteUrl || content.site.creator.url ? (
