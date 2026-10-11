@@ -191,7 +191,7 @@ export function Wishes({ guestId, guestName, onToast }: Props) {
       aria-label={gb.title}
     >
       <div className="section__head">
-        <p className="eyebrow">Ucapan</p>
+        <p className="eyebrow">wishes</p>
         <h3>{gb.title}</h3>
         <div className="ornament" aria-hidden="true" />
       </div>
