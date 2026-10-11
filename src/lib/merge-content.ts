@@ -156,6 +156,23 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
   const bibleQuote = legacyMatthew ? wedding.bibleQuote : merged.bibleQuote;
   const bibleReference = legacyMatthew ? wedding.bibleReference : merged.bibleReference;
 
+  // One-time: CMS still has the previous bride BCA number / dummy QRIS.
+  const legacyBrideAccount = merged.gift.accounts.some(
+    (account) => account.side === "bride" && account.number === "6705188657",
+  );
+  const gift = legacyBrideAccount
+    ? {
+        ...merged.gift,
+        qris: wedding.gift.qris,
+        qrisBride: wedding.gift.qrisBride,
+        accounts: wedding.gift.accounts.map((account) => {
+          if (account.side !== "groom") return account;
+          const cmsGroom = merged.gift.accounts.find((item) => item.side === "groom");
+          return cmsGroom ? { ...account, ...cmsGroom, side: "groom" as const } : account;
+        }),
+      }
+    : merged.gift;
+
   const story = {
     ...merged.story,
     milestones: migrateStoryMilestones(
@@ -170,6 +187,7 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
     story,
     bibleQuote,
     bibleReference,
+    gift,
     invite: {
       ...merged.invite,
       whatsappTemplates,

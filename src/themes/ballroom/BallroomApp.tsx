@@ -132,7 +132,7 @@ export function BallroomApp({ guestName, guestId }: Props) {
     setOpening(false);
     setLeaving(false);
     setRevealed(false);
-  }, [pause, sheet.close]);
+  }, [pause, sheet]);
 
   const coupleTitle = `${content.couple.groom.shortName} & ${content.couple.bride.shortName}`;
   const dockVisible = revealed && inFirstSection && heroProgress >= DOCK_AT && !sheet.isOpen;

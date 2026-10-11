@@ -126,4 +126,33 @@ describe("mergeWeddingContent", () => {
     expect(merged.story.milestones).toHaveLength(1);
     expect(merged.story.milestones[0].title).toBe("Bertemu");
   });
+
+  it("replaces legacy bride BCA account and QRIS from defaults", () => {
+    const merged = mergeWeddingContent({
+      gift: {
+        accounts: [
+          {
+            bank: "BCA",
+            number: "6705188657",
+            holder: "Christin Samosir, S.M.",
+            logo: "/assets/ballroom/bca-logo.png",
+            side: "bride",
+          },
+          {
+            bank: "BCA",
+            number: "999",
+            holder: "Geraldo Gracedo Sudena Tampubolon",
+            logo: "/assets/ballroom/bca-logo.png",
+            side: "groom",
+          },
+        ],
+      },
+    });
+    const bride = merged.gift.accounts.find((account) => account.side === "bride");
+    const groom = merged.gift.accounts.find((account) => account.side === "groom");
+    expect(bride?.number).toBe("2480419009");
+    expect(bride?.holder).toBe("Christin Samosir");
+    expect(merged.gift.qrisBride).toContain("qris-bride");
+    expect(groom?.number).toBe("999");
+  });
 });
