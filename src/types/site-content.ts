@@ -192,6 +192,7 @@ export type SiteContentOverrides = {
   };
   hashtag?: {
     title?: string;
+    subtitle?: string;
     tag?: string;
     lead?: string;
     storyTemplate?: string;

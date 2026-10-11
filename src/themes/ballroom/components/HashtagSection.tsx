@@ -39,6 +39,7 @@ export function HashtagSection({
   const boothLabel = content.hashtag.boothButton || "Rekam Video Story";
   const storyHint =
     content.hashtag.storyHint || "Rekam video dengan bingkai kami, lalu pilih Instagram → Story";
+  const subtitle = content.hashtag.subtitle || "Share Your Moment";
   const lead = content.hashtag.lead || "Abadikan momen bersama kami di Instagram Story";
   const maxSeconds = content.hashtag.boothMaxSeconds ?? 15;
   const explore = hashtagExploreUrl(tag);
@@ -171,6 +172,7 @@ export function HashtagSection({
     <section id="hashtag" className="section hashtag-mod fade-up" aria-label={title}>
       <div className="section__head">
         <h3 className="hashtag-mod__caption">{title}</h3>
+        {subtitle ? <p className="hashtag-mod__subtitle">{subtitle}</p> : null}
         <div className="ornament" aria-hidden="true" />
       </div>
       <p className="hashtag-mod__lead">{lead}</p>
