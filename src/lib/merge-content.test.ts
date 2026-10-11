@@ -152,14 +152,14 @@ Dengan penuh sukacita dan mengucap syukur kepada Tuhan Yesus Kristus, kami mengu
     expect(merged.bibleReference).toBe("Kidung Agung 2:16");
   });
 
-  it("migrates legacy SEO description to luxury-minimal copy", () => {
+  it("migrates legacy SEO description to the short OG CTA", () => {
     const merged = mergeWeddingContent({
       site: {
-        description: "Pernikahan Geraldo & Christin. Tangerang, 24 Oktober 2026",
+        description:
+          "The Wedding Of Geraldo & Christin · Sabtu, 24 Oktober 2026. Dengan penuh sukacita, kami mengundang Anda hadir.",
       },
     });
-    expect(merged.site.description).toBe(wedding.site.description);
-    expect(merged.site.description).toContain("The Wedding Of");
+    expect(merged.site.description).toBe("Klik untuk informasi lebih lengkap");
   });
 
   it("migrates legacy OG image to the share card", () => {
