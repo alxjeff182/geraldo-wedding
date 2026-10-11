@@ -36,6 +36,11 @@
   padding-bottom: calc(var(--dock-space) + env(safe-area-inset-bottom));
   scroll-padding-bottom: calc(var(--dock-space) + env(safe-area-inset-bottom));
 }
+.theme-ballroom .invitation.is-hero-locked {
+  overflow-y: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+}
 @keyframes inviteIn {
   from {
     opacity: 0;

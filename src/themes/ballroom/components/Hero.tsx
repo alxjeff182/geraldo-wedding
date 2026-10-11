@@ -15,7 +15,8 @@ type Props = {
   onProgress?: (progress: number) => void;
 };
 
-const HINT_HIDE_AT = 0.04;
+/** Scroll cue only after the hero video finishes. */
+const HINT_SHOW_AT = 0.99;
 
 export function Hero({
   eyebrow,
@@ -31,12 +32,12 @@ export function Hero({
 }: Props) {
   const heroRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [hintGone, setHintGone] = useState(false);
+  const [hintGone, setHintGone] = useState(true);
   const cd = useCountdown(weddingDate);
 
   const handleProgress = useCallback(
     (progress: number) => {
-      setHintGone(progress >= HINT_HIDE_AT);
+      setHintGone(progress < HINT_SHOW_AT);
       onProgress?.(progress);
     },
     [onProgress],

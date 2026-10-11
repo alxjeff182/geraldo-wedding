@@ -96,6 +96,10 @@ export function useHeroVideo({ videoRef, heroRef, enabled = true, onProgress }: 
         holdLastFrame(video);
         applyProgress(1);
       };
+      const onError = () => {
+        // Don't trap guests if the hero asset fails — unlock scroll.
+        applyProgress(1);
+      };
       const onLoaded = () => {
         if (cancelled) return;
         applyProgress(readProgress());
@@ -112,8 +116,26 @@ export function useHeroVideo({ videoRef, heroRef, enabled = true, onProgress }: 
 
       video.addEventListener("timeupdate", onTimeUpdate);
       video.addEventListener("ended", onEnded);
+      video.addEventListener("error", onError);
       video.addEventListener("loadedmetadata", onLoaded);
       video.addEventListener("play", tick);
+
+      // Failsafe: never leave scroll locked if play stalls past duration + buffer.
+      let unlockTimer = 0;
+      const armUnlockFailsafe = () => {
+        window.clearTimeout(unlockTimer);
+        const duration =
+          Number.isFinite(video.duration) && video.duration > 0 ? video.duration : 12;
+        unlockTimer = window.setTimeout(
+          () => {
+            if (cancelled || video.ended) return;
+            holdLastFrame(video);
+            applyProgress(1);
+          },
+          Math.ceil(duration * 1000) + 2500,
+        );
+        timers.add(unlockTimer);
+      };
 
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       if (reduceMotion) {
@@ -129,8 +151,10 @@ export function useHeroVideo({ videoRef, heroRef, enabled = true, onProgress }: 
         detach = () => {
           video.removeEventListener("timeupdate", onTimeUpdate);
           video.removeEventListener("ended", onEnded);
+          video.removeEventListener("error", onError);
           video.removeEventListener("loadedmetadata", onLoaded);
           video.removeEventListener("play", tick);
+          window.clearTimeout(unlockTimer);
         };
         return;
       }
@@ -214,12 +238,17 @@ export function useHeroVideo({ videoRef, heroRef, enabled = true, onProgress }: 
       later(tryPlay, 120);
       later(tryPlay, 500);
       later(tryPlay, 1600);
+      if (video.readyState >= 1) armUnlockFailsafe();
+      else video.addEventListener("loadedmetadata", armUnlockFailsafe, { once: true });
+      // If metadata never arrives, still unlock eventually.
+      later(() => applyProgress(1), 20000);
 
       raf = requestAnimationFrame(tick);
 
       detach = () => {
         video.removeEventListener("timeupdate", onTimeUpdate);
         video.removeEventListener("ended", onEnded);
+        video.removeEventListener("error", onError);
         video.removeEventListener("loadedmetadata", onLoaded);
         video.removeEventListener("play", tick);
         video.removeEventListener("canplay", onCanPlay);
@@ -228,6 +257,7 @@ export function useHeroVideo({ videoRef, heroRef, enabled = true, onProgress }: 
         scrollRoot?.removeEventListener("pointerdown", onScroll);
         scrollRoot?.removeEventListener("scroll", onScroll);
         io?.disconnect();
+        window.clearTimeout(unlockTimer);
         video.pause();
       };
     };

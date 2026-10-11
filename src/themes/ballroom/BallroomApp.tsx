@@ -66,9 +66,30 @@ export function BallroomApp({ guestName, guestId }: Props) {
     [revealed],
   );
   const sheet = useSheet({ inertTargets });
-  const pullRefresh = usePullToRefresh(inviteRef, revealed, { blocked: sheet.isOpen });
+  const heroScrollLocked = revealed && heroProgress < 0.99;
+  const pullRefresh = usePullToRefresh(inviteRef, revealed, {
+    blocked: sheet.isOpen || heroScrollLocked,
+  });
 
   useInvitationFx(inviteRef, revealed);
+
+  useEffect(() => {
+    const root = inviteRef.current;
+    if (!root || !heroScrollLocked) return;
+    root.scrollTop = 0;
+    const blockTouch = (event: TouchEvent) => {
+      event.preventDefault();
+    };
+    const blockWheel = (event: WheelEvent) => {
+      event.preventDefault();
+    };
+    root.addEventListener("touchmove", blockTouch, { passive: false });
+    root.addEventListener("wheel", blockWheel, { passive: false });
+    return () => {
+      root.removeEventListener("touchmove", blockTouch);
+      root.removeEventListener("wheel", blockWheel);
+    };
+  }, [heroScrollLocked]);
 
   useEffect(() => {
     document.body.classList.add("theme-ballroom-host");
@@ -151,7 +172,7 @@ export function BallroomApp({ guestName, guestId }: Props) {
         <main
           id="invitation"
           ref={inviteRef}
-          className={`invitation${revealed ? " is-revealed" : ""}${dockVisible ? " has-dock" : ""}`}
+          className={`invitation${revealed ? " is-revealed" : ""}${dockVisible ? " has-dock" : ""}${heroScrollLocked ? " is-hero-locked" : ""}`}
           hidden={!revealed}
         >
           <Hero
