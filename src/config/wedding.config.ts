@@ -331,6 +331,8 @@ export const wedding = {
     lockedMessage: "Buka undangan dari link pribadi Anda untuk mengirim ucapan.",
     limitReachedMessage: "Batas 3 ucapan per undangan sudah tercapai.",
     remainingLabel: "Sisa {n} ucapan",
+    countLabel: "{n} ucapan",
+    loadMore: "Lihat lebih banyak",
     pagerPrev: "Sebelumnya",
     pagerNext: "Selanjutnya",
     errorMessage: "Gagal mengirim ucapan. Silakan coba lagi.",

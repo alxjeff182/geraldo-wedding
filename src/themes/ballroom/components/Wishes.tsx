@@ -1,4 +1,11 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type FormEvent,
+} from "react";
 import { fetchPublicWishes, isSupabaseConfigured, type Wish } from "../../../lib/supabase-rest";
 import { submitForm } from "../../../lib/submit-form";
 import {
@@ -16,8 +23,10 @@ type Props = {
   onToast: (msg: string) => void;
 };
 
-const PAGE = 5;
+const INITIAL_VISIBLE = 8;
+const LOAD_MORE = 8;
 const POLL_MS = 30_000;
+const LONG_MSG_CHARS = 140;
 
 function relativeTime(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
@@ -33,6 +42,21 @@ function relativeTime(iso: string): string {
     month: "short",
     year: "numeric",
   });
+}
+
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0] ?? ""}${parts[1][0] ?? ""}`.toUpperCase();
+}
+
+function avatarHue(name: string): number {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = (hash * 31 + name.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash) % 360;
 }
 
 function guardMessage(
@@ -63,8 +87,12 @@ export function Wishes({ guestId, guestName, onToast }: Props) {
   const guestKey = guestId;
   const formOpenedAt = useRef(Date.now());
   const sectionRef = useRef<HTMLElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const [items, setItems] = useState<Wish[]>([]);
-  const [page, setPage] = useState(0);
+  const [visible, setVisible] = useState(INITIAL_VISIBLE);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [freshId, setFreshId] = useState<string | null>(null);
+  const [fadeEdge, setFadeEdge] = useState({ top: false, bottom: false });
   const [message, setMessage] = useState("");
   const [company, setCompany] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -77,7 +105,7 @@ export function Wishes({ guestId, guestName, onToast }: Props) {
     formOpenedAt.current = Date.now();
   }, [guestKey]);
 
-  const fetchWishes = () => {
+  const fetchWishes = useCallback(() => {
     if (!isSupabaseConfigured) {
       setSupabaseOk(false);
       return;
@@ -90,11 +118,11 @@ export function Wishes({ guestId, guestName, onToast }: Props) {
       setSupabaseOk(true);
       if (data) setItems(data);
     });
-  };
+  }, []);
 
   useEffect(() => {
     fetchWishes();
-  }, []);
+  }, [fetchWishes]);
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -111,7 +139,7 @@ export function Wishes({ guestId, guestName, onToast }: Props) {
     if (!inView || document.visibilityState !== "visible") return;
     const id = window.setInterval(fetchWishes, POLL_MS);
     return () => window.clearInterval(id);
-  }, [inView]);
+  }, [inView, fetchWishes]);
 
   useEffect(() => {
     const onVisibility = () => {
@@ -121,12 +149,85 @@ export function Wishes({ guestId, guestName, onToast }: Props) {
     };
     document.addEventListener("visibilitychange", onVisibility);
     return () => document.removeEventListener("visibilitychange", onVisibility);
-  }, [inView]);
+  }, [inView, fetchWishes]);
 
-  const pages = Math.max(1, Math.ceil(items.length / PAGE));
-  const slice = items.slice(page * PAGE, page * PAGE + PAGE);
+  const updateFadeEdge = useCallback(() => {
+    const el = listRef.current;
+    if (!el) {
+      setFadeEdge({ top: false, bottom: false });
+      return;
+    }
+    const { scrollTop, scrollHeight, clientHeight } = el;
+    const overflow = scrollHeight > clientHeight + 2;
+    setFadeEdge({
+      top: overflow && scrollTop > 4,
+      bottom: overflow && scrollTop + clientHeight < scrollHeight - 4,
+    });
+  }, []);
+
+  useEffect(() => {
+    updateFadeEdge();
+  }, [items, visible, updateFadeEdge]);
+
+  useEffect(() => {
+    const el = listRef.current;
+    if (!el) return;
+    const onScroll = () => updateFadeEdge();
+    el.addEventListener("scroll", onScroll, { passive: true });
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(onScroll) : null;
+    ro?.observe(el);
+    return () => {
+      el.removeEventListener("scroll", onScroll);
+      ro?.disconnect();
+    };
+  }, [updateFadeEdge]);
+
+  useEffect(() => {
+    const root = listRef.current;
+    if (!root || typeof IntersectionObserver === "undefined") return;
+    const rows = root.querySelectorAll<HTMLElement>(".wish-row:not(.is-in)");
+    if (rows.length === 0) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          entry.target.classList.add("is-in");
+          io.unobserve(entry.target);
+        }
+      },
+      { root, threshold: 0.2 },
+    );
+    rows.forEach((row) => io.observe(row));
+    return () => io.disconnect();
+  }, [items, visible]);
+
+  useEffect(() => {
+    if (!freshId) return;
+    const id = window.setTimeout(() => setFreshId(null), 1800);
+    return () => window.clearTimeout(id);
+  }, [freshId]);
+
+  const slice = items.slice(0, visible);
+  const hasMore = visible < items.length;
   const remaining = Math.max(0, WISH_MAX_PER_GUEST - sentCount);
   const canSubmit = Boolean(guestId) && remaining > 0;
+  const countLabel = (gb.countLabel ?? "{n} ucapan").replace("{n}", String(items.length));
+  const loadMoreLabel = gb.loadMore ?? "Lihat lebih banyak";
+
+  const onLoadMore = () => {
+    setVisible((n) => Math.min(items.length, n + LOAD_MORE));
+    requestAnimationFrame(() => {
+      const el = listRef.current;
+      if (!el) return;
+      el.scrollBy({ top: 72, behavior: "smooth" });
+      updateFadeEdge();
+    });
+  };
+
+  const toggleExpand = (id: string, long: boolean) => {
+    if (!long) return;
+    setExpandedId((cur) => (cur === id ? null : id));
+  };
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -163,12 +264,13 @@ export function Wishes({ guestId, guestName, onToast }: Props) {
       return;
     }
 
+    const localId = crypto.randomUUID();
     markWishSubmitted(guestKey);
     setSentCount(getWishCount(guestKey));
     onToast(result.message ?? gb.successMessage);
     setItems((prev) => [
       {
-        id: crypto.randomUUID(),
+        id: localId,
         guest_id: guestId,
         name: guestName.trim() || "Tamu",
         message: message.trim(),
@@ -177,11 +279,21 @@ export function Wishes({ guestId, guestName, onToast }: Props) {
       },
       ...prev,
     ]);
+    setFreshId(localId);
+    setVisible(INITIAL_VISIBLE);
     setMessage("");
-    setPage(0);
     formOpenedAt.current = Date.now();
+    listRef.current?.scrollTo({ top: 0, behavior: "smooth" });
     fetchWishes();
   };
+
+  const fadeClass = [
+    "wishes-feed__list",
+    fadeEdge.top ? "is-fade-top" : "",
+    fadeEdge.bottom ? "is-fade-bottom" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <section
@@ -238,44 +350,67 @@ export function Wishes({ guestId, guestName, onToast }: Props) {
         <p className="wishes-locked">{!guestId ? gb.lockedMessage : gb.limitReachedMessage}</p>
       )}
 
-      <div className="wishes-list">
-        {slice.length === 0 ? (
-          <p className="gift__lead">{supabaseOk ? gb.emptyMessage : gb.emptyNoSupabase}</p>
-        ) : (
-          slice.map((wish) => (
-            <article key={wish.id} className="wish-card">
-              <div className="wish-card__head">
-                <p className="wish-card__name">{wish.name}</p>
-                <time className="wish-card__time" dateTime={wish.created_at}>
-                  {relativeTime(wish.created_at)}
-                </time>
-              </div>
-              <p className="wish-card__msg">{wish.message}</p>
-            </article>
-          ))
-        )}
-      </div>
-
-      {pages > 1 ? (
-        <div className="wishes-pager">
-          <button
-            type="button"
-            className="btn btn--ghost btn--small"
-            disabled={page === 0}
-            onClick={() => setPage((p) => Math.max(0, p - 1))}
-          >
-            {gb.pagerPrev}
-          </button>
-          <button
-            type="button"
-            className="btn btn--ghost btn--small"
-            disabled={page >= pages - 1}
-            onClick={() => setPage((p) => Math.min(pages - 1, p + 1))}
-          >
-            {gb.pagerNext}
-          </button>
+      {items.length === 0 ? (
+        <p className="gift__lead">{supabaseOk ? gb.emptyMessage : gb.emptyNoSupabase}</p>
+      ) : (
+        <div className="wishes-feed">
+          <div className="wishes-feed__head">
+            <p className="wishes-feed__count">{countLabel}</p>
+            <p className="wishes-feed__live">
+              <span className="wishes-feed__dot" aria-hidden="true" />
+              Terbaru
+            </p>
+          </div>
+          <div ref={listRef} className={fadeClass}>
+            {slice.map((wish, index) => {
+              const long = wish.message.trim().length > LONG_MSG_CHARS;
+              const expanded = expandedId === wish.id;
+              const hue = avatarHue(wish.name);
+              return (
+                <article
+                  key={wish.id}
+                  className={`wish-row${freshId === wish.id ? " is-fresh" : ""}${expanded ? " is-expanded" : ""}`}
+                  style={{ "--i": index % LOAD_MORE } as CSSProperties}
+                >
+                  <div
+                    className="wish-row__avatar"
+                    style={{ "--hue": hue } as CSSProperties}
+                    aria-hidden="true"
+                  >
+                    {initials(wish.name)}
+                  </div>
+                  <div className="wish-row__body">
+                    <div className="wish-row__meta">
+                      <p className="wish-row__name">{wish.name}</p>
+                      <time className="wish-row__time" dateTime={wish.created_at}>
+                        {relativeTime(wish.created_at)}
+                      </time>
+                    </div>
+                    {long ? (
+                      <button
+                        type="button"
+                        className="wish-row__msg wish-row__msg--toggle"
+                        aria-expanded={expanded}
+                        onClick={() => toggleExpand(wish.id, long)}
+                      >
+                        {wish.message}
+                      </button>
+                    ) : (
+                      <p className="wish-row__msg">{wish.message}</p>
+                    )}
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+          {hasMore ? (
+            <button type="button" className="wishes-feed__more" onClick={onLoadMore}>
+              <span>{loadMoreLabel}</span>
+              <span className="wishes-feed__chevron" aria-hidden="true" />
+            </button>
+          ) : null}
         </div>
-      ) : null}
+      )}
     </section>
   );
 }

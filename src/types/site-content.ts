@@ -72,6 +72,8 @@ export type GuestbookContent = {
   lockedMessage?: string;
   limitReachedMessage?: string;
   remainingLabel?: string;
+  countLabel?: string;
+  loadMore?: string;
   pagerPrev?: string;
   pagerNext?: string;
   errorMessage?: string;

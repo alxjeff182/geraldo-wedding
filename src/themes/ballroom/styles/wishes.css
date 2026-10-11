@@ -316,40 +316,9 @@
   gap: 1rem;
 }
 
-.theme-ballroom .wishes-list {
-  display: grid;
-  gap: 0.75rem;
-  max-width: 34rem;
-  margin-inline: auto;
-}
-
-.theme-ballroom .wish-card {
-  padding: 1rem 1.1rem;
-  border-radius: var(--r-md);
-  border: 1px solid var(--line);
-  background: var(--surface);
-}
-
-.theme-ballroom .wish-card__head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin-bottom: 0.4rem;
-}
-
-.theme-ballroom .wish-card__name {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-  color: var(--gold-soft);
-}
-
-.theme-ballroom .wish-card__time {
-  font-size: 0.68rem;
-  letter-spacing: 0.06em;
-  color: rgba(212, 196, 176, 0.72);
-  white-space: nowrap;
+.theme-ballroom .wishes-form textarea {
+  border-color: var(--gold-a25);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .theme-ballroom .couple-card:focus-visible {
@@ -357,8 +326,178 @@
   outline-offset: 4px;
 }
 
-.theme-ballroom .wish-card__msg {
+.theme-ballroom .wishes-feed {
+  max-width: 34rem;
+  margin: 0 auto;
+  border-radius: var(--r-md);
+  border: 1px solid var(--gold-a25);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015));
+  overflow: hidden;
+}
+
+.theme-ballroom .wishes-feed__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1.1rem 0.7rem;
+  border-bottom: 1px solid var(--gold-a15);
+}
+
+.theme-ballroom .wishes-feed__count {
   margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+}
+
+.theme-ballroom .wishes-feed__live {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: rgba(212, 196, 176, 0.65);
+}
+
+.theme-ballroom .wishes-feed__dot {
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 0 0 var(--gold-a40);
+  animation: wishes-live-pulse 1.8s ease-out infinite;
+}
+
+.theme-ballroom .wishes-feed__list {
+  max-height: min(60vh, 28rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gold-a40) transparent;
+  mask-image: linear-gradient(#000, #000);
+}
+
+.theme-ballroom .wishes-feed__list.is-fade-top {
+  mask-image: linear-gradient(180deg, transparent 0%, #000 1.25rem, #000 100%);
+}
+
+.theme-ballroom .wishes-feed__list.is-fade-bottom {
+  mask-image: linear-gradient(180deg, #000 0%, #000 calc(100% - 1.25rem), transparent 100%);
+}
+
+.theme-ballroom .wishes-feed__list.is-fade-top.is-fade-bottom {
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    #000 1.25rem,
+    #000 calc(100% - 1.25rem),
+    transparent 100%
+  );
+}
+
+.theme-ballroom .wishes-feed__list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.theme-ballroom .wishes-feed__list::-webkit-scrollbar-thumb {
+  background: var(--gold-a40);
+  border-radius: 999px;
+}
+
+.theme-ballroom .wish-row {
+  --i: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  padding: 0.9rem 1.1rem;
+  border-bottom: 1px solid var(--gold-a15);
+  opacity: 0;
+  transform: translate3d(0, 10px, 0);
+  transition:
+    opacity 0.45s var(--ease-out),
+    transform 0.45s var(--ease-out),
+    background 0.25s ease;
+  transition-delay: calc(var(--i) * 40ms);
+}
+
+.theme-ballroom .wish-row:last-child {
+  border-bottom: 0;
+}
+
+.theme-ballroom .wish-row.is-in {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.theme-ballroom .wish-row:hover,
+.theme-ballroom .wish-row:focus-within {
+  background: rgba(212, 196, 176, 0.04);
+}
+
+.theme-ballroom .wish-row.is-fresh {
+  animation: wishes-fresh-pulse 1.6s var(--ease-out);
+}
+
+.theme-ballroom .wish-row__avatar {
+  --hue: 40;
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--cream);
+  border: 1px solid hsla(var(--hue), 42%, 62%, 0.55);
+  background: hsla(var(--hue), 35%, 28%, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.theme-ballroom .wish-row__body {
+  min-width: 0;
+  display: grid;
+  gap: 0.28rem;
+}
+
+.theme-ballroom .wish-row__meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
+.theme-ballroom .wish-row__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--gold-soft);
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.theme-ballroom .wish-row__time {
+  flex-shrink: 0;
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+  color: rgba(212, 196, 176, 0.55);
+  white-space: nowrap;
+}
+
+.theme-ballroom .wish-row__msg {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
   font-size: var(--fs-body);
   line-height: 1.55;
   color: var(--cream-dim);
@@ -366,15 +505,96 @@
   word-break: break-word;
 }
 
-.theme-ballroom .wishes-pager {
-  display: flex;
-  justify-content: center;
-  gap: 0.65rem;
-  margin-top: 1.15rem;
+.theme-ballroom .wish-row__msg--toggle {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  cursor: pointer;
+  border-radius: 0.2rem;
 }
 
-.theme-ballroom .wishes-pager .btn--small {
-  margin-top: 0;
+.theme-ballroom .wish-row.is-expanded .wish-row__msg--toggle {
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+
+.theme-ballroom .wish-row__msg--toggle:focus-visible {
+  outline: 1px solid var(--gold-a60);
+  outline-offset: 2px;
+}
+
+.theme-ballroom .wishes-feed__more {
+  appearance: none;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border: 0;
+  border-top: 1px solid var(--gold-a15);
+  background: transparent;
+  color: var(--gold-soft);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.theme-ballroom .wishes-feed__more:hover,
+.theme-ballroom .wishes-feed__more:focus-visible {
+  background: rgba(212, 196, 176, 0.06);
+  color: var(--gold);
+}
+
+.theme-ballroom .wishes-feed__more:focus-visible {
+  outline: 1px solid var(--gold-a60);
+  outline-offset: -2px;
+}
+
+.theme-ballroom .wishes-feed__chevron {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg) translateY(-1px);
+}
+
+@keyframes wishes-live-pulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--gold-a40);
+  }
+  70% {
+    box-shadow: 0 0 0 0.45rem transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@keyframes wishes-fresh-pulse {
+  0% {
+    background: rgba(212, 196, 176, 0.16);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-ballroom .wish-row {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .theme-ballroom .wishes-feed__dot,
+  .theme-ballroom .wish-row.is-fresh {
+    animation: none;
+  }
 }
 
 .theme-ballroom .event-card__venue--inline {
