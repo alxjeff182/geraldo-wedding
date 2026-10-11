@@ -409,6 +409,7 @@
 
 .theme-ballroom .wish-row {
   --i: 0;
+
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 0.75rem;
@@ -443,6 +444,7 @@
 
 .theme-ballroom .wish-row__avatar {
   --hue: 40;
+
   width: 2.15rem;
   height: 2.15rem;
   border-radius: 50%;
