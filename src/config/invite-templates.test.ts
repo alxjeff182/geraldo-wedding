@@ -8,4 +8,13 @@ describe("invite-templates", () => {
       true,
     );
   });
+
+  it("uses the formal invite as the default guest-list template", () => {
+    const def = INVITE_MESSAGE_TEMPLATES[0];
+    expect(def.message).toContain("Kepada Yth.");
+    expect(def.message).toContain("*{nama}*");
+    expect(def.message).toContain("PESTA PERNIKAHAN {pasangan}");
+    expect(def.message).toContain("{link}");
+    expect(def.message).toContain("Salam hormat,");
+  });
 });

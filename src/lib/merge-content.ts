@@ -237,7 +237,23 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
   }
 
   const merged = deepMerge(structuredClone(wedding) as WeddingConfig, normalized) as WeddingConfig;
-  const whatsappTemplates = resolveInviteTemplates([...merged.invite.whatsappTemplates], undefined);
+  const defaultInvite = wedding.invite.whatsappTemplates[0];
+  const whatsappTemplates = resolveInviteTemplates(
+    [...merged.invite.whatsappTemplates],
+    undefined,
+  ).map((item) => {
+    // One-time: replace retired default WA invite copy with the new formal template.
+    const isLegacyDefault =
+      /^Shalom,/m.test(item.message) ||
+      item.message.includes("mengucap syukur kepada Tuhan Yesus Kristus");
+    if (!isLegacyDefault || !defaultInvite) return item;
+    return {
+      ...item,
+      id: defaultInvite.id,
+      name: defaultInvite.name,
+      message: defaultInvite.message,
+    };
+  });
 
   const defaultTemplateId = whatsappTemplates.some(
     (item) => item.id === merged.invite.defaultTemplateId,

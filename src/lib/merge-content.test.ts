@@ -112,6 +112,27 @@ describe("mergeWeddingContent", () => {
   it("provides 3 invite templates by default", () => {
     const merged = mergeWeddingContent({});
     expect(merged.invite.whatsappTemplates).toHaveLength(3);
+    expect(merged.invite.whatsappTemplates[0].message).toContain("Kepada Yth.");
+  });
+
+  it("migrates legacy Shalom invite template to the new formal copy", () => {
+    const merged = mergeWeddingContent({
+      invite: {
+        whatsappTemplates: [
+          {
+            id: "formal-kristen",
+            name: "1. Formal Kristen",
+            message: `Shalom,
+
+{salam} {nama},
+
+Dengan penuh sukacita dan mengucap syukur kepada Tuhan Yesus Kristus, kami mengundang.`,
+          },
+        ],
+      },
+    });
+    expect(merged.invite.whatsappTemplates[0].message).toContain("Kepada Yth.");
+    expect(merged.invite.whatsappTemplates[0].message).toContain("*{nama}*");
   });
 
   it("migrates legacy single whatsappTemplate override", () => {

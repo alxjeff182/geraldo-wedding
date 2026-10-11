@@ -7,23 +7,23 @@ export type InviteMessageTemplate = {
 export const INVITE_MESSAGE_TEMPLATES: InviteMessageTemplate[] = [
   {
     id: "formal-kristen",
-    name: "1. Formal Kristen",
-    message: `Shalom,
+    name: "1. Undangan Resmi",
+    message: `Kepada Yth.
+Bapak/Ibu/Saudara/i
+*{nama}*
 
-{salam} {nama},
+Dengan senang hati kami mengundang Bapak/Ibu/Saudara/i untuk hadir dan merayakan:
 
-Dengan penuh sukacita dan mengucap syukur kepada Tuhan Yesus Kristus, kami mengundang Bapak/Ibu/Saudara/i untuk hadir dalam pemberkatan pernikahan kami:
+PESTA PERNIKAHAN {pasangan}
 
-💍 {pasangan}
-📅 {tanggal}
-📍 {lokasi}
+Informasi lengkap dapat dilihat melalui undangan digital berikut:
 
-Kami berharap kehadiran dan doa Bapak/Ibu/Saudara/i menjadi berkat bagi kami.
-
-Undangan digital:
 {link}
 
-Tuhan memberkati 🙏`,
+Dengan penuh kasih, kami menantikan kehadiran Bapak/Ibu/Saudara/i.
+
+Salam hormat,
+{pasangan}`,
   },
   {
     id: "formal-nasional",
