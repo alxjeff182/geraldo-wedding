@@ -126,7 +126,6 @@ export async function shareStoryTemplate(
   openInstagramStoryCamera();
   return {
     status: "fallback",
-    message:
-      fallbackToast || "Template tersimpan, buka Instagram lalu pilih dari galeri",
+    message: fallbackToast || "Template tersimpan, buka Instagram lalu pilih dari galeri",
   };
 }

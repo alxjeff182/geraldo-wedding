@@ -91,9 +91,7 @@ describe("shareStoryTemplate", () => {
     });
 
     const click = vi.fn();
-    const appendChild = vi
-      .spyOn(document.body, "appendChild")
-      .mockImplementation((node) => node);
+    const appendChild = vi.spyOn(document.body, "appendChild").mockImplementation((node) => node);
     const remove = vi.fn();
     vi.spyOn(document, "createElement").mockImplementation((tag: string) => {
       if (tag === "a") {
