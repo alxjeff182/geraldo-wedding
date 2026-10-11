@@ -268,6 +268,14 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
   const bibleQuote = legacyMatthew ? wedding.bibleQuote : merged.bibleQuote;
   const bibleReference = legacyMatthew ? wedding.bibleReference : merged.bibleReference;
 
+  // One-time: CMS still has the terse SEO description.
+  const legacySeoDescription =
+    String(merged.site.description ?? "").trim() ===
+    "Pernikahan Geraldo & Christin. Tangerang, 24 Oktober 2026";
+  const site = legacySeoDescription
+    ? { ...merged.site, description: wedding.site.description }
+    : merged.site;
+
   // One-time: CMS still has previous bride number, empty groom number, or dummy QRIS.
   const legacyBrideAccount = merged.gift.accounts.some(
     (account) => account.side === "bride" && account.number === "6705188657",
@@ -300,6 +308,7 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
 
   return {
     ...merged,
+    site,
     events,
     story,
     bibleQuote,

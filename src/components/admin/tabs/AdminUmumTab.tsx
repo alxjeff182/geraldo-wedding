@@ -39,7 +39,7 @@ export function AdminUmumTab({ merged, defaults, updateDraft, clearDraftPath }: 
         />
       </label>
       <label className="admin-field admin-field--wide">
-        <span className="admin-label">Deskripsi SEO</span>
+        <span className="admin-label">Deskripsi SEO / OG</span>
         <textarea
           className="admin-input"
           rows={3}

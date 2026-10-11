@@ -16,6 +16,10 @@ function htmlMetaPlugin(siteUrl: string): Plugin {
       let out = html
         .replace(/content="\/assets/g, `content="${base}/assets`)
         .replace(/"image": "\/assets/g, `"image": "${base}/assets`)
+        .replace(/"url": "\/assets/g, `"url": "${base}/assets`)
+        .replace(/"@id": "\/#/g, `"@id": "${base}/#`)
+        .replace(/"url": "\/"/g, `"url": "${base}/"`)
+        .replace(/"@id": "\/"/g, `"@id": "${base}/"`)
         .replace(/property="og:url" content="[^"]*"/, `property="og:url" content="${base}/"`);
 
       if (!out.includes('rel="canonical"')) {

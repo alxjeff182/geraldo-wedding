@@ -131,6 +131,16 @@ describe("mergeWeddingContent", () => {
     expect(merged.bibleReference).toBe("Kidung Agung 2:16");
   });
 
+  it("migrates legacy SEO description to luxury-minimal copy", () => {
+    const merged = mergeWeddingContent({
+      site: {
+        description: "Pernikahan Geraldo & Christin. Tangerang, 24 Oktober 2026",
+      },
+    });
+    expect(merged.site.description).toBe(wedding.site.description);
+    expect(merged.site.description).toContain("The Wedding Of");
+  });
+
   it("migrates legacy story.paragraphs into milestones", () => {
     const merged = mergeWeddingContent({
       story: {

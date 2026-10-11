@@ -41,7 +41,8 @@ export type GiftAccount = {
 export const wedding = {
   site: {
     title: "Geraldo & Christin",
-    description: "Pernikahan Geraldo & Christin. Tangerang, 24 Oktober 2026",
+    description:
+      "The Wedding Of Geraldo & Christin · Sabtu, 24 Oktober 2026. Dengan penuh sukacita, kami mengundang Anda hadir.",
     url: import.meta.env.VITE_SITE_URL || "http://localhost:5173",
     noIndex: false,
     creator: {

@@ -23,34 +23,70 @@ function setLink(rel: string, href: string) {
   el.href = href;
 }
 
+/** Brand-first title that echoes the hero caption, e.g. "Geraldo & Christin · The Wedding Of". */
+export function buildSeoTitle(content: WeddingConfig): string {
+  const brand = content.site.title.trim();
+  const eyebrow = content.hero.eyebrow.trim();
+  if (!brand) return eyebrow || "Wedding";
+  if (!eyebrow || brand.toLowerCase().includes(eyebrow.toLowerCase())) return brand;
+  return `${brand} · ${eyebrow}`;
+}
+
+export function buildOgImageAlt(content: WeddingConfig): string {
+  const brand = content.site.title.trim() || "Wedding";
+  const eyebrow = content.hero.eyebrow.trim();
+  const date = content.dateShort.trim() || content.dateLabel.trim();
+  const lead = eyebrow ? `${brand} · ${eyebrow}` : brand;
+  return date ? `${lead} — ${date}` : lead;
+}
+
 export function usePageMeta(content: WeddingConfig, options?: { noIndex?: boolean }) {
   useEffect(() => {
     const siteUrl = content.site.url;
     const ogImage = absoluteUrl(siteUrl, content.media.ogImage);
+    const seoTitle = buildSeoTitle(content);
+    const description = content.site.description.trim();
+    const imageAlt = buildOgImageAlt(content);
     // Keep icon hrefs same-origin (relative). Absolute production URLs trip CORP
     // when the page is previewed on another host (LHCI localhost, Vercel previews).
     const icon = content.media.coverBg?.startsWith("http")
       ? "/icon-192.png"
       : content.media.coverBg || "/icon-192.png";
 
-    document.title = content.site.title;
+    document.title = seoTitle;
 
-    setMeta("description", content.site.description);
-    setMeta("og:title", content.site.title, true);
-    setMeta("og:description", content.site.description, true);
+    setMeta("description", description);
+    setMeta("author", content.site.title);
+    setMeta("application-name", content.site.title);
+    setMeta("apple-mobile-web-app-title", content.site.title);
+    setMeta("theme-color", "#1a0f0c");
+
+    setMeta("og:type", "website", true);
+    setMeta("og:site_name", content.site.title, true);
+    setMeta("og:title", seoTitle, true);
+    setMeta("og:description", description, true);
     setMeta("og:url", `${siteUrl.replace(/\/$/, "")}/`, true);
     setMeta("og:image", ogImage, true);
-    setMeta("twitter:title", content.site.title);
-    setMeta("twitter:description", content.site.description);
+    setMeta("og:image:type", "image/jpeg", true);
+    setMeta("og:image:width", "1200", true);
+    setMeta("og:image:height", "630", true);
+    setMeta("og:image:alt", imageAlt, true);
+    setMeta("og:locale", "id_ID", true);
+
+    setMeta("twitter:card", "summary_large_image");
+    setMeta("twitter:title", seoTitle);
+    setMeta("twitter:description", description);
     setMeta("twitter:image", ogImage);
+    setMeta("twitter:image:alt", imageAlt);
 
     setLink("icon", icon);
     setLink("apple-touch-icon", "/apple-touch-icon-180.png");
+    setLink("canonical", `${siteUrl.replace(/\/$/, "")}/`);
 
     if (content.site.noIndex || options?.noIndex) {
       setMeta("robots", "noindex, nofollow");
     } else {
-      setMeta("robots", "index, follow");
+      setMeta("robots", "index, follow, max-image-preview:large");
     }
   }, [content, options?.noIndex]);
 }
