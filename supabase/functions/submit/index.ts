@@ -175,7 +175,7 @@ serve(async (req) => {
         });
       }
 
-      if (attendance !== "hadir" && attendance !== "tidak_hadir" && attendance !== "ragu") {
+      if (attendance !== "hadir" && attendance !== "tidak_hadir") {
         return new Response(JSON.stringify({ error: "Kehadiran tidak valid" }), {
           status: 400,
           headers: { ...headers, "Content-Type": "application/json" },

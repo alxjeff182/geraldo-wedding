@@ -196,7 +196,6 @@ export function RsvpSubmissionsPanel({ rsvp, onNotify }: Props) {
     { id: "all", label: rsvp.filterAll },
     { id: "hadir", label: rsvp.filterHadir },
     { id: "tidak_hadir", label: rsvp.filterTidak },
-    { id: "ragu", label: rsvp.filterRagu },
   ];
 
   return (

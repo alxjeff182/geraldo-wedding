@@ -10,7 +10,7 @@ import { formatRsvpDeadlineLabel, isRsvpDeadlinePassed } from "../../../lib/rsvp
 import { buildGuestWhatsAppUrl, buildRsvpWhatsappMessage } from "../../../lib/guest-whatsapp";
 import { IconCheck, IconMail, IconSuccess, IconWhatsApp, IconX } from "../icons";
 
-type Attendance = "hadir" | "tidak_hadir" | "ragu";
+type Attendance = "hadir" | "tidak_hadir";
 
 type Props = {
   open: boolean;
@@ -53,11 +53,8 @@ export function RsvpSheet({ open, guestId, guestName, onClose, setSheetRef, onTo
     setDone(hasRsvpSubmitted(guestId));
   }, [guestId]);
 
-  const attendanceLabel = (value: Attendance) => {
-    if (value === "hadir") return rsvp.attendanceHadir;
-    if (value === "ragu") return rsvp.attendanceRagu;
-    return rsvp.attendanceTidak;
-  };
+  const attendanceLabel = (value: Attendance) =>
+    value === "hadir" ? rsvp.attendanceHadir : rsvp.attendanceTidak;
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -209,16 +206,6 @@ export function RsvpSheet({ open, guestId, guestName, onClose, setSheetRef, onTo
                     <IconX />
                     {rsvp.attendanceTidak}
                   </span>
-                </label>
-                <label className="choice__pill">
-                  <input
-                    type="radio"
-                    name="attendance"
-                    value="ragu"
-                    checked={attendance === "ragu"}
-                    onChange={() => setAttendance("ragu")}
-                  />
-                  <span>{rsvp.attendanceRagu}</span>
                 </label>
               </div>
             </fieldset>
