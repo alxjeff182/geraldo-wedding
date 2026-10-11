@@ -34,6 +34,17 @@
   font-weight: 300;
 }
 
+.theme-ballroom .hashtag-mod .section__head h3.hashtag-mod__caption {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: clamp(0.95rem, 3.6cqi, 1.15rem);
+  font-weight: 400;
+  letter-spacing: 0.42em;
+  text-indent: 0.42em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+}
+
 .theme-ballroom .hashtag-mod__lead {
   max-width: 22rem;
   margin: -0.35rem auto 1.5rem;

@@ -214,7 +214,7 @@ export const wedding = {
   },
 
   hashtag: {
-    title: "Share Your Moments",
+    title: "SHARE",
     tag: "#GeralDOanythingforChristine",
     lead: "Abadikan momen bersama kami di Instagram Story",
     storyTemplate: "/assets/ballroom/story-template.png",

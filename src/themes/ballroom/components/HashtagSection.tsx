@@ -49,8 +49,7 @@ export function HashtagSection({
   return (
     <section id="hashtag" className="section hashtag-mod fade-up" aria-label={title}>
       <div className="section__head">
-        <p className="eyebrow">Share</p>
-        <h3>{title}</h3>
+        <h3 className="hashtag-mod__caption">{title}</h3>
         <div className="ornament" aria-hidden="true" />
       </div>
       <p className="hashtag-mod__lead">{lead}</p>
