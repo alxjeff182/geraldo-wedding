@@ -6,6 +6,45 @@
   margin: 0;
   padding: 0;
 }
+
+/* Pull-to-refresh at top of invitation */
+.theme-ballroom .ptr {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  padding-top: calc(0.35rem + env(safe-area-inset-top, 0px));
+  transform: translateY(calc(var(--ptr, 0) * 0.55px - 1.25rem));
+  opacity: min(1, calc(var(--ptr, 0) / 36));
+  pointer-events: none;
+  color: var(--gold-soft);
+}
+.theme-ballroom .ptr__ring {
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--gold-a25);
+  border-top-color: var(--gold);
+  transform: rotate(calc(var(--ptr, 0) * 2.4deg));
+}
+.theme-ballroom .ptr.is-armed .ptr__ring {
+  animation: ptrSpin 0.7s linear infinite;
+}
+.theme-ballroom .ptr__label {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+}
+@keyframes ptrSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 .theme-ballroom {
   scroll-behavior: smooth;
   width: 100%;

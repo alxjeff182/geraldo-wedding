@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useWeddingContent } from "../../context/use-wedding-content";
 import { useAudio } from "../../hooks/useAudio";
 import { useToast } from "../../hooks/useToast";
@@ -24,6 +24,7 @@ import { LocationSheet } from "./sheets/LocationSheet";
 import { GiftSheet } from "./sheets/GiftSheet";
 import { useSheet } from "./hooks/useSheet";
 import { useInvitationFx } from "./hooks/useInvitationFx";
+import { usePullToRefresh } from "./hooks/usePullToRefresh";
 import "./ballroom.css";
 
 const DOCK_AT = 0.3;
@@ -65,6 +66,7 @@ export function BallroomApp({ guestName, guestId }: Props) {
     [revealed],
   );
   const sheet = useSheet({ inertTargets });
+  const pullRefresh = usePullToRefresh(inviteRef, revealed, { blocked: sheet.isOpen });
 
   useInvitationFx(inviteRef, revealed);
 
@@ -293,6 +295,23 @@ export function BallroomApp({ guestName, guestId }: Props) {
             </div>
           </footer>
         </main>
+
+        {revealed && (pullRefresh.pull > 0 || pullRefresh.refreshing) ? (
+          <div
+            className={`ptr${pullRefresh.armed || pullRefresh.refreshing ? " is-armed" : ""}`}
+            style={{ "--ptr": String(pullRefresh.pull) } as CSSProperties}
+            aria-hidden="true"
+          >
+            <span className="ptr__ring" />
+            <span className="ptr__label">
+              {pullRefresh.refreshing
+                ? "Memuat ulang…"
+                : pullRefresh.armed
+                  ? "Lepas untuk refresh"
+                  : "Tarik untuk refresh"}
+            </span>
+          </div>
+        ) : null}
 
         <FloatDock
           visible={dockVisible}
