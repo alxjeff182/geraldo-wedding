@@ -38,32 +38,27 @@ export function buildWaExportEntries(
   });
 }
 
-/** Readable list of wa.me deep links for one-by-one opens. */
+/**
+ * WhatsApp-safe pack: name + lone wa.me URL, separated by blank lines.
+ * Adjacent long URLs get glued/corrupted when pasted into WA without gaps.
+ */
 export function formatWaExportPlainText(entries: readonly WaExportEntry[]): string {
   if (entries.length === 0) return "";
 
-  const blocks = entries.map((entry) => {
-    const phoneLine = entry.hasPhone ? entry.phone : "(belum ada nomor)";
-    const linkLine = entry.waUrl ?? "(tidak ada link WA)";
-    return [`${entry.index}. ${entry.name}`, phoneLine, linkLine].join("\n");
-  });
+  const ready = entries.filter((entry) => entry.waUrl);
+  if (ready.length === 0) return "";
 
-  return [
-    `Batch link WhatsApp (${entries.length} tamu)`,
-    `Dibuat: ${new Date().toLocaleString("id-ID")}`,
-    "═".repeat(32),
-    "",
-    blocks.join("\n\n"),
-    "",
-  ].join("\n");
+  const blocks = ready.map((entry) => `${entry.index}. ${entry.name}\n${entry.waUrl}`);
+
+  // Triple newline keeps each wa.me on its own “island” in WhatsApp.
+  return `${blocks.join("\n\n\n")}\n`;
 }
 
-/** One wa.me URL per line — handy for paste into a notes app. */
+/** wa.me URLs only, still spaced so WhatsApp does not merge them. */
 export function formatWaExportLinksOnly(entries: readonly WaExportEntry[]): string {
-  return entries
-    .map((entry) => entry.waUrl)
-    .filter((url): url is string => Boolean(url))
-    .join("\n");
+  const links = entries.map((entry) => entry.waUrl).filter((url): url is string => Boolean(url));
+  if (links.length === 0) return "";
+  return `${links.join("\n\n\n")}\n`;
 }
 
 export function downloadWaExportText(text: string, filename?: string): void {

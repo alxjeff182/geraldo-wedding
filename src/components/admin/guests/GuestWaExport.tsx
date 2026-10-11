@@ -221,21 +221,13 @@ function WaExportCard({
         </div>
       </div>
       {entry.waUrl ? (
-        <a
-          className="admin-wa-export__link"
-          href={entry.waUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <code className="admin-wa-export__link" title={entry.waUrl}>
           {entry.waUrl}
-        </a>
+        </code>
       ) : (
         <p className="admin-wa-export__empty-link">{invite.waExportNoPhone}</p>
       )}
       <div className="admin-wa-export__card-actions">
-        <button type="button" className="admin-btn" disabled={!entry.waUrl} onClick={onCopyLink}>
-          {copied ? "✓ Tersalin" : invite.waExportCopyMessage}
-        </button>
         <button
           type="button"
           className="admin-btn admin-btn--primary"
@@ -243,6 +235,9 @@ function WaExportCard({
           onClick={onOpenWa}
         >
           {invite.waExportOpenWa}
+        </button>
+        <button type="button" className="admin-btn" disabled={!entry.waUrl} onClick={onCopyLink}>
+          {copied ? "✓ Tersalin" : invite.waExportCopyMessage}
         </button>
       </div>
     </li>
