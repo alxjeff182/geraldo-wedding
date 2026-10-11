@@ -279,7 +279,11 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
   // One-time: CMS still points OG preview to the bare field photo.
   const cmsOg = String(merged.media.ogImage ?? "").trim();
   const legacyOg =
-    !cmsOg || cmsOg.endsWith("/og-image.jpg") || cmsOg.endsWith("/assets/ballroom/og-image.jpg");
+    !cmsOg ||
+    cmsOg.endsWith("/og-image.jpg") ||
+    cmsOg.endsWith("/og-share.jpg") ||
+    cmsOg.includes("/assets/ballroom/og-image.jpg") ||
+    cmsOg.includes("/assets/ballroom/og-share.jpg");
   const media = legacyOg ? { ...merged.media, ogImage: wedding.media.ogImage } : merged.media;
 
   // One-time: CMS still has previous bride number, empty groom number, or dummy QRIS.
