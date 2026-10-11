@@ -196,6 +196,26 @@ export function IconCameraFlip({ size = 20, className }: IconProps) {
   );
 }
 
+export function IconRedo({ size = 18, className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3" />
+      <path d="M4 4.5v5h5" />
+    </svg>
+  );
+}
+
 export function IconSuccess({ size = 48 }: IconProps) {
   return (
     <svg

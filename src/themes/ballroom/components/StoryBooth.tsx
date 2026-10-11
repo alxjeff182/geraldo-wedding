@@ -1,16 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { shareStoryFile, shareStoryTemplate } from "../../../lib/share-story";
+import { shareStoryTemplate } from "../../../lib/share-story";
 import {
   CANVAS_H,
   CANVAS_W,
   DEFAULT_MAX_SECONDS,
   RECORD_FPS,
+  type FitMode,
+  containRect,
   coverRect,
   extensionForMime,
+  fitMode as pickFitMode,
   pickRecorderMimeType,
 } from "../../../lib/story-recorder";
-import { IconCameraFlip, IconInstagram, IconX } from "../icons";
+import { IconCameraFlip, IconInstagram, IconRedo, IconX } from "../icons";
 
 type Facing = "user" | "environment";
 type Phase = "loading" | "live" | "recording" | "review" | "error";
@@ -31,6 +34,46 @@ type Props = {
 
 function stopStream(stream: MediaStream | null) {
   stream?.getTracks().forEach((t) => t.stop());
+}
+
+function normalizeHashtag(tag: string): string {
+  const trimmed = tag.trim();
+  if (!trimmed) return "";
+  return trimmed.startsWith("#") ? trimmed : `#${trimmed}`;
+}
+
+function probeCanShare(file: File): boolean {
+  if (typeof navigator === "undefined" || typeof navigator.share !== "function") return false;
+  if (typeof navigator.canShare !== "function") return true;
+  try {
+    return navigator.canShare({ files: [file] });
+  } catch {
+    return false;
+  }
+}
+
+function downloadFile(file: File): void {
+  const href = URL.createObjectURL(file);
+  const a = document.createElement("a");
+  a.href = href;
+  a.download = file.name;
+  a.rel = "noopener";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.setTimeout(() => URL.revokeObjectURL(href), 2000);
+}
+
+async function applyWidestZoom(track: MediaStreamTrack) {
+  try {
+    const caps = track.getCapabilities?.() as MediaTrackCapabilities & { zoom?: { min: number } };
+    if (!caps?.zoom || typeof caps.zoom.min !== "number") return;
+    await track.applyConstraints({
+      advanced: [{ zoom: caps.zoom.min } as MediaTrackConstraintSet],
+    });
+  } catch {
+    // Zoom constraint unsupported — ignore.
+  }
 }
 
 export function StoryBooth({
@@ -55,24 +98,30 @@ export function StoryBooth({
   const rafRef = useRef(0);
   const overlayRef = useRef<HTMLImageElement | null>(null);
   const facingRef = useRef<Facing>("user");
+  const modeRef = useRef<FitMode>("fit");
   const recordStartedRef = useRef(0);
   const clipUrlRef = useRef<string | null>(null);
+  const clipFileRef = useRef<File | null>(null);
   const maxMs = Math.max(3, maxSeconds) * 1000;
 
   const [phase, setPhase] = useState<Phase>("loading");
   const [facing, setFacing] = useState<Facing>("user");
+  const [mode, setMode] = useState<FitMode>("fit");
   const [elapsedMs, setElapsedMs] = useState(0);
   const [clipUrl, setClipUrl] = useState<string | null>(null);
-  const [clipMime, setClipMime] = useState("video/mp4");
+  const [canShareClip, setCanShareClip] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
 
-  const setClip = useCallback((url: string | null) => {
+  const setClip = useCallback((url: string | null, file: File | null = null) => {
     if (clipUrlRef.current && clipUrlRef.current !== url) {
       URL.revokeObjectURL(clipUrlRef.current);
     }
     clipUrlRef.current = url;
+    clipFileRef.current = file;
     setClipUrl(url);
+    setCanShareClip(file ? probeCanShare(file) : false);
   }, []);
 
   const stopLoop = useCallback(() => {
@@ -90,18 +139,56 @@ export function StoryBooth({
     if (!ctx) return;
 
     if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-      const { sx, sy, sw, sh, dx, dy, dw, dh } = coverRect(
-        video.videoWidth,
-        video.videoHeight,
-        CANVAS_W,
-        CANVAS_H,
-      );
+      const vw = video.videoWidth;
+      const vh = video.videoHeight;
+      const mirror = facingRef.current === "user";
+      const currentMode = modeRef.current;
+
       ctx.save();
-      if (facingRef.current === "user") {
+      if (mirror) {
         ctx.translate(CANVAS_W, 0);
         ctx.scale(-1, 1);
       }
-      ctx.drawImage(video, sx, sy, sw, sh, dx, dy, dw, dh);
+
+      if (currentMode === "fit") {
+        const cover = coverRect(vw, vh, CANVAS_W, CANVAS_H);
+        ctx.save();
+        try {
+          ctx.filter = "blur(24px) brightness(0.55)";
+        } catch {
+          // filter unsupported
+        }
+        ctx.drawImage(
+          video,
+          cover.sx,
+          cover.sy,
+          cover.sw,
+          cover.sh,
+          cover.dx,
+          cover.dy,
+          cover.dw,
+          cover.dh,
+        );
+        ctx.restore();
+        ctx.fillStyle = "rgba(8, 5, 4, 0.35)";
+        ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+
+        const fit = containRect(vw, vh, CANVAS_W, CANVAS_H);
+        ctx.drawImage(video, fit.sx, fit.sy, fit.sw, fit.sh, fit.dx, fit.dy, fit.dw, fit.dh);
+      } else {
+        const cover = coverRect(vw, vh, CANVAS_W, CANVAS_H);
+        ctx.drawImage(
+          video,
+          cover.sx,
+          cover.sy,
+          cover.sw,
+          cover.sh,
+          cover.dx,
+          cover.dy,
+          cover.dw,
+          cover.dh,
+        );
+      }
       ctx.restore();
 
       const overlay = overlayRef.current;
@@ -120,19 +207,24 @@ export function StoryBooth({
       streamRef.current = null;
       setPhase("loading");
       setError(null);
+      setStatus(null);
 
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           audio: true,
           video: {
             facingMode: { ideal: nextFacing },
-            width: { ideal: 720 },
-            height: { ideal: 1280 },
+            // Prefer full-sensor 4:3 over a cropped 9:16 stream (less digital zoom).
+            width: { ideal: 1920 },
+            height: { ideal: 1440 },
           },
         });
         streamRef.current = stream;
         facingRef.current = nextFacing;
         setFacing(nextFacing);
+
+        const track = stream.getVideoTracks()[0];
+        if (track) await applyWidestZoom(track);
 
         const video = videoRef.current;
         if (video) {
@@ -140,6 +232,13 @@ export function StoryBooth({
           video.muted = true;
           video.playsInline = true;
           await video.play().catch(() => undefined);
+          // Wait a tick for videoWidth/Height
+          await new Promise((r) => requestAnimationFrame(() => r(undefined)));
+          if (video.videoWidth > 0 && video.videoHeight > 0) {
+            const auto = pickFitMode(video.videoWidth, video.videoHeight, CANVAS_W, CANVAS_H);
+            modeRef.current = auto;
+            setMode(auto);
+          }
         }
 
         stopLoop();
@@ -153,7 +252,6 @@ export function StoryBooth({
     [deniedMessage, drawFrame, stopLoop],
   );
 
-  // Open / close lifecycle
   useEffect(() => {
     if (!open) return;
 
@@ -184,23 +282,10 @@ export function StoryBooth({
         URL.revokeObjectURL(clipUrlRef.current);
         clipUrlRef.current = null;
       }
+      clipFileRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- open/close only
   }, [open]);
-
-  // Elapsed timer while recording
-  useEffect(() => {
-    if (phase !== "recording") return;
-    const id = window.setInterval(() => {
-      const ms = Date.now() - recordStartedRef.current;
-      setElapsedMs(ms);
-      if (ms >= maxMs) {
-        stopRecording();
-      }
-    }, 100);
-    return () => window.clearInterval(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, maxMs]);
 
   const stopRecording = useCallback(() => {
     const rec = recorderRef.current;
@@ -211,6 +296,16 @@ export function StoryBooth({
       // ignore
     }
   }, []);
+
+  useEffect(() => {
+    if (phase !== "recording") return;
+    const id = window.setInterval(() => {
+      const ms = Date.now() - recordStartedRef.current;
+      setElapsedMs(ms);
+      if (ms >= maxMs) stopRecording();
+    }, 100);
+    return () => window.clearInterval(id);
+  }, [phase, maxMs, stopRecording]);
 
   const startRecording = useCallback(() => {
     const canvas = canvasRef.current;
@@ -243,7 +338,6 @@ export function StoryBooth({
     }
 
     const usedMime = recorder.mimeType || mime || "video/webm";
-    setClipMime(usedMime);
 
     recorder.ondataavailable = (ev) => {
       if (ev.data.size > 0) chunksRef.current.push(ev.data);
@@ -251,7 +345,12 @@ export function StoryBooth({
     recorder.onstop = () => {
       mixed.getTracks().forEach((t) => t.stop());
       const blob = new Blob(chunksRef.current, { type: usedMime });
-      setClip(URL.createObjectURL(blob));
+      const ext = extensionForMime(usedMime);
+      const file = new File([blob], `geraldo-christin-story.${ext}`, {
+        type: blob.type || usedMime,
+      });
+      setClip(URL.createObjectURL(blob), file);
+      setStatus(null);
       setPhase("review");
       setElapsedMs(0);
     };
@@ -264,9 +363,9 @@ export function StoryBooth({
   }, [deniedMessage, phase, setClip]);
 
   const retry = useCallback(() => {
-    setClip(null);
+    setClip(null, null);
+    setStatus(null);
     setPhase("live");
-    // ensure draw loop is running
     if (!rafRef.current) {
       rafRef.current = requestAnimationFrame(drawFrame);
     }
@@ -278,38 +377,69 @@ export function StoryBooth({
     void startCamera(next);
   }, [facing, phase, startCamera]);
 
-  const shareClip = useCallback(async () => {
-    if (!clipUrl || sharing) return;
-    setSharing(true);
-    try {
-      const res = await fetch(clipUrl);
-      const blob = await res.blob();
-      const ext = extensionForMime(clipMime);
-      const file = new File([blob], `geraldo-christin-story.${ext}`, {
-        type: blob.type || clipMime,
-      });
-      const result = await shareStoryFile(
-        file,
-        hashtag,
-        fallbackToast || "Video tersimpan, buka Instagram lalu pilih dari galeri",
-      );
-      if (result.status === "fallback" && result.message) onToast?.(result.message);
-      if (result.status === "error") onToast?.(result.message);
-      if (result.status === "shared") onClose();
-    } catch {
-      onToast?.("Gagal membagikan video");
-    } finally {
-      setSharing(false);
+  const toggleMode = useCallback(() => {
+    if (phase === "recording") return;
+    const next: FitMode = modeRef.current === "cover" ? "fit" : "cover";
+    modeRef.current = next;
+    setMode(next);
+  }, [phase]);
+
+  const shareClip = useCallback(() => {
+    const file = clipFileRef.current;
+    if (!file || sharing) return;
+
+    // Download path when Web Share files are unavailable (honest UI).
+    if (!canShareClip) {
+      downloadFile(file);
+      void navigator.clipboard?.writeText?.(normalizeHashtag(hashtag)).catch(() => undefined);
+      setStatus(fallbackToast || "Video tersimpan. Upload dari galeri ke Instagram Story.");
+      return;
     }
-  }, [clipMime, clipUrl, fallbackToast, hashtag, onClose, onToast, sharing]);
+
+    setSharing(true);
+    setStatus(null);
+    // Call share synchronously on the tap — no await before this (iOS gesture).
+    const sharePromise = navigator.share({
+      files: [file],
+      text: normalizeHashtag(hashtag) || undefined,
+    });
+
+    void sharePromise
+      .then(() => {
+        onClose();
+      })
+      .catch((err: unknown) => {
+        if (err instanceof DOMException && err.name === "AbortError") {
+          setSharing(false);
+          return;
+        }
+        setStatus("Gagal membagikan. Coba Simpan Video, lalu upload ke Instagram.");
+        setSharing(false);
+      });
+  }, [canShareClip, fallbackToast, hashtag, onClose, sharing]);
+
+  const saveClip = useCallback(() => {
+    const file = clipFileRef.current;
+    if (!file) return;
+    downloadFile(file);
+    void navigator.clipboard?.writeText?.(normalizeHashtag(hashtag)).catch(() => undefined);
+    setStatus(fallbackToast || "Video tersimpan. Upload dari galeri ke Instagram Story.");
+  }, [fallbackToast, hashtag]);
 
   const sharePhotoFallback = useCallback(async () => {
     setSharing(true);
+    setStatus(null);
     try {
       const result = await shareStoryTemplate(overlayUrl, hashtag, fallbackToast);
-      if (result.status === "fallback" && result.message) onToast?.(result.message);
-      if (result.status === "error") onToast?.(result.message);
-      if (result.status === "shared") onClose();
+      if (result.status === "fallback" && result.message) {
+        setStatus(result.message);
+        onToast?.(result.message);
+      } else if (result.status === "error") {
+        setStatus(result.message);
+        onToast?.(result.message);
+      } else if (result.status === "shared") {
+        onClose();
+      }
     } finally {
       setSharing(false);
     }
@@ -319,9 +449,15 @@ export function StoryBooth({
 
   const progress = Math.min(1, elapsedMs / maxMs);
   const secondsLeft = Math.max(0, Math.ceil((maxMs - elapsedMs) / 1000));
+  const primaryLabel = canShareClip ? shareLabel : "Simpan Video";
 
   return createPortal(
-    <div className="booth" role="dialog" aria-modal="true" aria-label="Rekam Video Story">
+    <div
+      className="theme-ballroom booth"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Rekam Video Story"
+    >
       <div className="booth__stage">
         <video ref={videoRef} className="booth__cam" playsInline muted autoPlay />
         <canvas
@@ -347,15 +483,26 @@ export function StoryBooth({
             <IconX size={18} />
           </button>
           {phase === "live" || phase === "recording" ? (
-            <button
-              type="button"
-              className="booth__icon-btn"
-              aria-label="Ganti kamera"
-              onClick={flipCamera}
-              disabled={phase === "recording"}
-            >
-              <IconCameraFlip size={18} />
-            </button>
+            <div className="booth__chrome-right">
+              <button
+                type="button"
+                className="booth__chip"
+                onClick={toggleMode}
+                disabled={phase === "recording"}
+                aria-label={mode === "cover" ? "Mode penuh" : "Mode pas"}
+              >
+                {mode === "cover" ? "Penuh" : "Pas"}
+              </button>
+              <button
+                type="button"
+                className="booth__icon-btn"
+                aria-label="Ganti kamera"
+                onClick={flipCamera}
+                disabled={phase === "recording"}
+              >
+                <IconCameraFlip size={18} />
+              </button>
+            </div>
           ) : (
             <span className="booth__icon-spacer" />
           )}
@@ -368,7 +515,7 @@ export function StoryBooth({
             <p>{error || deniedMessage}</p>
             <button
               type="button"
-              className="btn booth__share-btn"
+              className="booth__btn booth__btn--primary"
               disabled={sharing}
               onClick={() => void sharePhotoFallback()}
             >
@@ -415,19 +562,35 @@ export function StoryBooth({
         ) : null}
 
         {phase === "review" ? (
-          <div className="booth__review-actions">
-            <button type="button" className="btn btn--ghost booth__retry" onClick={retry}>
-              {retryLabel}
-            </button>
-            <button
-              type="button"
-              className="btn booth__share-btn"
-              disabled={sharing}
-              onClick={() => void shareClip()}
-            >
-              <IconInstagram size={18} />
-              <span>{sharing ? "Menyiapkan…" : shareLabel}</span>
-            </button>
+          <div className="booth__review-bar">
+            {!canShareClip ? (
+              <p className="booth__review-hint">Lalu upload dari galeri ke Instagram Story</p>
+            ) : null}
+            {status ? (
+              <p className="booth__inline-status" role="status">
+                {status}
+              </p>
+            ) : null}
+            <div className="booth__review-actions">
+              <button type="button" className="booth__btn booth__btn--ghost" onClick={retry}>
+                <IconRedo size={18} />
+                <span>{retryLabel}</span>
+              </button>
+              <button
+                type="button"
+                className="booth__btn booth__btn--primary"
+                disabled={sharing}
+                onClick={shareClip}
+              >
+                <IconInstagram size={18} />
+                <span>{sharing ? "Menyiapkan…" : primaryLabel}</span>
+              </button>
+            </div>
+            {canShareClip ? (
+              <button type="button" className="booth__text-link" onClick={saveClip}>
+                Atau simpan video
+              </button>
+            ) : null}
           </div>
         ) : null}
       </div>

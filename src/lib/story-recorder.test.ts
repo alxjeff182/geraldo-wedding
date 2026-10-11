@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { coverRect, extensionForMime, pickRecorderMimeType } from "./story-recorder";
+import {
+  containRect,
+  coverRect,
+  extensionForMime,
+  fitMode,
+  pickRecorderMimeType,
+} from "./story-recorder";
 
 describe("pickRecorderMimeType", () => {
   it("prefers MP4 AVC when supported", () => {
@@ -22,7 +28,6 @@ describe("coverRect", () => {
     const r = coverRect(1920, 1080, 720, 1280);
     expect(r.dw).toBe(720);
     expect(r.dh).toBe(1280);
-    // Source is wider than 9:16 → crop left/right
     expect(r.sh).toBe(1080);
     expect(r.sw).toBeCloseTo(1080 * (720 / 1280), 1);
     expect(r.sx).toBeGreaterThan(0);
@@ -40,6 +45,29 @@ describe("coverRect", () => {
     const r = coverRect(0, 0, 720, 1280);
     expect(r.dw).toBe(720);
     expect(r.dh).toBe(1280);
+  });
+});
+
+describe("containRect", () => {
+  it("letterboxes landscape into portrait", () => {
+    const r = containRect(1920, 1080, 720, 1280);
+    expect(r.sx).toBe(0);
+    expect(r.sy).toBe(0);
+    expect(r.sw).toBe(1920);
+    expect(r.sh).toBe(1080);
+    expect(r.dw).toBe(720);
+    expect(r.dh).toBeCloseTo(720 / (1920 / 1080), 1);
+    expect(r.dy).toBeGreaterThan(0);
+  });
+});
+
+describe("fitMode", () => {
+  it("chooses fit when cover would crop heavily (landscape → 9:16)", () => {
+    expect(fitMode(1920, 1080, 720, 1280)).toBe("fit");
+  });
+
+  it("chooses cover when most of the frame is kept (near-portrait)", () => {
+    expect(fitMode(1080, 1440, 720, 1280)).toBe("cover");
   });
 });
 
