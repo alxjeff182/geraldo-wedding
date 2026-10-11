@@ -129,7 +129,7 @@ export const MEDIA_SPECS = {
     dimensions: "723 × 1024 px",
     width: 723,
     height: 1024,
-    ratio: "≈ 3:4 (flyer BCA QRIS)",
+    ratio: "1:1 (square QRIS)",
     maxSize: "300 KB",
     maxBytes: 320 * 1024,
     formats: "WebP / JPG",

@@ -1,8 +1,4 @@
-import {
-  buildWhatsAppChatUrl,
-  buildWhatsAppUrl,
-  formatPhoneDisplay,
-} from "./invite-links";
+import { buildWhatsAppChatUrl, buildWhatsAppUrl, formatPhoneDisplay } from "./invite-links";
 
 export type WaExportGuest = {
   id: string;
