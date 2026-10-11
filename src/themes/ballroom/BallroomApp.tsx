@@ -257,7 +257,9 @@ export function BallroomApp({ guestName, guestId }: Props) {
             <StorySection
               subtitle={content.story.subtitle}
               title={content.story.title}
-              paragraphs={[...content.story.paragraphs]}
+              milestones={[...content.story.milestones]}
+              scrollRootRef={inviteRef}
+              enabled={revealed}
             />
           ) : null}
           {content.guestbook.enabled ? (

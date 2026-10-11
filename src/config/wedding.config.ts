@@ -19,6 +19,14 @@ export type WeddingEvent = {
   endsAt: string;
 };
 
+export type StoryMilestone = {
+  date: string;
+  title: string;
+  text: string;
+  /** Optional photo URL — empty string means no photo */
+  photo: string;
+};
+
 export type GiftSide = "groom" | "bride";
 
 export type GiftAccount = {
@@ -124,10 +132,32 @@ export const wedding = {
     enabled: true,
     title: "Our Story",
     subtitle: "Constantly, consistently, continually, You.",
-    paragraphs: [
-      "[Cerita kalian di sini] Ceritakan singkat bagaimana kalian bertemu dan tumbuh bersama.",
-      "[Cerita kalian di sini] Tutup dengan rasa syukur dan undangan untuk merayakan bersama.",
-    ],
+    milestones: [
+      {
+        date: "2019",
+        title: "Pertama Bertemu",
+        text: "[Cerita singkat] Bagaimana kalian saling kenal.",
+        photo: "",
+      },
+      {
+        date: "2021",
+        title: "Mulai Bersama",
+        text: "[Cerita singkat] Langkah pertama menjadi pasangan.",
+        photo: "",
+      },
+      {
+        date: "2025",
+        title: "Lamaran",
+        text: "[Cerita singkat] Momen kalian berkomitmen.",
+        photo: "",
+      },
+      {
+        date: "24 Oktober 2026",
+        title: "Menikah",
+        text: "[Cerita singkat] Hari kami mengucap janji.",
+        photo: "",
+      },
+    ] satisfies StoryMilestone[],
   },
 
   gallery: {

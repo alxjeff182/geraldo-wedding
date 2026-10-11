@@ -28,7 +28,14 @@ export function buildChecks(
     Boolean(qrisGroom) &&
     !qrisGroom.includes("qris-dummy");
   const audio = content.media.audio?.trim() ?? "";
-  const storyText = (content.story.paragraphs ?? []).join(" ");
+  const storyText = (content.story.milestones ?? [])
+    .map((item) => [item.date, item.title, item.text].filter(Boolean).join(" "))
+    .join(" ");
+  const storyHasPlaceholder =
+    /\[Cerita singkat\]|\[Cerita kalian di sini\]/i.test(storyText) ||
+    !(content.story.milestones ?? []).some(
+      (item) => item.title?.trim() && item.text?.trim() && !/\[Cerita/i.test(item.text),
+    );
   const creatorSite =
     content.site.creator.websiteUrl?.trim() || content.site.creator.url?.trim() || "";
   const deadlineOk = isRsvpDeadlineOk(content.rsvp.deadline, now);
@@ -55,8 +62,8 @@ export function buildChecks(
     {
       id: "story",
       label: "Our Story diisi",
-      ok: Boolean(storyText.trim()) && !storyText.includes("[Cerita kalian di sini]"),
-      hint: "Edit paragraf story — hindari placeholder.",
+      ok: Boolean(storyText.trim()) && !storyHasPlaceholder,
+      hint: "Isi momen timeline Our Story — hindari placeholder.",
     },
     {
       id: "creator",

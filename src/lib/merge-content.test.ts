@@ -99,4 +99,31 @@ describe("mergeWeddingContent", () => {
     expect(merged.bibleQuote).toBe(wedding.bibleQuote);
     expect(merged.bibleReference).toBe("Kidung Agung 2:16");
   });
+
+  it("migrates legacy story.paragraphs into milestones", () => {
+    const merged = mergeWeddingContent({
+      story: {
+        paragraphs: ["Kami bertemu di kampus.", "Lalu tumbuh bersama."],
+      },
+    });
+    expect(merged.story.milestones).toHaveLength(2);
+    expect(merged.story.milestones[0]).toMatchObject({
+      date: "",
+      title: "",
+      text: "Kami bertemu di kampus.",
+      photo: "",
+    });
+    expect(merged.story.milestones[1].text).toBe("Lalu tumbuh bersama.");
+    expect("paragraphs" in merged.story).toBe(false);
+  });
+
+  it("keeps story milestones when provided", () => {
+    const merged = mergeWeddingContent({
+      story: {
+        milestones: [{ date: "2020", title: "Bertemu", text: "Di Jakarta", photo: "" }],
+      },
+    });
+    expect(merged.story.milestones).toHaveLength(1);
+    expect(merged.story.milestones[0].title).toBe("Bertemu");
+  });
 });

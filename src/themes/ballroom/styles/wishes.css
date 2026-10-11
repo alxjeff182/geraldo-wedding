@@ -84,19 +84,197 @@
   color: rgba(212, 196, 176, 0.55);
 }
 
-.theme-ballroom .story-mod__body {
-  display: grid;
-  gap: 1rem;
-  max-width: 34rem;
-  margin-inline: auto;
+/* Our Story — scroll-filled vertical timeline */
+.theme-ballroom .story-mod {
+  --fill: 0;
 }
 
-.theme-ballroom .story-mod__p {
-  font-size: var(--fs-lead);
-  line-height: 1.7;
+.theme-ballroom .story-tl {
+  position: relative;
+  margin: 0.35rem auto 0;
+  padding: 0 0 0 1.85rem;
+  max-width: 22rem;
+}
+
+.theme-ballroom .story-tl__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1.65rem;
+}
+
+.theme-ballroom .story-tl__track {
+  position: absolute;
+  left: 0.42rem;
+  top: 0.35rem;
+  bottom: 0.35rem;
+  width: 1px;
+  pointer-events: none;
+}
+
+.theme-ballroom .story-tl__rail {
+  position: absolute;
+  inset: 0;
+  background: var(--gold-a25);
+}
+
+.theme-ballroom .story-tl__fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, var(--gold-soft), var(--gold));
+  transform: scaleY(var(--fill, 0));
+  transform-origin: top center;
+  will-change: transform;
+}
+
+.theme-ballroom .story-tl__item {
+  position: relative;
+  opacity: 0;
+  transform: translate3d(14px, 0, 0);
+  transition:
+    opacity 0.55s var(--ease-out),
+    transform 0.55s var(--ease-out);
+}
+
+.theme-ballroom .story-tl__item.is-in {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.theme-ballroom .story-tl__node {
+  position: absolute;
+  left: -1.62rem;
+  top: 0.28rem;
+  width: 0.72rem;
+  height: 0.72rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--gold-a40);
+  background: #1a0f0c;
+  box-shadow: 0 0 0 3px #1a0f0c;
+  display: grid;
+  place-items: center;
+  color: transparent;
+  transition:
+    border-color 0.35s var(--ease-out),
+    background 0.35s var(--ease-out),
+    transform 0.4s var(--ease-out),
+    box-shadow 0.4s var(--ease-out),
+    color 0.35s var(--ease-out);
+}
+
+.theme-ballroom .story-tl__item.is-on .story-tl__node {
+  border-color: var(--gold);
+  background: var(--gold-a15);
+  transform: scale(1.12);
+  box-shadow:
+    0 0 0 3px #1a0f0c,
+    0 0 12px var(--gold-a40);
+}
+
+.theme-ballroom .story-tl__node--heart {
+  width: 0.95rem;
+  height: 0.95rem;
+  left: -1.74rem;
+  top: 0.18rem;
+}
+
+.theme-ballroom .story-tl__item.is-on .story-tl__node--heart {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--ink);
+}
+
+.theme-ballroom .story-tl__body {
+  display: grid;
+  gap: 0.35rem;
+  padding-bottom: 0.15rem;
+  border-bottom: 1px solid var(--gold-a15);
+}
+
+.theme-ballroom .story-tl__item:last-child .story-tl__body {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.theme-ballroom .story-tl__date {
+  margin: 0;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.theme-ballroom .story-tl__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.25rem, 5cqi, 1.5rem);
+  color: var(--cream);
+  line-height: 1.25;
+}
+
+.theme-ballroom .story-tl__text {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
   color: var(--cream-dim);
-  text-align: center;
   font-weight: 300;
+  max-width: 18.5rem;
+}
+
+.theme-ballroom .story-tl__photo {
+  appearance: none;
+  -webkit-appearance: none;
+  display: block;
+  margin: 0.45rem 0 0.65rem;
+  padding: 0;
+  border: 1px solid var(--gold-a25);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  width: 5.5rem;
+  aspect-ratio: 1;
+  background: var(--surface);
+  cursor: pointer;
+  transition:
+    width 0.45s var(--ease-out),
+    border-color 0.3s,
+    box-shadow 0.3s;
+}
+
+.theme-ballroom .story-tl__photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.theme-ballroom .story-tl__photo.is-expanded {
+  width: min(100%, 16rem);
+  border-color: var(--gold-a40);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+}
+
+.theme-ballroom .story-tl__photo:focus-visible {
+  outline: 1px solid var(--gold-a60);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-ballroom .story-tl__item {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .theme-ballroom .story-tl__fill {
+    transform: scaleY(1);
+  }
+  .theme-ballroom .story-tl__photo {
+    transition: none;
+  }
 }
 
 .theme-ballroom .wishes-form {

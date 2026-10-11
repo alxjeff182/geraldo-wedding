@@ -1,6 +1,28 @@
-import { wedding, type WeddingConfig } from "../config/wedding.config";
+import { wedding, type StoryMilestone, type WeddingConfig } from "../config/wedding.config";
 import type { SiteContentOverrides } from "../types/site-content";
 import { resolveInviteTemplates } from "../config/invite-templates";
+
+function migrateStoryMilestones(
+  story: WeddingConfig["story"] & { paragraphs?: string[] },
+): StoryMilestone[] {
+  const milestones = story.milestones;
+  if (Array.isArray(milestones) && milestones.length > 0) {
+    return milestones.map((item) => ({
+      date: item.date ?? "",
+      title: item.title ?? "",
+      text: item.text ?? "",
+      photo: item.photo ?? "",
+    }));
+  }
+  const paragraphs = story.paragraphs;
+  if (Array.isArray(paragraphs) && paragraphs.length > 0) {
+    return paragraphs
+      .map((text) => text.trim())
+      .filter(Boolean)
+      .map((text) => ({ date: "", title: "", text, photo: "" }));
+  }
+  return wedding.story.milestones.map((item) => ({ ...item }));
+}
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -87,6 +109,21 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
     normalized.media = cleaned;
   }
 
+  // Migrate legacy story.paragraphs → milestones before deepMerge so arrays replace cleanly.
+  if (normalized.story) {
+    const legacy = normalized.story as SiteContentOverrides["story"] & {
+      paragraphs?: string[];
+      milestones?: StoryMilestone[];
+    };
+    if (!legacy.milestones?.length && legacy.paragraphs?.length) {
+      legacy.milestones = legacy.paragraphs
+        .map((text) => text.trim())
+        .filter(Boolean)
+        .map((text) => ({ date: "", title: "", text, photo: "" }));
+    }
+    delete legacy.paragraphs;
+  }
+
   const merged = deepMerge(structuredClone(wedding) as WeddingConfig, normalized) as WeddingConfig;
   const whatsappTemplates = resolveInviteTemplates([...merged.invite.whatsappTemplates], undefined);
 
@@ -119,9 +156,18 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
   const bibleQuote = legacyMatthew ? wedding.bibleQuote : merged.bibleQuote;
   const bibleReference = legacyMatthew ? wedding.bibleReference : merged.bibleReference;
 
+  const story = {
+    ...merged.story,
+    milestones: migrateStoryMilestones(
+      merged.story as WeddingConfig["story"] & { paragraphs?: string[] },
+    ),
+  };
+  delete (story as { paragraphs?: string[] }).paragraphs;
+
   return {
     ...merged,
     events,
+    story,
     bibleQuote,
     bibleReference,
     invite: {

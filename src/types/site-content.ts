@@ -155,6 +155,13 @@ export type SiteContentOverrides = {
     enabled?: boolean;
     title?: string;
     subtitle?: string;
+    milestones?: {
+      date?: string;
+      title?: string;
+      text?: string;
+      photo?: string;
+    }[];
+    /** @deprecated use milestones */
     paragraphs?: string[];
   };
   gallery?: {

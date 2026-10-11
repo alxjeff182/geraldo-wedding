@@ -75,6 +75,16 @@ export const MEDIA_SPECS = {
     formats: "WebP / JPG",
     notes: "Foto hashtag (opsional).",
   },
+  story: {
+    dimensions: "800 × 800 px",
+    width: 800,
+    height: 800,
+    ratio: "1:1 (square)",
+    maxSize: "250 KB",
+    maxBytes: 260 * 1024,
+    formats: "WebP / JPG",
+    notes: "Foto opsional di momen timeline Our Story.",
+  },
   logo: {
     dimensions: "512 × 512 px",
     width: 512,

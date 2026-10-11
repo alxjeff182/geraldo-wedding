@@ -1,8 +1,32 @@
 import { AdminOverrideTextField, AdminTextField } from "../AdminFields";
+import { ImageUploader } from "../ImageUploader";
 import { SiapKirimChecklist } from "../SiapKirimChecklist";
+import { MEDIA_SPECS } from "../../../config/media-specs";
+import type { StoryMilestone } from "../../../config/wedding.config";
 import type { AdminTabProps } from "../types";
 
+const emptyMilestone = (): StoryMilestone => ({
+  date: "",
+  title: "",
+  text: "",
+  photo: "",
+});
+
 export function AdminUmumTab({ merged, defaults, updateDraft, clearDraftPath }: AdminTabProps) {
+  const milestones = merged.story.milestones ?? [];
+
+  const setMilestones = (next: StoryMilestone[]) => {
+    updateDraft(["story", "milestones"], next);
+  };
+
+  const moveMilestone = (index: number, dir: -1 | 1) => {
+    const target = index + dir;
+    if (target < 0 || target >= milestones.length) return;
+    const next = [...milestones];
+    const [item] = next.splice(index, 1);
+    next.splice(target, 0, item);
+    setMilestones(next);
+  };
   return (
     <div className="admin-form-grid">
       <SiapKirimChecklist merged={merged} />
@@ -114,7 +138,7 @@ export function AdminUmumTab({ merged, defaults, updateDraft, clearDraftPath }: 
         </div>
       </fieldset>
       <fieldset className="admin-fieldset admin-field--wide">
-        <legend>Our Story</legend>
+        <legend>Our Story (Timeline)</legend>
         <div className="admin-form-grid">
           <label className="admin-field">
             <span className="admin-label">Tampilkan section</span>
@@ -138,23 +162,96 @@ export function AdminUmumTab({ merged, defaults, updateDraft, clearDraftPath }: 
             value={merged.story.subtitle}
             onChange={(value) => updateDraft(["story", "subtitle"], value)}
           />
-          <AdminOverrideTextField
-            label="Paragraf (pisah baris kosong = paragraf baru)"
-            wide
-            rows={6}
-            value={merged.story.paragraphs.join("\n\n")}
-            defaultValue={defaults.story.paragraphs.join("\n\n")}
-            onReset={() => clearDraftPath(["story", "paragraphs"])}
-            onChange={(value) =>
-              updateDraft(
-                ["story", "paragraphs"],
-                value
-                  .split(/\n\s*\n/)
-                  .map((p) => p.trim())
-                  .filter(Boolean),
-              )
-            }
-          />
+        </div>
+        {milestones.map((item, index) => (
+          <fieldset key={index} className="admin-fieldset">
+            <legend>Momen {index + 1}</legend>
+            <div className="admin-form-grid">
+              <AdminTextField
+                label="Tanggal / Tahun"
+                value={item.date}
+                onChange={(value) => {
+                  const next = [...milestones];
+                  next[index] = { ...next[index], date: value };
+                  setMilestones(next);
+                }}
+              />
+              <AdminTextField
+                label="Judul momen"
+                value={item.title}
+                onChange={(value) => {
+                  const next = [...milestones];
+                  next[index] = { ...next[index], title: value };
+                  setMilestones(next);
+                }}
+              />
+              <AdminTextField
+                label="Cerita singkat"
+                wide
+                rows={3}
+                value={item.text}
+                onChange={(value) => {
+                  const next = [...milestones];
+                  next[index] = { ...next[index], text: value };
+                  setMilestones(next);
+                }}
+              />
+            </div>
+            <ImageUploader
+              label="Foto (opsional)"
+              folder="story"
+              spec={MEDIA_SPECS.story}
+              value={item.photo ?? ""}
+              onChange={(url) => {
+                const next = [...milestones];
+                next[index] = { ...next[index], photo: url };
+                setMilestones(next);
+              }}
+            />
+            <div className="admin-inline-actions">
+              <button
+                type="button"
+                className="admin-btn admin-btn--ghost admin-btn--sm"
+                disabled={index === 0}
+                onClick={() => moveMilestone(index, -1)}
+              >
+                Naik
+              </button>
+              <button
+                type="button"
+                className="admin-btn admin-btn--ghost admin-btn--sm"
+                disabled={index === milestones.length - 1}
+                onClick={() => moveMilestone(index, 1)}
+              >
+                Turun
+              </button>
+              {milestones.length > 1 ? (
+                <button
+                  type="button"
+                  className="admin-btn admin-btn--ghost admin-btn--danger admin-btn--sm"
+                  onClick={() => setMilestones(milestones.filter((_, i) => i !== index))}
+                >
+                  Hapus momen
+                </button>
+              ) : null}
+            </div>
+          </fieldset>
+        ))}
+        <div className="admin-inline-actions">
+          <button
+            type="button"
+            className="admin-btn admin-btn--ghost admin-btn--sm"
+            onClick={() => setMilestones([...milestones, emptyMilestone()])}
+          >
+            Tambah momen
+          </button>
+          <button
+            type="button"
+            className="admin-btn admin-btn--ghost admin-btn--sm"
+            onClick={() => clearDraftPath(["story", "milestones"])}
+          >
+            Reset ke default
+          </button>
         </div>
       </fieldset>
     </div>
