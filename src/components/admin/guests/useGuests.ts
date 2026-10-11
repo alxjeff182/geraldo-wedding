@@ -99,7 +99,7 @@ export function useGuests({
 
     const { data, error } = await supabase
       .from("guests")
-      .select("id, slug, display_name, phone, invite_sent_at, created_at")
+      .select("id, slug, display_name, phone, notes, invite_sent_at, created_at")
       .order("display_name", { ascending: true });
 
     if (error) {
@@ -175,7 +175,8 @@ export function useGuests({
           (guest) =>
             guest.display_name.toLowerCase().includes(q) ||
             guest.slug.toLowerCase().includes(q) ||
-            (guest.phone ?? "").toLowerCase().includes(q),
+            (guest.phone ?? "").toLowerCase().includes(q) ||
+            (guest.notes ?? "").toLowerCase().includes(q),
         );
     if (sentFilter === "sent") {
       list = list.filter((guest) => Boolean(guest.invite_sent_at));
@@ -189,6 +190,8 @@ export function useGuests({
         cmp = a.display_name.localeCompare(b.display_name, "id");
       } else if (sortKey === "phone") {
         cmp = (a.phone ?? "").localeCompare(b.phone ?? "", "id");
+      } else if (sortKey === "notes") {
+        cmp = (a.notes ?? "").localeCompare(b.notes ?? "", "id");
       } else if (sortKey === "template") {
         const ta = getInviteTemplateById(templates, getGuestTemplateId(a.id)).name;
         const tb = getInviteTemplateById(templates, getGuestTemplateId(b.id)).name;
@@ -229,6 +232,7 @@ export function useGuests({
   const handleAddGuest = async () => {
     const display_name = newGuest.display_name.trim();
     const phone = newGuest.phone.trim();
+    const notes = newGuest.notes.trim();
     const phoneKey = phoneUniquenessKey(phone);
 
     if (!display_name) {
@@ -260,6 +264,7 @@ export function useGuests({
       display_name,
       slug,
       phone: phone || null,
+      notes: notes || null,
     });
 
     setAdding(false);
@@ -358,6 +363,7 @@ export function useGuests({
 
     const display_name = guest.display_name.trim();
     const phone = guest.phone?.trim() || "";
+    const notes = guest.notes?.trim() || "";
     const phoneKey = phoneUniquenessKey(phone);
 
     if (phone && !phoneKey) {
@@ -388,6 +394,7 @@ export function useGuests({
         display_name,
         slug,
         phone: phone || null,
+        notes: notes || null,
       })
       .eq("id", guest.id);
 

@@ -7,6 +7,8 @@ export type Guest = {
   slug: string;
   display_name: string;
   phone: string | null;
+  /** Excel "Keterangan" / grup / perusahaan */
+  notes?: string | null;
   invite_sent_at?: string | null;
   created_at?: string;
 };
@@ -64,6 +66,7 @@ export type WeddingDatabase = {
           slug: string;
           display_name: string;
           phone?: string | null;
+          notes?: string | null;
           invite_sent_at?: string | null;
         };
         Update: Partial<Guest>;

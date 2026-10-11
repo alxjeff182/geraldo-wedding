@@ -1552,9 +1552,18 @@ textarea.admin-input {
 
 @media (min-width: 640px) {
   .admin-invite__add-row {
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1.1fr) auto;
     align-items: center;
   }
+}
+
+.admin-datalist__notes {
+  max-width: 10rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgba(245, 240, 232, 0.78);
+  font-size: 0.8rem;
 }
 
 .admin-invite__bulk {

@@ -394,6 +394,7 @@ export const wedding = {
     templateMessageLabel: "Isi pesan",
     phoneLabel: "No. WhatsApp",
     nameLabel: "Nama Tamu",
+    notesLabel: "Keterangan",
     slugLabel: "Slug URL",
     linkLabel: "Link Undangan",
     deleteConfirm: "Hapus tamu ini dari daftar?",

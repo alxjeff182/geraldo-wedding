@@ -139,6 +139,12 @@ export function GuestTable({ guests: g }: Props) {
           inputMode="tel"
           onChange={(e) => g.setNewGuest((prev) => ({ ...prev, phone: e.target.value }))}
         />
+        <input
+          className="admin-input"
+          value={g.newGuest.notes}
+          placeholder={invite.notesLabel}
+          onChange={(e) => g.setNewGuest((prev) => ({ ...prev, notes: e.target.value }))}
+        />
         <button
           type="button"
           className="admin-btn admin-btn--primary"
@@ -192,6 +198,15 @@ export function GuestTable({ guests: g }: Props) {
                     onClick={() => g.toggleSort("phone")}
                   >
                     {invite.phoneLabel} <span>{g.sortIcon("phone")}</span>
+                  </button>
+                </th>
+                <th>
+                  <button
+                    type="button"
+                    className="admin-datalist__sort"
+                    onClick={() => g.toggleSort("notes")}
+                  >
+                    {invite.notesLabel} <span>{g.sortIcon("notes")}</span>
                   </button>
                 </th>
                 <th>
@@ -294,6 +309,7 @@ function GuestTableRow({
         <td className="admin-datalist__no">{rowNo}</td>
         <td className="admin-datalist__name">{guest.display_name}</td>
         <td className="admin-datalist__mono">{guest.phone || "—"}</td>
+        <td className="admin-datalist__notes">{guest.notes?.trim() || "—"}</td>
         <td>{template.name}</td>
         <td className="admin-datalist__msg">{truncate(preview)}</td>
         <td className="admin-datalist__date">{formatGuestDate(guest.created_at)}</td>
@@ -326,7 +342,7 @@ function GuestTableRow({
 
       {isExpanded ? (
         <tr className="admin-datalist__detail-row">
-          <td colSpan={9}>
+          <td colSpan={10}>
             <div className="admin-datalist__detail">
               <div className="admin-datalist__detail-msg">
                 <span className="admin-datalist__detail-label">Isi Pesan</span>
@@ -350,6 +366,15 @@ function GuestTableRow({
                     placeholder="081234567890"
                     inputMode="tel"
                     onChange={(e) => g.updateGuestField(guest.id, "phone", e.target.value)}
+                  />
+                </label>
+                <label className="admin-field">
+                  <span className="admin-label">{invite.notesLabel}</span>
+                  <input
+                    className="admin-input"
+                    value={guest.notes ?? ""}
+                    placeholder="Tim / perusahaan"
+                    onChange={(e) => g.updateGuestField(guest.id, "notes", e.target.value)}
                   />
                 </label>
                 <label className="admin-field">

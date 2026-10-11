@@ -5,15 +5,17 @@ export const PAGE_SIZES = [10, 15, 25, 50] as const;
 export type GuestDraft = {
   display_name: string;
   phone: string;
+  notes: string;
 };
 
-export type SortKey = "name" | "phone" | "template" | "created";
+export type SortKey = "name" | "phone" | "notes" | "template" | "created";
 export type SortDir = "asc" | "desc";
 export type SentFilter = "all" | "unsent" | "sent";
 
 export const emptyGuestDraft = (): GuestDraft => ({
   display_name: "",
   phone: "",
+  notes: "",
 });
 
 export function formatInviteLabel(template: string, vars: Record<string, string | number>) {
