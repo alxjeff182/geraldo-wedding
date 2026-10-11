@@ -78,13 +78,15 @@ export function HashtagSection({ title, tag, photo, storyTemplate, onToast }: Pr
       </button>
       {template ? (
         <div className="hashtag-mod__story">
-          <MediaImage
+          {/* Plain img: avoid MediaImage .webp swap when only PNG exists */}
+          <img
             className="hashtag-mod__story-preview"
             src={template}
             alt="Preview template Instagram Story"
             width={108}
             height={192}
             loading="lazy"
+            decoding="async"
           />
           <button
             type="button"
