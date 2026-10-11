@@ -246,6 +246,20 @@ export function BallroomApp({ guestName, guestId }: Props) {
             scrollRootRef={inviteRef}
             enabled={revealed}
           />
+          <HashtagSection
+            title={content.hashtag.title}
+            tag={content.hashtag.tag}
+            storyTemplate={content.hashtag.storyTemplate}
+            onToast={show}
+            onBoothOpen={() => {
+              musicWasPlayingRef.current = playing;
+              if (playing) pause();
+            }}
+            onBoothClose={() => {
+              if (musicWasPlayingRef.current && hasAudio) play();
+              musicWasPlayingRef.current = false;
+            }}
+          />
           <GiftHub
             title={content.gift.title}
             description={content.gift.description}
@@ -266,20 +280,6 @@ export function BallroomApp({ guestName, guestId }: Props) {
           {content.guestbook.enabled ? (
             <Wishes guestId={guestId} guestName={guestName} onToast={show} />
           ) : null}
-          <HashtagSection
-            title={content.hashtag.title}
-            tag={content.hashtag.tag}
-            storyTemplate={content.hashtag.storyTemplate}
-            onToast={show}
-            onBoothOpen={() => {
-              musicWasPlayingRef.current = playing;
-              if (playing) pause();
-            }}
-            onBoothClose={() => {
-              if (musicWasPlayingRef.current && hasAudio) play();
-              musicWasPlayingRef.current = false;
-            }}
-          />
           <footer className="footer">
             <div className="footer__glow" aria-hidden="true" />
             <MediaImage
