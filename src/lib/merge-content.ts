@@ -164,8 +164,9 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
     (account) => account.side === "groom" && !String(account.number ?? "").trim(),
   );
   const legacyGiftQris =
-    /qris-dummy/i.test(String(merged.gift.qrisBride ?? merged.gift.qris ?? "")) ||
-    /qris-dummy/i.test(String(merged.gift.qrisGroom ?? ""));
+    /qris-dummy|qris-bride\.webp$|qris-groom\.webp$/i.test(
+      String(merged.gift.qrisBride ?? merged.gift.qris ?? ""),
+    ) || /qris-dummy|qris-groom\.webp$/i.test(String(merged.gift.qrisGroom ?? ""));
   const gift =
     legacyBrideAccount || legacyGroomAccount || legacyGiftQris
       ? {

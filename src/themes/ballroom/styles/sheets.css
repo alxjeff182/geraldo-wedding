@@ -612,9 +612,9 @@
 }
 .theme-ballroom .qris-frame {
   position: relative;
-  width: min(100%, 11rem);
+  width: min(100%, 15rem);
   aspect-ratio: 1;
-  padding: 0.5rem;
+  padding: 0.65rem;
   border-radius: var(--r-md);
   background: #fff;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
