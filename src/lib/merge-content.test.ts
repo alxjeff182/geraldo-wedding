@@ -203,7 +203,38 @@ describe("mergeWeddingContent", () => {
     expect(bride?.holder).toBe("Christin Samosir");
     expect(groom?.number).toBe("5271021641");
     expect(groom?.holder).toBe("Geraldo Gracedo Sudena");
-    expect(merged.gift.qrisBride).toContain("qris-bride-v2");
-    expect(merged.gift.qrisGroom).toContain("qris-groom-v2");
+    expect(merged.gift.qrisBride).toContain("qris-bride-v3");
+    expect(merged.gift.qrisGroom).toContain("qris-groom-v3");
+  });
+
+  it("migrates old v2 QRIS assets to BCA v3 flyers", () => {
+    const merged = mergeWeddingContent({
+      gift: {
+        qrisBride: "/assets/ballroom/qris-bride-v2.webp",
+        qrisGroom: "/assets/ballroom/qris-groom-v2.webp",
+        accounts: [
+          {
+            bank: "BCA",
+            number: "2480419009",
+            holder: "Christin Priscilia",
+            logo: "/assets/ballroom/bca-logo.png",
+            side: "bride",
+          },
+          {
+            bank: "BCA",
+            number: "5271021641",
+            holder: "Geraldo Sibarani",
+            logo: "/assets/ballroom/bca-logo.png",
+            side: "groom",
+          },
+        ],
+      },
+    });
+    expect(merged.gift.qrisBride).toBe("/assets/ballroom/qris-bride-v3.webp");
+    expect(merged.gift.qrisGroom).toBe("/assets/ballroom/qris-groom-v3.webp");
+    expect(merged.gift.accounts.find((a) => a.side === "bride")?.holder).toBe("Christin Samosir");
+    expect(merged.gift.accounts.find((a) => a.side === "groom")?.holder).toBe(
+      "Geraldo Gracedo Sudena",
+    );
   });
 });

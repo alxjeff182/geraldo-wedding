@@ -286,17 +286,36 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
     cmsOg.includes("/assets/ballroom/og-share.jpg");
   const media = legacyOg ? { ...merged.media, ogImage: wedding.media.ogImage } : merged.media;
 
-  // One-time: CMS still has previous bride number, empty groom number, or dummy QRIS.
+  // One-time: CMS still has previous bride number, empty groom number, wrong holder, or old QRIS.
   const legacyBrideAccount = merged.gift.accounts.some(
-    (account) => account.side === "bride" && account.number === "6705188657",
+    (account) =>
+      account.side === "bride" &&
+      (account.number === "6705188657" ||
+        /priscilla|priscilia/i.test(String(account.holder ?? "")) ||
+        (account.number === "2480419009" &&
+          String(account.holder ?? "")
+            .trim()
+            .toLowerCase() !== "christin samosir")),
   );
   const legacyGroomAccount = merged.gift.accounts.some(
-    (account) => account.side === "groom" && !String(account.number ?? "").trim(),
+    (account) =>
+      account.side === "groom" &&
+      (!String(account.number ?? "").trim() ||
+        /sibarani/i.test(String(account.holder ?? "")) ||
+        (account.number === "5271021641" &&
+          String(account.holder ?? "")
+            .trim()
+            .toLowerCase() !== "geraldo gracedo sudena")),
   );
+  const cmsQrisBride = String(merged.gift.qrisBride ?? merged.gift.qris ?? "");
+  const cmsQrisGroom = String(merged.gift.qrisGroom ?? "");
   const legacyGiftQris =
-    /qris-dummy|qris-bride(?:-code|-qr)?\.webp$|qris-groom(?:-code|-qr)?\.webp$/i.test(
-      String(merged.gift.qrisBride ?? merged.gift.qris ?? ""),
-    ) || /qris-dummy|qris-groom(?:-code|-qr)?\.webp$/i.test(String(merged.gift.qrisGroom ?? ""));
+    /qris-dummy|qris-bride(?:-v2|-code|-qr)?\.(?:webp|jpg|jpeg|png)$|\/qris-bride\.(?:webp|jpg|jpeg|png)$/i.test(
+      cmsQrisBride,
+    ) ||
+    /qris-dummy|qris-groom(?:-v2|-code|-qr)?\.(?:webp|jpg|jpeg|png)$|\/qris-groom\.(?:webp|jpg|jpeg|png)$/i.test(
+      cmsQrisGroom,
+    );
   const gift =
     legacyBrideAccount || legacyGroomAccount || legacyGiftQris
       ? {

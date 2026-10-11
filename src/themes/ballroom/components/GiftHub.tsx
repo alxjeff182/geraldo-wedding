@@ -77,6 +77,8 @@ export function GiftHub({
     if (!account.side) return side === "bride";
     return account.side === side;
   });
+  // Match QRIS flyer / bank account holder (not couple short name).
+  const accountHolder = sideAccounts[0]?.holder?.trim() || sideName;
 
   const selectTab = (next: "qris" | "bank") => {
     setTab(next);
@@ -163,9 +165,9 @@ export function GiftHub({
             ) : (
               <img
                 src={qrisImgSrc}
-                alt={`Kode QRIS ${sideName}`}
+                alt={`QRIS a.n. ${accountHolder}`}
                 width={280}
-                height={280}
+                height={396}
                 decoding="async"
                 onError={() => {
                   if (qrisImgSrc !== QRIS_FALLBACK) {
@@ -177,7 +179,7 @@ export function GiftHub({
               />
             )}
           </div>
-          <p className="qris-name">a.n. {sideName}</p>
+          <p className="qris-name">a.n. {accountHolder}</p>
           {isDummy ? (
             <p className="qris-dummy-note">QRIS sementara — ganti lewat CMS (tab Gift)</p>
           ) : (
