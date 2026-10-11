@@ -24,11 +24,11 @@ set content = jsonb_set(
       true
     ),
     '{gift,qrisGroom}',
-    '"/assets/ballroom/qris-groom-code.webp"'::jsonb,
+    '"/assets/ballroom/qris-groom-qr.webp"'::jsonb,
     true
   ),
   '{gift,qrisBride}',
-  '"/assets/ballroom/qris-bride-code.webp"'::jsonb,
+  '"/assets/ballroom/qris-bride-qr.webp"'::jsonb,
   true
 )
 where id = 'main';

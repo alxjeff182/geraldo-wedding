@@ -192,9 +192,9 @@ export const wedding = {
     description:
       "Doa restu Anda sudah lebih dari cukup. Bila ingin berbagi kebahagiaan, kami sediakan cara mudah di bawah ini.",
     /** @deprecated prefer qrisBride / qrisGroom */
-    qris: "/assets/ballroom/qris-bride-code.webp",
-    qrisBride: "/assets/ballroom/qris-bride-code.webp",
-    qrisGroom: "/assets/ballroom/qris-groom-code.webp",
+    qris: "/assets/ballroom/qris-bride-qr.webp",
+    qrisBride: "/assets/ballroom/qris-bride-qr.webp",
+    qrisGroom: "/assets/ballroom/qris-groom-qr.webp",
     accounts: [
       {
         bank: "BCA",

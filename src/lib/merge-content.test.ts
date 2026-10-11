@@ -155,7 +155,7 @@ describe("mergeWeddingContent", () => {
     expect(bride?.holder).toBe("Christin Samosir");
     expect(groom?.number).toBe("5271021641");
     expect(groom?.holder).toBe("Geraldo Gracedo Sudena");
-    expect(merged.gift.qrisBride).toContain("qris-bride-code");
-    expect(merged.gift.qrisGroom).toContain("qris-groom-code");
+    expect(merged.gift.qrisBride).toContain("qris-bride-qr");
+    expect(merged.gift.qrisGroom).toContain("qris-groom-qr");
   });
 });
