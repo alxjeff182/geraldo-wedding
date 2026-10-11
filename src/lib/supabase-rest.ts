@@ -126,9 +126,49 @@ export type InvokeSubmitResult = {
   kind?: InvokeSubmitKind;
 };
 
+async function invokePublicWishRpc(payload: WishInsert): Promise<InvokeSubmitResult> {
+  try {
+    const res = await fetch(restUrl("rpc/submit_public_wish"), {
+      method: "POST",
+      headers: restHeaders({
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      }),
+      body: JSON.stringify({
+        p_name: payload.name,
+        p_message: payload.message,
+      }),
+    });
+
+    let data: unknown = null;
+    try {
+      data = await res.json();
+    } catch {
+      data = null;
+    }
+
+    if (!res.ok) {
+      const message =
+        data && typeof data === "object" && data !== null && "message" in data
+          ? String((data as { message: unknown }).message)
+          : `HTTP ${res.status}`;
+      return { data, error: message, kind: "server" };
+    }
+
+    return { data: data ?? { ok: true }, error: null };
+  } catch {
+    return { data: null, error: "Gagal mengirim (jaringan)", kind: "network" };
+  }
+}
+
 export async function invokeSubmitFunction(body: SubmitBody): Promise<InvokeSubmitResult> {
   if (!isSupabaseConfigured) {
     return { data: null, error: "Supabase tidak dikonfigurasi", kind: "network" };
+  }
+
+  // Public share links: wishes without guest invite go through RPC (no edge token needed).
+  if (body.type === "wish" && !body.payload.guest_id) {
+    return invokePublicWishRpc(body.payload);
   }
 
   try {
