@@ -15,11 +15,17 @@ function htmlMetaPlugin(siteUrl: string): Plugin {
     transformIndexHtml(html) {
       let out = html
         .replace(/content="\/assets/g, `content="${base}/assets`)
-        .replace(/content="\/og\.jpg"/g, `content="${base}/og.jpg"`)
+        .replace(/content="\/og(?:-v2)?\.jpg"/g, (m) =>
+          m.replace(/content="(\/og(?:-v2)?\.jpg)"/, `content="${base}$1"`),
+        )
         .replace(/"image": "\/assets/g, `"image": "${base}/assets`)
-        .replace(/"image": "\/og\.jpg"/g, `"image": "${base}/og.jpg"`)
+        .replace(/"image": "\/og(?:-v2)?\.jpg"/g, (m) =>
+          m.replace(/"image": "(\/og(?:-v2)?\.jpg)"/, `"image": "${base}$1"`),
+        )
         .replace(/"url": "\/assets/g, `"url": "${base}/assets`)
-        .replace(/"url": "\/og\.jpg"/g, `"url": "${base}/og.jpg"`)
+        .replace(/"url": "\/og(?:-v2)?\.jpg"/g, (m) =>
+          m.replace(/"url": "(\/og(?:-v2)?\.jpg)"/, `"url": "${base}$1"`),
+        )
         .replace(/"@id": "\/#/g, `"@id": "${base}/#`)
         .replace(/"url": "\/"/g, `"url": "${base}/"`)
         .replace(/"@id": "\/"/g, `"@id": "${base}/"`)
