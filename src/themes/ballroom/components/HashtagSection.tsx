@@ -39,11 +39,9 @@ export function HashtagSection({
   const boothLabel = content.hashtag.boothButton || "Rekam Video Story";
   const storyHint =
     content.hashtag.storyHint ||
-    "Klik rekam video story, lalu bagikan pilih Instagram → Story.";
-  const subtitle = content.hashtag.subtitle || "feel free to use our template";
-  const lead =
-    content.hashtag.lead ||
     "Panduan: klik rekam video story, lalu bagikan pilih Instagram → Story.";
+  const subtitle = content.hashtag.subtitle || "Abadikan Momenmu";
+  const lead = content.hashtag.lead || "feel free to use our template";
   const maxSeconds = content.hashtag.boothMaxSeconds ?? 15;
   const explore = hashtagExploreUrl(tag);
 
