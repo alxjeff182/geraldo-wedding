@@ -58,9 +58,9 @@ describe("maps-links", () => {
     expect(intent).not.toContain("browser_fallback_url");
   });
 
-  it("builds iOS Google Maps directions deep link with coordinates", () => {
+  it("builds iOS Google Maps directions deep link with venue name + coordinates", () => {
     expect(buildIosGoogleMapsUrl({ mapsUrl, address, venue, ...coords })).toBe(
-      "comgooglemaps://?daddr=-6.1806164,106.7798582&directionsmode=driving",
+      `comgooglemaps://?daddr=${encodeURIComponent("Gedung Gorga")}@-6.1806164,106.7798582&directionsmode=driving`,
     );
   });
 
@@ -87,7 +87,7 @@ describe("maps-links", () => {
       "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15",
     );
     expect(assign).toHaveBeenCalledWith(
-      "comgooglemaps://?daddr=-6.1806164,106.7798582&directionsmode=driving",
+      `comgooglemaps://?daddr=${encodeURIComponent("Gedung Gorga")}@-6.1806164,106.7798582&directionsmode=driving`,
     );
   });
 

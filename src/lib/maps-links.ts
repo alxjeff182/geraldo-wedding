@@ -91,17 +91,19 @@ export function buildAndroidMapsIntent(input: MapsOpenInput): string | null {
 
 /**
  * iOS Google Maps deep link with turn-by-turn directions to the venue.
- * Prefers lat/lng so "Gedung Gorga, Jakarta" doesn't resolve to the wrong place.
+ * Uses Name@lat,lng so the pin stays precise but the app shows "Gedung Gorga"
+ * (not raw coordinates) as the destination title.
  */
 export function buildIosGoogleMapsUrl(input: MapsOpenInput): string | null {
-  const label = mapsQuery(input);
-  const dest = hasCoords(input)
-    ? `${input.lat},${input.lng}`
-    : label
-      ? encodeURIComponent(label)
-      : "";
-  if (!dest) return null;
-  return `comgooglemaps://?daddr=${dest}&directionsmode=driving`;
+  const label = (input.venue || input.address || "").trim();
+  if (hasCoords(input)) {
+    const daddr = label
+      ? `${encodeURIComponent(label)}@${input.lat},${input.lng}`
+      : `${input.lat},${input.lng}`;
+    return `comgooglemaps://?daddr=${daddr}&directionsmode=driving`;
+  }
+  if (!label) return null;
+  return `comgooglemaps://?daddr=${encodeURIComponent(label)}&directionsmode=driving`;
 }
 
 function openWithAppThenWebFallback(nativeHref: string, webHref: string, delayMs = 1500) {
