@@ -8,7 +8,8 @@ import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const out = resolve(root, "public/assets/ballroom/story-template.png");
+const outPng = resolve(root, "public/assets/ballroom/story-template.png");
+const outWebp = resolve(root, "public/assets/ballroom/story-template.webp");
 
 const W = 1080;
 const H = 1920;
@@ -64,5 +65,8 @@ const svg = `<?xml version="1.0" encoding="UTF-8"?>
   <text x="540" y="1780" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="18" letter-spacing="3" fill="#cbb9a8" opacity="0.55">SHARE YOUR MOMENT</text>
 </svg>`;
 
-await sharp(Buffer.from(svg)).png({ compressionLevel: 9 }).toFile(out);
-console.log("Wrote", out);
+const buf = Buffer.from(svg);
+await sharp(buf).png({ compressionLevel: 9 }).toFile(outPng);
+await sharp(buf).webp({ quality: 88 }).toFile(outWebp);
+console.log("Wrote", outPng);
+console.log("Wrote", outWebp);
