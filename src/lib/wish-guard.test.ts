@@ -31,15 +31,21 @@ describe("wish-guard", () => {
     expect(result).toEqual({ allowed: false, reason: "limit_reached" });
   });
 
-  it("rejects too-fast submissions and missing guest", () => {
-    expect(checkWishClientGuard(null, Date.now(), "Halo")).toEqual({
+  it("rejects too-fast submissions for invite and public keys", () => {
+    expect(checkWishClientGuard(null, Date.now(), "Semoga bahagia selalu")).toEqual({
       allowed: false,
-      reason: "no_guest",
+      reason: "too_fast",
     });
     expect(checkWishClientGuard("guest-1", Date.now(), "Semoga bahagia selalu")).toEqual({
       allowed: false,
       reason: "too_fast",
     });
+  });
+
+  it("tracks public wish count separately from invite guests", () => {
+    markWishSubmitted(null);
+    expect(getWishCount(null)).toBe(1);
+    expect(getWishCount("guest-1")).toBe(0);
   });
 
   it("flags spammy messages", () => {

@@ -62,12 +62,10 @@ function avatarHue(name: string): number {
 function guardMessage(
   reason: string,
   gb: {
-    lockedMessage: string;
     limitReachedMessage: string;
     errorMessage: string;
   },
 ): string {
-  if (reason === "no_guest") return gb.lockedMessage;
   if (reason === "limit_reached") return gb.limitReachedMessage;
   if (reason === "too_fast") return "Mohon tunggu sebentar sebelum mengirim.";
   if (reason === "link" || reason === "phone") {
@@ -93,6 +91,7 @@ export function Wishes({ guestId, guestName, onToast }: Props) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [freshId, setFreshId] = useState<string | null>(null);
   const [fadeEdge, setFadeEdge] = useState({ top: false, bottom: false });
+  const [name, setName] = useState(guestName.trim());
   const [message, setMessage] = useState("");
   const [company, setCompany] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -104,6 +103,10 @@ export function Wishes({ guestId, guestName, onToast }: Props) {
     setSentCount(getWishCount(guestKey));
     formOpenedAt.current = Date.now();
   }, [guestKey]);
+
+  useEffect(() => {
+    if (guestName.trim()) setName(guestName.trim());
+  }, [guestName]);
 
   const fetchWishes = useCallback(() => {
     if (!isSupabaseConfigured) {
@@ -210,9 +213,10 @@ export function Wishes({ guestId, guestName, onToast }: Props) {
   const slice = items.slice(0, visible);
   const hasMore = visible < items.length;
   const remaining = Math.max(0, WISH_MAX_PER_GUEST - sentCount);
-  const canSubmit = Boolean(guestId) && remaining > 0;
+  const canSubmit = remaining > 0;
   const countLabel = (gb.countLabel ?? "{n} ucapan").replace("{n}", String(items.length));
   const loadMoreLabel = gb.loadMore ?? "Lihat lebih banyak";
+  const displayName = (guestId ? guestName : name).trim();
 
   const onLoadMore = () => {
     setVisible((n) => Math.min(items.length, n + LOAD_MORE));
@@ -233,6 +237,12 @@ export function Wishes({ guestId, guestName, onToast }: Props) {
     e.preventDefault();
     if (submitting) return;
 
+    const submitName = displayName;
+    if (!submitName) {
+      onToast("Nama wajib diisi.");
+      return;
+    }
+
     const guard = checkWishClientGuard(guestKey, formOpenedAt.current, message);
     if (!guard.allowed) {
       onToast(guardMessage(guard.reason, gb));
@@ -247,7 +257,7 @@ export function Wishes({ guestId, guestName, onToast }: Props) {
       formOpenedAt: formOpenedAt.current,
       payload: {
         guest_id: guestId,
-        name: guestName.trim() || "Tamu",
+        name: submitName,
         message: message.trim(),
       },
       messages: {
@@ -272,7 +282,7 @@ export function Wishes({ guestId, guestName, onToast }: Props) {
       {
         id: localId,
         guest_id: guestId,
-        name: guestName.trim() || "Tamu",
+        name: submitName,
         message: message.trim(),
         attendance: null,
         created_at: new Date().toISOString(),
@@ -321,10 +331,26 @@ export function Wishes({ guestId, guestName, onToast }: Props) {
             style={{ display: "none" }}
             aria-hidden="true"
           />
-          <div className="sheet-form__field">
-            <span className="sheet-form__label">Nama</span>
-            <p className="wishes-namechip">{guestName}</p>
-          </div>
+          {guestId ? (
+            <div className="sheet-form__field">
+              <span className="sheet-form__label">Nama</span>
+              <p className="wishes-namechip">{guestName}</p>
+            </div>
+          ) : (
+            <label className="sheet-form__field">
+              <span className="sheet-form__label">Nama</span>
+              <input
+                type="text"
+                name="name"
+                autoComplete="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder={gb.namePlaceholder ?? "Nama Anda"}
+                required
+                maxLength={80}
+              />
+            </label>
+          )}
           <label className="sheet-form__field">
             <span className="sheet-form__label">Ucapan</span>
             <textarea
@@ -347,7 +373,7 @@ export function Wishes({ guestId, guestName, onToast }: Props) {
           </button>
         </form>
       ) : (
-        <p className="wishes-locked">{!guestId ? gb.lockedMessage : gb.limitReachedMessage}</p>
+        <p className="wishes-locked">{gb.limitReachedMessage}</p>
       )}
 
       {items.length === 0 ? (

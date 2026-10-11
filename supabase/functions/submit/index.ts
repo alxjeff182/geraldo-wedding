@@ -230,19 +230,13 @@ serve(async (req) => {
 
       const message = sanitizeString(payload?.message, MAX_WISH_MESSAGE);
       const guestId = isUuid(payload?.guest_id) ? payload.guest_id : null;
+      const payloadName = sanitizeString(payload?.name, MAX_NAME);
 
       if (!message) {
         return new Response(JSON.stringify({ error: "Data ucapan tidak valid" }), {
           status: 400,
           headers: { ...headers, "Content-Type": "application/json" },
         });
-      }
-
-      if (!guestId) {
-        return new Response(
-          JSON.stringify({ error: "Buka undangan dari link pribadi Anda untuk mengirim ucapan." }),
-          { status: 403, headers: { ...headers, "Content-Type": "application/json" } },
-        );
       }
 
       const spamReason = isSpammyMessage(message);
@@ -253,58 +247,113 @@ serve(async (req) => {
         });
       }
 
-      const { data: guest, error: guestError } = await supabase
-        .from("guests")
-        .select("id, display_name")
-        .eq("id", guestId)
-        .maybeSingle();
-      if (guestError) throw guestError;
+      let wishName: string | null = null;
 
-      if (!guest?.id || !guest.display_name) {
-        return new Response(JSON.stringify({ error: "Tamu tidak valid" }), {
-          status: 400,
-          headers: { ...headers, "Content-Type": "application/json" },
-        });
-      }
+      if (guestId) {
+        const { data: guest, error: guestError } = await supabase
+          .from("guests")
+          .select("id, display_name")
+          .eq("id", guestId)
+          .maybeSingle();
+        if (guestError) throw guestError;
 
-      const { data: recentWishes, error: countError } = await supabase
-        .from("wishes")
-        .select("message, created_at")
-        .eq("guest_id", guestId)
-        .order("created_at", { ascending: false });
-
-      if (countError) throw countError;
-
-      const wishRows = recentWishes ?? [];
-      if (wishRows.length >= MAX_WISH_PER_GUEST) {
-        return new Response(
-          JSON.stringify({ error: "Batas 3 ucapan per undangan sudah tercapai." }),
-          {
-            status: 429,
+        if (!guest?.id || !guest.display_name) {
+          return new Response(JSON.stringify({ error: "Tamu tidak valid" }), {
+            status: 400,
             headers: { ...headers, "Content-Type": "application/json" },
-          },
-        );
-      }
+          });
+        }
+        wishName = guest.display_name;
 
-      const latest = wishRows[0];
-      if (latest?.created_at) {
-        const elapsed = Date.now() - new Date(latest.created_at).getTime();
-        if (elapsed < MIN_WISH_GUEST_INTERVAL_MS) {
+        const { data: recentWishes, error: countError } = await supabase
+          .from("wishes")
+          .select("message, created_at")
+          .eq("guest_id", guestId)
+          .order("created_at", { ascending: false });
+
+        if (countError) throw countError;
+
+        const wishRows = recentWishes ?? [];
+        if (wishRows.length >= MAX_WISH_PER_GUEST) {
           return new Response(
-            JSON.stringify({ error: "Tunggu sebentar sebelum mengirim ucapan lagi." }),
+            JSON.stringify({ error: "Batas 3 ucapan per undangan sudah tercapai." }),
             {
               status: 429,
               headers: { ...headers, "Content-Type": "application/json" },
             },
           );
         }
-      }
 
-      if (wishRows.some((row) => normalizeName(row.message) === normalizeName(message))) {
-        return new Response(JSON.stringify({ error: "Ucapan yang sama sudah pernah dikirim." }), {
-          status: 409,
-          headers: { ...headers, "Content-Type": "application/json" },
-        });
+        const latest = wishRows[0];
+        if (latest?.created_at) {
+          const elapsed = Date.now() - new Date(latest.created_at).getTime();
+          if (elapsed < MIN_WISH_GUEST_INTERVAL_MS) {
+            return new Response(
+              JSON.stringify({ error: "Tunggu sebentar sebelum mengirim ucapan lagi." }),
+              {
+                status: 429,
+                headers: { ...headers, "Content-Type": "application/json" },
+              },
+            );
+          }
+        }
+
+        if (wishRows.some((row) => normalizeName(row.message) === normalizeName(message))) {
+          return new Response(JSON.stringify({ error: "Ucapan yang sama sudah pernah dikirim." }), {
+            status: 409,
+            headers: { ...headers, "Content-Type": "application/json" },
+          });
+        }
+      } else {
+        // Public share links (grup / sosial media) — no personal guest invite required.
+        if (!payloadName || isSpammyName(payloadName)) {
+          return new Response(JSON.stringify({ error: "Nama tidak valid" }), {
+            status: 400,
+            headers: { ...headers, "Content-Type": "application/json" },
+          });
+        }
+        wishName = payloadName;
+
+        const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+        const { data: recentPublic, error: publicCountError } = await supabase
+          .from("wishes")
+          .select("message, created_at, name")
+          .is("guest_id", null)
+          .ilike("name", payloadName)
+          .gte("created_at", since)
+          .order("created_at", { ascending: false });
+        if (publicCountError) throw publicCountError;
+
+        const publicRows = (recentPublic ?? []).filter(
+          (row) => normalizeName(row.name) === normalizeName(payloadName),
+        );
+        if (publicRows.length >= MAX_WISH_PER_GUEST) {
+          return new Response(
+            JSON.stringify({ error: "Batas 3 ucapan untuk nama ini sudah tercapai." }),
+            {
+              status: 429,
+              headers: { ...headers, "Content-Type": "application/json" },
+            },
+          );
+        }
+        if (publicRows[0]?.created_at) {
+          const elapsed = Date.now() - new Date(publicRows[0].created_at).getTime();
+          if (elapsed < MIN_WISH_GUEST_INTERVAL_MS) {
+            return new Response(
+              JSON.stringify({ error: "Tunggu sebentar sebelum mengirim ucapan lagi." }),
+              {
+                status: 429,
+                headers: { ...headers, "Content-Type": "application/json" },
+              },
+            );
+          }
+        }
+        if (publicRows.some((row) => normalizeName(row.message) === normalizeName(message))) {
+          return new Response(JSON.stringify({ error: "Ucapan yang sama sudah pernah dikirim." }), {
+            status: 409,
+            headers: { ...headers, "Content-Type": "application/json" },
+          });
+        }
       }
 
       const allowed = await checkRateLimit(supabase, ip, "wish", MAX_WISH_PER_HOUR);
@@ -320,7 +369,7 @@ serve(async (req) => {
 
       const { error } = await supabase.from("wishes").insert({
         guest_id: guestId,
-        name: guest.display_name,
+        name: wishName,
         message,
       });
 

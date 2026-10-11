@@ -53,10 +53,9 @@ export function AdminGuestbookTab({
         onChange={(value) => updateDraft(["guestbook", "emptyMessage"], value)}
       />
       <AdminTextField
-        label="Pesan Tanpa Link Tamu"
-        wide
-        value={merged.guestbook.lockedMessage}
-        onChange={(value) => updateDraft(["guestbook", "lockedMessage"], value)}
+        label="Placeholder Nama (publik)"
+        value={merged.guestbook.namePlaceholder ?? "Nama Anda"}
+        onChange={(value) => updateDraft(["guestbook", "namePlaceholder"], value)}
       />
       <AdminTextField
         label="Pesan Batas Ucapan"

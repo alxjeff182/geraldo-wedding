@@ -8,18 +8,19 @@ vi.mock("../../../lib/supabase-rest", () => ({
   fetchPublicWishes: vi.fn().mockResolvedValue({ data: [], error: true }),
 }));
 
-describe("Wishes invite gating", () => {
-  it("locks wish form without guestId", () => {
+describe("Wishes public + invite forms", () => {
+  it("shows public wish form without guestId", () => {
     render(
       <WeddingContentProvider>
-        <Wishes guestId={null} guestName="Tamu" onToast={() => undefined} />
+        <Wishes guestId={null} guestName="" onToast={() => undefined} />
       </WeddingContentProvider>,
     );
-    expect(screen.getByText(/buka undangan dari link pribadi/i)).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /kirim ucapan/i })).toBeNull();
+    expect(screen.queryByText(/buka undangan dari link pribadi/i)).toBeNull();
+    expect(screen.getByRole("button", { name: /kirim ucapan/i })).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/nama anda/i)).toBeInTheDocument();
   });
 
-  it("shows wish form when guestId is present", () => {
+  it("shows locked name chip when guestId is present", () => {
     render(
       <WeddingContentProvider>
         <Wishes
@@ -30,5 +31,6 @@ describe("Wishes invite gating", () => {
       </WeddingContentProvider>,
     );
     expect(screen.getByRole("button", { name: /kirim ucapan/i })).toBeInTheDocument();
+    expect(screen.getByText("Budi")).toBeInTheDocument();
   });
 });
