@@ -89,4 +89,14 @@ describe("mergeWeddingContent", () => {
     });
     expect(merged.invite.whatsappTemplates[0].message).toBe("Halo {nama}");
   });
+
+  it("migrates legacy Matthew bible quote to Song of Songs", () => {
+    const merged = mergeWeddingContent({
+      bibleQuote:
+        "Demikianlah mereka bukan lagi dua, melainkan satu. Karena itu, apa yang telah dipersatukan Allah, tidak boleh diceraikan manusia.",
+      bibleReference: "Matius 19:6",
+    });
+    expect(merged.bibleQuote).toBe(wedding.bibleQuote);
+    expect(merged.bibleReference).toBe("Kidung Agung 2:16");
+  });
 });

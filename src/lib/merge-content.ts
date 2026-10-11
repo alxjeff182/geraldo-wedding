@@ -105,9 +105,20 @@ export function mergeWeddingContent(overrides: SiteContentOverrides = {}): Weddi
     };
   });
 
+  // One-time content migrate: CMS still has the previous Matthew quote.
+  const bibleQuote =
+    merged.bibleReference === "Matius 19:6" ||
+    (typeof merged.bibleQuote === "string" && merged.bibleQuote.includes("bukan lagi dua"))
+      ? wedding.bibleQuote
+      : merged.bibleQuote;
+  const bibleReference =
+    merged.bibleReference === "Matius 19:6" ? wedding.bibleReference : merged.bibleReference;
+
   return {
     ...merged,
     events,
+    bibleQuote,
+    bibleReference,
     invite: {
       ...merged.invite,
       whatsappTemplates,
