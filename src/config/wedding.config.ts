@@ -320,7 +320,6 @@ export const wedding = {
     calendarGoogleButton: "Simpan Kalender",
     sheetMapsButton: "Buka Maps",
     sheetCalendarButton: "Kalender",
-    calendarIcsButton: "Unduh .ics",
     calendarFabLabel: "Tambah ke Kalender",
     calendarSaveAll: "Simpan ke Kalender",
   },

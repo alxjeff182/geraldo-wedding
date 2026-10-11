@@ -1,11 +1,6 @@
 import { useWeddingContent } from "../../../context/use-wedding-content";
 import type { WeddingEvent } from "../../../config/wedding.config";
-import {
-  buildIcsCalendar,
-  downloadIcsFile,
-  openCalendarForEvents,
-  type CalendarEventInput,
-} from "../../../lib/calendar-links";
+import { openCalendarForEvents, type CalendarEventInput } from "../../../lib/calendar-links";
 import { IconCalendar } from "../icons";
 
 type Props = {
@@ -13,7 +8,6 @@ type Props = {
   title: string;
   events: WeddingEvent[];
   calendarLabel: string;
-  calendarIcsLabel?: string;
 };
 
 function toCalendarInput(event: WeddingEvent, siteTitle: string): CalendarEventInput {
@@ -41,13 +35,7 @@ function formatTimeRange(events: WeddingEvent[]): string {
   return `${fmt(start)} – ${fmt(end)} WIB`;
 }
 
-export function EventCard({
-  eyebrow,
-  title,
-  events,
-  calendarLabel,
-  calendarIcsLabel = "Unduh .ics",
-}: Props) {
+export function EventCard({ eyebrow, title, events, calendarLabel }: Props) {
   const { content } = useWeddingContent();
   const saveAllLabel = content.eventsSection.calendarSaveAll || calendarLabel;
   const first = events[0];
@@ -68,11 +56,6 @@ export function EventCard({
 
   const saveAll = () => {
     openCalendarForEvents(calendarEvents, content.site.title || title, "wedding-events.ics");
-  };
-
-  const downloadIcs = () => {
-    const ics = buildIcsCalendar(calendarEvents, content.site.title || title);
-    if (ics) downloadIcsFile("wedding-events.ics", ics);
   };
 
   return (
@@ -100,13 +83,6 @@ export function EventCard({
           <button type="button" className="cal-card__btn" onClick={saveAll}>
             <IconCalendar size={16} />
             <span>{saveAllLabel}</span>
-          </button>
-          <button
-            type="button"
-            className="cal-card__btn cal-card__btn--ghost"
-            onClick={downloadIcs}
-          >
-            {calendarIcsLabel}
           </button>
         </div>
         <p className="cal-card__note">Detail lokasi & tata acara ada di menu Lokasi</p>

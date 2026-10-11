@@ -192,7 +192,6 @@ export function BallroomApp({ guestName, guestId }: Props) {
             title="Simpan Tanggalnya"
             events={[...content.events]}
             calendarLabel={content.eventsSection.calendarGoogleButton}
-            calendarIcsLabel={content.eventsSection.calendarIcsButton}
           />
           <section id="quote" className="quote" aria-label="Ayat">
             <blockquote className="quote__card">
