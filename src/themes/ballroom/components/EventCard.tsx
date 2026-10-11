@@ -10,34 +10,31 @@ type Props = {
   calendarLabel: string;
 };
 
-function toCalendarInput(event: WeddingEvent, siteTitle: string): CalendarEventInput {
-  return {
-    title: `${siteTitle} — ${event.name}`,
-    details: `${event.name}\n${event.time}\n${event.venue}`,
-    location: event.address,
-    startsAt: event.startsAt,
-    endsAt: event.endsAt,
-  };
-}
+const DISPLAY_TIME = "08:00 - Selesai";
 
-function formatTimeRange(events: WeddingEvent[]): string {
-  if (!events.length) return "";
-  const start = new Date(events[0].startsAt);
-  const end = new Date(events[events.length - 1].endsAt);
-  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return "";
-  const fmt = (d: Date) =>
-    d.toLocaleTimeString("id-ID", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-      timeZone: "Asia/Jakarta",
-    });
-  return `${fmt(start)} – ${fmt(end)} WIB`;
+function buildWeddingCalendarEvent(
+  events: WeddingEvent[],
+  calendarTitle: string,
+): CalendarEventInput | null {
+  if (!events.length) return null;
+  const first = events[0];
+  const last = events[events.length - 1];
+  const details = events
+    .map((event) => `• ${event.name} — ${event.time}\n  ${event.venue}`)
+    .join("\n");
+  return {
+    title: calendarTitle,
+    details,
+    location: first.address || first.venue,
+    startsAt: first.startsAt,
+    endsAt: last.endsAt,
+  };
 }
 
 export function EventCard({ eyebrow, title, events, calendarLabel }: Props) {
   const { content } = useWeddingContent();
   const saveAllLabel = content.eventsSection.calendarSaveAll || calendarLabel;
+  const calendarTitle = `${content.hero.eyebrow} ${content.site.title}`.replace(/\s+/g, " ").trim();
   const first = events[0];
   const startDate = first ? new Date(first.startsAt) : null;
   const day = startDate && !Number.isNaN(startDate.getTime()) ? startDate.getDate() : "";
@@ -50,12 +47,11 @@ export function EventCard({ eyebrow, title, events, calendarLabel }: Props) {
     startDate && !Number.isNaN(startDate.getTime())
       ? startDate.toLocaleDateString("id-ID", { weekday: "long" })
       : "";
-  const timeRange = formatTimeRange(events);
-
-  const calendarEvents = events.map((event) => toCalendarInput(event, content.site.title || title));
 
   const saveAll = () => {
-    openCalendarForEvents(calendarEvents, content.site.title || title, "wedding-events.ics");
+    const event = buildWeddingCalendarEvent(events, calendarTitle);
+    if (!event) return;
+    openCalendarForEvents([event], calendarTitle, "wedding-events.ics");
   };
 
   return (
@@ -77,7 +73,7 @@ export function EventCard({ eyebrow, title, events, calendarLabel }: Props) {
         <p className="cal-card__month">
           {month} {year}
         </p>
-        {timeRange ? <p className="cal-card__time">{timeRange}</p> : null}
+        <p className="cal-card__time">{DISPLAY_TIME}</p>
         <div className="cal-card__divider" aria-hidden="true" />
         <div className="cal-card__actions">
           <button type="button" className="cal-card__btn" onClick={saveAll}>
