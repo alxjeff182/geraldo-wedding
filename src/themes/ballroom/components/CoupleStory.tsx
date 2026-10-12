@@ -217,11 +217,10 @@ export function CoupleStory({
                   <div className="couple-card__face couple-card__face--front">
                     <MediaImage
                       src={person.photo}
-                      loading="eager"
                       alt={person.name}
                       width={720}
                       height={1280}
-                      loading="lazy"
+                      loading="eager"
                     />
                     <div className="couple-card__caption">
                       <p className="couple-card__role">{person.role}</p>
