@@ -169,15 +169,15 @@ export const wedding = {
   gallery: {
     title: "Galeri",
     images: [
+      { src: "/assets/ballroom/gallery/06.jpg", alt: "Studio beige" },
       { src: "/assets/ballroom/gallery/01.jpg", alt: "Studio bersama" },
       { src: "/assets/ballroom/gallery/02.jpg", alt: "Berdiri bersama" },
       { src: "/assets/ballroom/gallery/03.jpg", alt: "Adat duduk" },
       { src: "/assets/ballroom/gallery/04.jpg", alt: "Adat kebaya" },
       { src: "/assets/ballroom/gallery/05.jpg", alt: "Studio pilar" },
-      { src: "/assets/ballroom/gallery/06.jpg", alt: "Studio beige" },
       { src: "/assets/ballroom/gallery/07.jpg", alt: "Adat berdiri" },
       { src: "/assets/ballroom/gallery/08.jpg", alt: "Adat ulos" },
-      { src: "/assets/ballroom/gallery/09.jpg", alt: "Studio mempelai wanita" },
+      { src: "/assets/ballroom/gallery/09.jpg", alt: "Studio casual" },
       { src: "/assets/ballroom/gallery/10.jpg", alt: "Adat close-up" },
     ],
   },
@@ -211,7 +211,7 @@ export const wedding = {
   hashtag: {
     title: "Photobooth",
     subtitle: "Abadikan Momenmu",
-    tag: "#GeralDOAnythingForChristine",
+    tag: "#GeraldoAnythingForChristine",
     lead: "feel free to use our template",
     storyTemplate: "/assets/ballroom/story-template.png",
     boothButton: "Rekam Video Story",
