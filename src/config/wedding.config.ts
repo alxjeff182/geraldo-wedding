@@ -211,7 +211,7 @@ export const wedding = {
   hashtag: {
     title: "Photobooth",
     subtitle: "Abadikan Momenmu",
-    tag: "#GeraldoAnythingForChristine",
+    tag: "#GeralDoAnythingForChristine",
     lead: "feel free to use our template",
     storyTemplate: "/assets/ballroom/story-template.png",
     boothButton: "Rekam Video Story",
