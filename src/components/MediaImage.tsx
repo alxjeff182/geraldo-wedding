@@ -11,6 +11,10 @@ type Props = {
 };
 
 function webpCandidate(src: string): string | null {
+  // Only invent co-located .webp for same-origin static assets.
+  // Remote CMS/storage URLs often have JPG without a sibling WebP; a 400/404
+  // <source> can break the <picture> and show a missing image.
+  if (/^https?:\/\//i.test(src) || src.startsWith("//")) return null;
   if (/\.jpe?g$/i.test(src) || /\.png$/i.test(src)) {
     return src.replace(/\.(jpe?g|png)$/i, ".webp");
   }

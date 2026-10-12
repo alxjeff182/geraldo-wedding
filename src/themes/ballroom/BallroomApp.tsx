@@ -52,6 +52,7 @@ export function BallroomApp({ guestName, guestId }: Props) {
   const inviteRef = useRef<HTMLElement>(null);
   const [leaving, setLeaving] = useState(false);
   const [opening, setOpening] = useState(false);
+  const [openingKey, setOpeningKey] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [heroProgress, setHeroProgress] = useState(0);
   const [inFirstSection, setInFirstSection] = useState(true);
@@ -113,6 +114,8 @@ export function BallroomApp({ guestName, guestId }: Props) {
   const startOpening = () => {
     if (opening || revealed) return;
     setLeaving(true);
+    // Fresh mount every open so playhead / media pipeline never reuse a finished video.
+    setOpeningKey((key) => key + 1);
     setOpening(true);
     if (hasAudio) play();
   };
@@ -168,13 +171,15 @@ export function BallroomApp({ guestName, guestId }: Props) {
           />
         ) : null}
 
-        <OpeningVideo
-          active={opening}
-          src={content.media.openingVideo}
-          poster={content.media.coverBg}
-          skipLabel={content.opening.skipLabel}
-          onReveal={onReveal}
-        />
+        {opening ? (
+          <OpeningVideo
+            key={openingKey}
+            src={content.media.openingVideo}
+            poster={content.media.coverBg}
+            skipLabel={content.opening.skipLabel}
+            onReveal={onReveal}
+          />
+        ) : null}
 
         <main
           id="invitation"

@@ -11,7 +11,7 @@ from pathlib import Path
 import openpyxl
 
 ROOT = Path(__file__).resolve().parents[1]
-XLSX = Path("/Users/alex-dat/Downloads/Undangan Digital Geraldo.xlsx")
+XLSX = Path("/Users/alex-dat/Downloads/Undangan Digital.xlsx")
 OUT_CSV = ROOT / "scripts" / "undangan-digital-geraldo.csv"
 OUT_SQL = ROOT / "scripts" / "import-undangan-digital-geraldo.sql"
 
@@ -24,7 +24,17 @@ def slugify(name: str) -> str:
 
 
 def normalize_phone(raw: str) -> str | None:
-    digits = re.sub(r"\D", "", raw or "")
+    # Excel often wraps phones with bidi marks / special dashes.
+    cleaned = (
+        (raw or "")
+        .replace("\u202a", "")
+        .replace("\u202c", "")
+        .replace("\xa0", " ")
+        .replace("\u2011", "-")
+        .replace("\u2013", "-")
+        .replace("\u2014", "-")
+    )
+    digits = re.sub(r"\D", "", cleaned)
     if not digits:
         return None
     if digits.startswith("0"):
@@ -54,7 +64,8 @@ def sql_str(value: str) -> str:
 
 def main() -> None:
     wb = openpyxl.load_workbook(XLSX, data_only=True)
-    ws = wb.active
+    # Prefer Geraldo PIC sheet; fall back to first sheet.
+    ws = wb["PIC GERALDO"] if "PIC GERALDO" in wb.sheetnames else wb.active
     guests: list[dict[str, str]] = []
     for row in ws.iter_rows(values_only=True):
         name = str(row[0]).strip() if row[0] else ""
@@ -114,7 +125,7 @@ def main() -> None:
         for row in rows
     )
 
-    sql = f"""-- Import Undangan Digital Geraldo.xlsx ({len(rows)} tamu)
+    sql = f"""-- Import Undangan Digital.xlsx ({len(rows)} tamu)
 -- Includes Excel Keterangan → guests.notes
 -- Template bawaan daftar tamu: 3. Singkat & Sopan (singkat-sopan)
 
@@ -150,7 +161,7 @@ where id = 'main';
 """
     OUT_SQL.write_text(sql, encoding="utf-8")
 
-    dest_xlsx = ROOT / "scripts" / "Undangan Digital Geraldo.xlsx"
+    dest_xlsx = ROOT / "scripts" / "Undangan Digital.xlsx"
     dest_xlsx.write_bytes(XLSX.read_bytes())
 
     print(

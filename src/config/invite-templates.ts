@@ -14,7 +14,7 @@ Bapak/Ibu/Saudara/i
 
 Dengan senang hati kami mengundang Bapak/Ibu/Saudara/i untuk hadir dan merayakan:
 
-PESTA PERNIKAHAN {pasangan}
+Pesta Pernikahan {pasangan}
 
 Informasi lengkap dapat dilihat melalui undangan digital berikut:
 
@@ -23,7 +23,7 @@ Informasi lengkap dapat dilihat melalui undangan digital berikut:
 Dengan penuh kasih, kami menantikan kehadiran Bapak/Ibu/Saudara/i.
 
 Salam hormat,
-{pasangan}`,
+{pasangan}.`,
   },
   {
     id: "formal-nasional",
@@ -61,8 +61,8 @@ Tuhan memberkati, sampai jumpa!`,
   },
 ];
 
-/** Default guest-list template: 3. Singkat & Sopan */
-export const DEFAULT_INVITE_TEMPLATE_ID: string = "singkat-sopan";
+/** Default guest-list template: 1. Undangan Resmi */
+export const DEFAULT_INVITE_TEMPLATE_ID: string = "formal-kristen";
 
 export function resolveInviteTemplates(
   templates: InviteMessageTemplate[] | undefined,

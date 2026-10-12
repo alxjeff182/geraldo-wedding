@@ -156,6 +156,35 @@
   font-variant-numeric: lining-nums tabular-nums;
 }
 
+.theme-ballroom .cal-card__schedule {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.7rem 0 0;
+  text-align: center;
+}
+
+.theme-ballroom .cal-card__schedule-row {
+  display: grid;
+  gap: 0.1rem;
+  margin: 0;
+}
+
+.theme-ballroom .cal-card__schedule-name {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+}
+
+.theme-ballroom .cal-card__schedule-time {
+  font-size: 0.84rem;
+  letter-spacing: 0.06em;
+  color: var(--cream);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
 .theme-ballroom .cal-card__divider {
   position: relative;
   z-index: 1;

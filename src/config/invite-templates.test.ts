@@ -9,10 +9,14 @@ describe("invite-templates", () => {
     );
   });
 
-  it("defaults guest-list sends to 3. Singkat & Sopan", () => {
-    expect(DEFAULT_INVITE_TEMPLATE_ID).toBe("singkat-sopan");
+  it("defaults guest-list sends to 1. Undangan Resmi", () => {
+    expect(DEFAULT_INVITE_TEMPLATE_ID).toBe("formal-kristen");
     const def = INVITE_MESSAGE_TEMPLATES.find((t) => t.id === DEFAULT_INVITE_TEMPLATE_ID);
-    expect(def?.name).toMatch(/Singkat/i);
+    expect(def?.name).toMatch(/Undangan Resmi/i);
+    expect(def?.message).toContain("Kepada Yth.");
+    expect(def?.message).toContain("Pesta Pernikahan {pasangan}");
+    expect(def?.message).not.toContain("PESTA PERNIKAHAN");
+    expect(def?.message).toContain("Salam hormat,\n{pasangan}.");
     expect(def?.message).toContain("{nama}");
     expect(def?.message).toContain("{link}");
   });

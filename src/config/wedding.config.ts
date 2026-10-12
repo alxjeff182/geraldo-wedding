@@ -59,8 +59,8 @@ export const wedding = {
       photo: "/assets/ballroom/couple/groom.jpg",
     },
     bride: {
-      shortName: "Christin",
-      fullName: "Christin br. Samosir",
+      shortName: "Christine",
+      fullName: "Christine br. Samosir",
       parents: "Putri dari R. Samosir / br. Silalahi",
       instagramHandle: "@christin.samosir",
       photo: "/assets/ballroom/couple/bride.jpg",
@@ -84,7 +84,7 @@ export const wedding = {
   hero: {
     eyebrow: "The Wedding Of",
     groomName: "Geraldo Tampubolon",
-    brideName: "Christin br. Samosir",
+    brideName: "Christine br. Samosir",
   },
 
   intro:
@@ -97,20 +97,20 @@ export const wedding = {
     {
       name: "Pemberkatan",
       dateLabel: "Sabtu\n24 . 10 . 2026",
-      time: "08.00 WIB",
+      time: "09.00 – 11.00 WIB",
       venue: "Gereja HKBP Ress. Kebon Jeruk",
       address: "Gereja HKBP Ress. Kebon Jeruk, Jakarta Barat",
       mapsUrl: "https://maps.app.goo.gl/CTqpxvQrfmLgQpsb8",
       lat: -6.1839709,
       lng: 106.7553829,
       mapsCid: "14120004088073944725",
-      startsAt: "2026-10-24T08:00:00+07:00",
-      endsAt: "2026-10-24T10:00:00+07:00",
+      startsAt: "2026-10-24T09:00:00+07:00",
+      endsAt: "2026-10-24T11:00:00+07:00",
     },
     {
       name: "Resepsi & Adat",
       dateLabel: "Sabtu\n24 . 10 . 2026",
-      time: "11.00 WIB",
+      time: "11.00 – 15.00 WIB",
       venue: "Gedung Gorga",
       address: "Gedung Gorga, Jakarta",
       mapsUrl: "https://maps.app.goo.gl/WSsX9X17dp7qSwqh6",
@@ -130,31 +130,31 @@ export const wedding = {
       {
         date: "Agustus 2022",
         title: "Pertama Bertemu",
-        text: "Kami pertama kali bertemu di sebuah coffee shop di bilangan Jakarta Selatan.",
+        text: "Momen pertemuan pertama kami adalah pada saat kami sedang bersama teman kami masing-masing di sebuah coffee shop bilangan Jakarta Selatan. Tanpa direncanakan, di situlah awal mula kisah dan pertemuan kami untuk mengenal lebih dalam.",
         photo: "",
       },
       {
         date: "Oktober 2022",
         title: "Awal Kisah Kami",
-        text: "Geraldo menyatakan cintanya kepada Christin, dan sejak itu kisah kami dimulai.",
+        text: "Geraldo menyatakan cintanya kepada Christine, dan sejak itu kisah kami dimulai.",
         photo: "",
       },
       {
         date: "Juli 2025",
         title: "Langkah Serius",
-        text: "Geraldo menyampaikan niat tulusnya untuk menikahi Christin di hadapan kedua orang tua Christin.",
+        text: "Geraldo menyampaikan niat tulusnya untuk menikahi Christine di hadapan kedua orang tua Christine.",
         photo: "",
       },
       {
         date: "April 2026",
         title: "Pertemuan Keluarga",
-        text: "Keluarga Geraldo berkunjung ke kediaman keluarga Christin untuk memantapkan rencana pernikahan kami.",
+        text: "Keluarga Geraldo berkunjung ke kediaman keluarga Christine untuk memantapkan rencana pernikahan kami.",
         photo: "",
       },
       {
         date: "Oktober 2026",
         title: "Pertunangan",
-        text: "Geraldo dan Christin resmi bertunangan.",
+        text: "Geraldo dan Christine resmi bertunangan.",
         photo: "",
       },
       {
@@ -169,14 +169,14 @@ export const wedding = {
   gallery: {
     title: "Galeri",
     images: [
-      { src: "/assets/ballroom/gallery/01.jpg", alt: "Bersama" },
-      { src: "/assets/ballroom/gallery/02.jpg", alt: "Ulos Pertama" },
-      { src: "/assets/ballroom/gallery/03.jpg", alt: "Padang Hijau" },
-      { src: "/assets/ballroom/gallery/04.jpg", alt: "Dalam Pelukan" },
-      { src: "/assets/ballroom/gallery/05.jpg", alt: "Hari Kami" },
-      { src: "/assets/ballroom/gallery/06.jpg", alt: "Adat Batak" },
-      { src: "/assets/ballroom/gallery/07.jpg", alt: "Menoleh" },
-      { src: "/assets/ballroom/gallery/08.jpg", alt: "Payung Putih" },
+      { src: "/assets/ballroom/gallery/01.jpg", alt: "Studio bersama" },
+      { src: "/assets/ballroom/gallery/02.jpg", alt: "Berdiri bersama" },
+      { src: "/assets/ballroom/gallery/03.jpg", alt: "Adat duduk" },
+      { src: "/assets/ballroom/gallery/04.jpg", alt: "Adat kebaya" },
+      { src: "/assets/ballroom/gallery/05.jpg", alt: "Studio pilar" },
+      { src: "/assets/ballroom/gallery/06.jpg", alt: "Studio beige" },
+      { src: "/assets/ballroom/gallery/07.jpg", alt: "Adat berdiri" },
+      { src: "/assets/ballroom/gallery/08.jpg", alt: "Adat ulos" },
     ],
   },
 
@@ -209,7 +209,7 @@ export const wedding = {
   hashtag: {
     title: "Photobooth",
     subtitle: "Abadikan Momenmu",
-    tag: "#GeralDOanythingforChristine",
+    tag: "#GeralDOAnythingForChristine",
     lead: "feel free to use our template",
     storyTemplate: "/assets/ballroom/story-template.png",
     boothButton: "Rekam Video Story",

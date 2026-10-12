@@ -1,6 +1,6 @@
--- Import Undangan Digital Geraldo.xlsx (21 tamu)
+-- Import Undangan Digital.xlsx (49 tamu)
 -- Includes Excel Keterangan → guests.notes
--- Template bawaan daftar tamu: 3. Singkat & Sopan (singkat-sopan)
+-- Template bawaan daftar tamu: 1. Undangan Resmi (formal-kristen)
 
 begin;
 
@@ -28,7 +28,35 @@ values
   ('denny', 'Denny', '081911822688', 'PT. CMNP'),
   ('dwinny', 'Dwinny', '085777465129', 'PT. CMNP'),
   ('yusdi', 'Yusdi', '085694043123', 'PT. CMNP'),
-  ('anang-keisha', 'Anang Keisha', '081282062288', 'PT. CMNP')
+  ('anang-keisha', 'Anang Keisha', '081282062288', 'PT. CMNP'),
+  ('gilang', 'Gilang', '081314449184', 'KEMENTRIAN PU'),
+  ('willy', 'Willy', '085318669945', 'KEMENTRIAN PU'),
+  ('yudha', 'Yudha', '0895704082121', 'KEMENTRIAN PU'),
+  ('didy', 'Didy', '081804904875', 'KEMENTRIAN PU'),
+  ('evan', 'Evan', '081224046004', 'KEMENTRIAN PU'),
+  ('toto', 'Toto', '0895353068186', 'KEMENTRIAN PU'),
+  ('fahmi', 'Fahmi', '081278909829', 'KEMENTRIAN PU'),
+  ('ari', 'Ari', '081514174724', 'KEMENTRIAN PU'),
+  ('ghulam', 'Ghulam', '081914350023', 'KEMENTRIAN PU'),
+  ('saud-damanik', 'Saud Damanik', '081218641126', 'Kelurahan Ancol'),
+  ('erwin-djati-kusuma', 'Erwin Djati Kusuma', '082115555287', 'Kelurahan Papanggo'),
+  ('makrus-nugroho', 'Makrus Nugroho', '08121556013', 'Kelurahan Penjaringan'),
+  ('timbo', 'Timbo', '081291429540', 'Tim Walikota Jakarta Utara'),
+  ('iwan-dwi-mahendra-minul', 'Iwan Dwi Mahendra & Minul', '089636616366', null),
+  ('dj-jezz', 'DJ Jezz', '081314993309', null),
+  ('abizar-simatupang', 'Abizar Simatupang', '087882212161', null),
+  ('ayudhira', 'Ayudhira', '082125873130', null),
+  ('anggita-ayuningtyas', 'Anggita Ayuningtyas', '081220595921', null),
+  ('dani-afterhours-group', 'Dani Afterhours Group', '081318799257', null),
+  ('sunawar', 'Sunawar', '081282375767', 'Sudin Perkim'),
+  ('haryono', 'Haryono', '085775408013', null),
+  ('burhan', 'Burhan', '0816928255', null),
+  ('kadek', 'Kadek', '087832690111', 'WIKA'),
+  ('prima', 'Prima', '0895405474104', 'WIKA'),
+  ('prima-2', 'Prima', '081258244223', 'WIKA'),
+  ('andrian', 'Andrian', '081291697875', 'BRI KEMAYORAN'),
+  ('daryl', 'Daryl', '081299663418', null),
+  ('gema', 'Gema', '089699336065', 'GI')
 on conflict (slug) do update
 set
   display_name = excluded.display_name,
@@ -39,7 +67,7 @@ update site_content
 set content = jsonb_set(
   coalesce(content, '{}'::jsonb),
   '{invite,defaultTemplateId}',
-  to_jsonb('singkat-sopan'::text),
+  to_jsonb('formal-kristen'::text),
   true
 )
 where id = 'main';

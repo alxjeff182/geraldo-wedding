@@ -196,7 +196,7 @@ export function Gallery3D({ eyebrow, title, images, scrollRootRef, enabled = tru
                     width={720}
                     height={960}
                     draggable={false}
-                    loading="lazy"
+                    loading={i < 3 ? "eager" : "lazy"}
                   />
                 )}
                 <figcaption className="visually-hidden">

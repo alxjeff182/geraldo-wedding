@@ -10,8 +10,6 @@ type Props = {
   calendarLabel: string;
 };
 
-const DISPLAY_TIME = "08:00 - Selesai";
-
 function buildWeddingCalendarEvent(
   events: WeddingEvent[],
   calendarTitle: string,
@@ -73,7 +71,14 @@ export function EventCard({ eyebrow, title, events, calendarLabel }: Props) {
         <p className="cal-card__month">
           {month} {year}
         </p>
-        <p className="cal-card__time">{DISPLAY_TIME}</p>
+        <div className="cal-card__schedule">
+          {events.map((event) => (
+            <p key={`${event.name}-${event.startsAt}`} className="cal-card__schedule-row">
+              <span className="cal-card__schedule-name">{event.name}</span>
+              <span className="cal-card__schedule-time">{event.time.replace(/\s*WIB\s*$/i, "")}</span>
+            </p>
+          ))}
+        </div>
         <div className="cal-card__divider" aria-hidden="true" />
         <div className="cal-card__actions">
           <button type="button" className="cal-card__btn" onClick={saveAll}>
