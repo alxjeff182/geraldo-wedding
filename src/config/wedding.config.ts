@@ -110,7 +110,7 @@ export const wedding = {
     {
       name: "Resepsi & Adat",
       dateLabel: "Sabtu\n24 . 10 . 2026",
-      time: "11.00 – 15.00 WIB",
+      time: "11.00 – 14.00 WIB",
       venue: "Gedung Gorga",
       address: "Gedung Gorga, Jakarta",
       mapsUrl: "https://maps.app.goo.gl/WSsX9X17dp7qSwqh6",
@@ -118,7 +118,7 @@ export const wedding = {
       lng: 106.7798582,
       mapsCid: "3244947555986001362",
       startsAt: "2026-10-24T11:00:00+07:00",
-      endsAt: "2026-10-24T15:00:00+07:00",
+      endsAt: "2026-10-24T14:00:00+07:00",
     },
   ] satisfies WeddingEvent[],
 

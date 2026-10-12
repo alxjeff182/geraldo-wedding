@@ -75,7 +75,7 @@ export function EventCard({ eyebrow, title, events, calendarLabel }: Props) {
           {events.map((event) => (
             <p key={`${event.name}-${event.startsAt}`} className="cal-card__schedule-row">
               <span className="cal-card__schedule-name">{event.name}</span>
-              <span className="cal-card__schedule-time">{event.time.replace(/\s*WIB\s*$/i, "")}</span>
+              <span className="cal-card__schedule-time">{event.time}</span>
             </p>
           ))}
         </div>
