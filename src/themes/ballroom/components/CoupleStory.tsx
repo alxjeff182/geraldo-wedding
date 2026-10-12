@@ -251,7 +251,7 @@ export function CoupleStory({
           </div>
         </div>
         <div className="couple-story__hint" aria-hidden="true">
-          Scroll · ketuk kartu untuk flip
+          Scroll untuk melanjutkan
         </div>
       </div>
     </section>

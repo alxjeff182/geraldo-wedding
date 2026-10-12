@@ -88,7 +88,7 @@ export const wedding = {
   },
 
   intro:
-    "Dengan penuh sukacita dan mengucap syukur kepada Tuhan Yesus Kristus, kami mengundang Bapak/Ibu/Saudara/i untuk hadir dalam pemberkatan pernikahan kami. Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan mendoakan kami.",
+    "Dengan penuh sukacita dan mengucap syukur kepada Tuhan, kami mengundang Bapak/Ibu/Saudara/i untuk hadir dalam pemberkatan pernikahan kami. Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan mendoakan kami.",
 
   bibleQuote: "Kekasihku kepunyaanku, dan aku kepunyaan dia.",
   bibleReference: "Kidung Agung 2:16",
@@ -177,6 +177,8 @@ export const wedding = {
       { src: "/assets/ballroom/gallery/06.jpg", alt: "Studio beige" },
       { src: "/assets/ballroom/gallery/07.jpg", alt: "Adat berdiri" },
       { src: "/assets/ballroom/gallery/08.jpg", alt: "Adat ulos" },
+      { src: "/assets/ballroom/gallery/09.jpg", alt: "Studio mempelai wanita" },
+      { src: "/assets/ballroom/gallery/10.jpg", alt: "Adat close-up" },
     ],
   },
 
